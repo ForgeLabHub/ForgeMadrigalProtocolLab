@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>MADRIGAL-PROTOCOL-LAB — Команда HTTP 418</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { margin: 0; padding: 0; background-color: #0d0d0e; font-family: 'Plus Jakarta Sans', sans-serif; color: #e2e8f0; }
+    
+    .slide-container {
+      width: 1280px;
+      height: 720px;
+      margin: 0 auto 20px auto;
+      overflow: hidden;
+      box-sizing: border-box;
+      background: #121316;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 56px 64px;
+      border-bottom: 1px solid #22252a;
+    }
+
+    /* Header & Footer */
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+
+    .slide-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slide-tag::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #991b1b;
+      border-radius: 2px;
+    }
+
+    .slide-title {
+      font-size: 36px;
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .slide-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    .footer-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 20px;
+      border-top: 1px solid #22252b;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* Highlight Colors & Cards */
+    .accent-green { color: #10b981; }
+    .accent-red { color: #ef4444; }
+    .accent-burgundy { color: #991b1b; }
+    .accent-amber { color: #f59e0b; }
+    .accent-blue { color: #3b82f6; }
+
+    .bg-card { background: #1a1c23; border: 1px solid #2a2d37; border-radius: 12px; }
+  </style>
+</head>
+<body>
+
+  <!-- SLIDE 1: Title Slide -->
+  <div class="slide-container" id="slide1" style="background: linear-gradient(135deg, #0d0d0f 0%, #170c10 100%); justify-content: center; align-items: center; text-align: center;">
+    <div style="position: absolute; top: 40px; left: 64px; display: flex; align-items: center; gap: 12px;">
+      <div style="width: 40px; height: 40px; background: #991b1b; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono'; font-weight: 800; color: #fff; font-size: 20px;">M</div>
+      <span style="font-family: 'JetBrains Mono'; font-size: 14px; letter-spacing: 2px; color: #a1a1aa;">MADRIGAL-PROTOCOL-LAB</span>
+    </div>
+
+    <div style="max-width: 900px; margin-top: 20px;">
+      <div style="display: inline-block; padding: 6px 16px; background: rgba(153, 27, 27, 0.2); border: 1px solid #991b1b; border-radius: 20px; font-family: 'JetBrains Mono'; font-size: 13px; color: #fca5a5; margin-bottom: 24px;">
+        КЕЙС ЗАКАЗЧИКА #02 · UMIRHack 2026
+      </div>
+      <h1 contenteditable="true" style="font-size: 52px; font-weight: 800; color: #ffffff; line-height: 1.15; margin-bottom: 24px; letter-spacing: -1px;">
+        Восстановление недокументированного бинарного протокола поверх TCP
+      </h1>
+      <p contenteditable="true" style="font-size: 20px; color: #a1a1aa; margin-bottom: 40px;">
+        Лаборатория протоколов · Команда <span style="color: #ef4444; font-weight: 700;">HTTP 418</span>
+      </p>
+      
+      <div style="display: flex; justify-content: center; gap: 12px; font-family: 'JetBrains Mono'; font-size: 13px; color: #71717a;">
+        <span style="padding: 6px 12px; background: #18181b; border-radius: 6px; border: 1px solid #27272a;">Python 3.12</span>
+        <span style="padding: 6px 12px; background: #18181b; border-radius: 6px; border: 1px solid #27272a;">PySide6</span>
+        <span style="padding: 6px 12px; background: #18181b; border-radius: 6px; border: 1px solid #27272a;">dpkt</span>
+        <span style="padding: 6px 12px; background: #18181b; border-radius: 6px; border: 1px solid #27272a;">pytest</span>
+        <span style="padding: 6px 12px; background: #18181b; border-radius: 6px; border: 1px solid #27272a;">Docker</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: Team -->
+  <div class="slide-container" id="slide2">
+    <div class="slide-header">
+      <div>
+        <div class="slide-tag">КОМАНДА HTTP 418</div>
+        <h2 class="slide-title" contenteditable="true">Нас двое</h2>
+      </div>
+      <div class="slide-number">02 / 14</div>
+    </div>
+
+    <div style="display: flex; gap: 32px; flex-grow: 1; align-items: center; justify-content: center;">
+      <div class="bg-card" style="flex: 1; padding: 36px; display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 500px;">
+        <img src="https://ui-avatars.com/api/?name=Pasha+Sabadash&background=991b1b&color=fff&size=120" alt="Павел Сабадаш" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #991b1b; margin-bottom: 20px;">
+        <h3 contenteditable="true" style="font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 8px;">Сабадаш Павел</h3>
+        <p contenteditable="true" style="font-size: 16px; color: #10b981; font-weight: 600; margin-bottom: 16px;">Архитектура · Захват · Интерфейс</p>
+        <span class="mono" style="font-size: 14px; color: #94a3b8; background: #111318; padding: 6px 16px; border-radius: 20px;">@Pasha1778</span>
+      </div>
+
+      <div class="bg-card" style="flex: 1; padding: 36px; display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 500px;">
+        <img src="https://ui-avatars.com/api/?name=Nikita+Predkov&background=991b1b&color=fff&size=120" alt="Никита Предков" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #991b1b; margin-bottom: 20px;">
+        <h3 contenteditable="true" style="font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 8px;">Предков Никита</h3>
+        <p contenteditable="true" style="font-size: 16px; color: #10b981; font-weight: 600; margin-bottom: 16px;">Правила · Тесты · Ревью</p>
+        <span class="mono" style="font-size: 14px; color: #94a3b8; background: #111318; padding: 6px 16px; border-radius: 20px;">@petruan</span>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Команда HTTP 418 · кейс #02 · Мадригал</span>
+      <span>UMIRHack 2026</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: Problem Statement -->
+  <div class="slide-container" id="slide3">
+    <div class="slide-header">
+      <div>
+        <div class="slide-tag">ПОСТАНОВКА И МЕТОД</div>
+        <h2 class="slide-title" contenteditable="true">TCP разрезает сообщения посередине</h2>
+      </div>
+      <div class="slide-number">03 / 14</div>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 32px;">
+      <div class="bg-card" style="padding: 40px; display: flex; flex-direction: column; gap: 24px;">
+        <div style="display: flex; gap: 16px; align-items: stretch; height: 100px;">
+          <div style="flex: 1; background: #27272a; border: 2px dashed #ef4444; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #f8fafc;">Пакет 1</div>
+          <div style="flex: 1; background: #27272a; border: 2px dashed #ef4444; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #f8fafc;">Пакет 2</div>
+          <div style="flex: 3; background: #27272a; border: 2px dashed #ef4444; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #f8fafc;">Пакет 3</div>
+        </div>
+
+        <div style="display: flex; gap: 16px; align-items: center;">
+          <div style="flex: 2; height: 12px; background: #10b981; border-radius: 6px; position: relative;">
+            <span style="position: absolute; top: -28px; left: 0; font-family: 'JetBrains Mono'; font-size: 13px; color: #10b981; font-weight: 700;">Сообщение A</span>
+          </div>
+          <div style="flex: 3; height: 12px; background: #f59e0b; border-radius: 6px; position: relative;">
+            <span style="position: absolute; top: -28px; left: 0; font-family: 'JetBrains Mono'; font-size: 13px; color: #f59e0b; font-weight: 700;">Сообщение B</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 20px; border-radius: 12px;">
+        <p contenteditable="true" style="font-size: 22px; font-weight: 700; color: #f8fafc; margin: 0;">
+          Границы пакета и границы сообщения — <span class="accent-red">разные вещи</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Команда HTTP 418 · кейс #02 · Мадригал</span>
+      <span>Постановка и метод</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Given & Required -->
+  <div class="slide-container" id="slide4">
+    <div class="slide-header">
+      <div>
+        <div class="slide-tag">ПОСТАНОВКА И МЕТОД</div>
+        <h2 class="slide-title" contenteditable="true">Дано и требуется</h2>
+      </div>
+      <div class="slide-number">04 / 14</div>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 24px;">
+      <div style="display: flex; gap: 24px;">
+        <div class="bg-card" style="flex: 1; padding: 32px;">
+          <h3 contenteditable="true" style="font-size: 14px; font-family: 'JetBrains Mono'; color: #ef4444; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px;">ДАНО</h3>
+          <ul style="list-style: none; font-size: 18px; color: #e2e8f0; display: flex; flex-direction: column; gap: 12px;">
+            <li contenteditable="true" style="display: flex; align-items: flex-start; gap: 10px;">
+              <i class="fa-solid fa-file-code accent-red" style="margin-top: 4px;"></i>
+              <span>Захваты pcap / pcapng и журнал действий устройства</span>
+            </li>
+            <li contenteditable="true" style="display: flex; align-items: flex-start; gap: 10px;">
+              <i class="fa-solid fa-circle-xmark accent-red" style="margin-top: 4px;"></i>
+              <span>Спецификации протокола нет</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="bg-card" style="flex: 1; padding: 32px;">
+          <h3 contenteditable="true" style="font-size: 14px; font-family: 'JetBrains Mono'; color: #10b981; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px;">ТРЕБУЕТСЯ</h3>
+          <ul style="list-style: none; font-size: 18px; color: #e2e8f0; display: flex; flex-direction: column; gap: 12px;">
+            <li contenteditable="true" style="display: flex; align-items: flex-start; gap: 10px;">
+              <i class="fa-solid fa-square-check accent-green" style="margin-top: 4px;"></i>
+              <span>Проверяемая интерпретация структуры сообщений</span>
+            </li>
+            <li contenteditable="true" style="display: flex; align-items: flex-start; gap: 10px;">
+              <i class="fa-solid fa-eye accent-green" style="margin-top: 4px;"></i>
+              <span>Видно, где чтение верно, а где перестаёт работать</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bg-card" style="padding: 24px; text-align: center;">
+        <p contenteditable="true" style="font-size: 16px; color: #94a3b8; margin-bottom: 12px;">
+          Смещение поля длины оказалось на четыре байта позже, чем мы считали: одно правило, два чтения, поле длины остаётся на <span class="mono accent-amber">offset 2</span>.
+        </p>
+        <div class="mono" style="font-size: 20px; font-weight: 700; letter-spacing: 4px; color: #f8fafc; background: #111318; padding: 12px; border-radius: 8px; display: inline-block;">
+          <span style="color:#ef4444;">01</span> 00 <span style="color:#10b981;">00 03</span> 13 00 55 02 00 00
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Команда HTTP 418 · кейс #02 · Мадригал</span>
+      <span>Постановка и метод</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: Architecture / Modules -->
+  <div class="slide-container" id="slide5">
+    <div class="slide-header">
+      <div>
+        <div class="slide-tag">АРХИТЕКТУРА</div>
+        <h2 class="slide-title" contenteditable="true">Три модуля связаны форматами, а не вызовами</h2>
+      </div>
+      <div class="slide-number">05 / 14</div>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 32px;">
+      <div style="display: flex; gap: 20px; align-items: center;">
+        <div class="bg-card" style="flex: 1; padding: 28px;">
+          <div class="mono" style="color: #ef4444; font-weight: 700; margin-bottom: 8px; font-size: 18px;">capture</div>
+          <p contenteditable="true" style="font-size: 15px; color: #94a3b8; margin-bottom: 16px;">pcap/pcapng → сессии</p>
+          <div class="mono" style="font-size: 12px; background: #111318; padding: 8px 12px; border-radius: 6px; color: #38bdf8;">
+            reassembly, provenance
+          </div>
+        </div>
+
+        <i class="fa-solid fa-arrow-right accent-red" style="font-size: 20px;"></i>
+
+        <div class="mono" style="font-size: 13px; color: #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 8px 12px; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px;">JSON</div>
+
+        <i class="fa-solid fa-arrow-right accent-red" style="font-size: 20px;"></i>
+
+        <div class="bg-card" style="flex: 1; padding: 28px;">
+          <div class="mono" style="color: #10b981; font-weight: 700; margin-bottom: 8px; font-size: 18px;">protocol + hypothesis</div>
+          <p contenteditable="true" style="font-size: 15px; color: #94a3b8; margin-bottom: 16px;">правила, фрейминг</p>
+          <div class="mono" style="font-size: 12px; background: #111318; padding: 8px 12px; border-radius: 6px; color: #38bdf8;">
+            контрпримеры, версии
+          </div>
+        </div>
+
+        <i class="fa-solid fa-arrow-right accent-red" style="font-size: 20px;"></i>
+
+        <div class="mono" style="font-size: 13px; color: #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 8px 12px; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px;">JSON</div>
+
+        <i class="fa-solid fa-arrow-right accent-red" style="font-size: 20px;"></i>
+
+        <div class="bg-card" style="flex: 1; padding: 28px;">
+          <div class="mono" style="color: #3b82f6; font-weight: 700; margin-bottom: 8px; font-size: 18px;">ui</div>
+          <p contenteditable="true" style="font-size: 15px; color: #94a3b8; margin-bottom: 16px;">окно PySide6</p>
+          <div class="mono" style="font-size: 12px; background: #111318; padding: 8px 12px; border-radius: 6px; color: #38bdf8;">
+            исследование и просмотр
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 20px; border-radius: 12px;">
+        <p contenteditable="true" style="font-size: 18px; color: #f8fafc; margin: 0;">
+          Контракты между модулями зафиксированы <span class="accent-green" style="font-weight: 700;">схемами JSON</span>; порядок вызовов не важен
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Команда HTTP 418 · кейс #02 · Мадригал</span>
+      <span>Постановка и метод</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: Traceability -->
+  <div class="slide-container" id="slide6">
+    <div class="slide-header">
+      <div>
+        <div class="slide-tag">ПОСТАНОВКА И МЕТОД</div>
+        <h2 class="slide-title" contenteditable="true">От интерпретации можно вернуться к исходным данным</h2>
+      </div>
+      <div class="slide-number">06 / 14</div>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; gap: 32px; align-items: center;">
+      <div class="bg-card" style="flex: 1.2; padding: 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6; color: #10b981; background: #0c0d10;">
+        <div style="color: #64748b; margin-bottom: 12px;">// Raw Payload Trace</div>
+        <div>00000010 <span style="background: rgba(16,185,129,0.2);">00 00 01 10 01 00 00 01 11 01 00 00 01 12 01 00</span></div>
+        <div>00000020 <span style="background: rgba(16,185,129,0.2);">00 01 10 01 00 00 01 11 01 00 00 01 12 01 00 00</span></div>
+        <div>00000030 <span style="background: rgba(16,185,129,0.2);">01 10 01 00 00 01 11 01 00 00 01 12 01 00 00 01</span></div>
+        <div>00000040 <span style="background: rgba(16,185,129,0.2);">10 01 00 00 01 11 01 00 00 01 12 01 00 00 01 10</span></div>
+        <div>00000050 <span style="background: rgba(16,185,129,0.2);">01 00 00 01 11 01 00 00 01 12 01 00 00 01 10 01</span></div>
+      </div>
+
+      <div class="bg-card" style="flex: 0.8; padding: 32px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 contenteditable="true" style="font-size: 18px; color: #fff; margin-bottom: 8px;">Метаданные пакета</h3>
+        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid #27272a;">
+          <span style="color: #64748b;">Packet Index:</span>
+          <span class="mono accent-amber">packet 3</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid #27272a;">
+          <span style="color: #64748b;">Sequence Number:</span>
+          <span class="mono accent-green">seq 1001</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid #27272a;">
+          <span style="color: #64748b;">Timestamp:</span>
+          <span class="mono" style="color: #38bdf8;">1700000000.004</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: #64748b;">Session Identifier:</span>
+          <span class="mono accent-red">сессия s1</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Команда HTTP 418 · кейс #02 · Мадригал</span>
+      <span>Постановка и метод</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: Rule Validation -->
+  <div class="slide-container" id="slide7">
+    <div class="slide-header">
+      <div>
+        <div class="slide-tag">ПОСТАНОВКА И МЕТОД</div>
+        <h2 class="slide-title" contenteditable="true">Правило проверяется на всём корпусе сразу</h2>
+      </div>
+      <div class="slide-number">07 / 14</div>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 20px;">
+      <div style="display: flex; gap: 24px; justify-content: center; font-family: 'JetBrains Mono'; font-size: 13px;">
+        <span style="color: #10b981;"><i class="fa-solid fa-square"></i> matched</span>
+        <span style="color: #ef4444;"><i class="fa-solid fa-square"></i> mismatched</span>
+        <span style="color: #f59e0b;"><i class="fa-solid fa-square"></i> incomplete</span>
+        <span style="color: #64748b;"><i class="fa-solid fa-square"></i> gap / ambiguity</span>
+      </div>
+
+      <div class="bg-card" style="padding: 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #ef4444; background: #0c0d10;">
+        <div style="color: #94a3b8; margin-bottom: 12px; font-size: 14px; font-weight: 700;">session s2 · A_to_B · Counterexamples (60)</div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div>offset 0 &nbsp;&nbsp;02000003130055 &nbsp;&nbsp;<span style="color: #fca5a5;">value 2 not in expected [1]</span></div>
+          <div>offset 7 &nbsp;&nbsp;020000031400ff &nbsp;&nbsp;<span style="color: #fca5a5;">value 2 not in expected [1]</span></div>
+          <div>offset 14 &nbsp;0200000315009f &nbsp;&nbsp;<span style="color: #fca5a5;">value 2 not in expected [1]</span></div>
+          <div>offset 21 &nbsp;0200000313005c &nbsp;&nbsp;<span style="color: #fca5a5;">value 2 not in expected [1]</span></div>
+          <div>offset 28 &nbsp;02000003140003 &nbsp;&nbsp;<span style="color: #fca5a5;">value 2 not in expected [1]</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Команда HTTP 418 · кейс #02 · Мадригал</span>
+      <span>Постановка и метод</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: Counterexample -->
+  <div class="slide-container" id="slide8">
+    <div class="slide-header">
+      <div>
+        <div class="slide-tag">ПОСТАНОВКА И МЕТОД</div>
+        <h2 class="slide-title" contenteditable="true">Контрпример важнее метрики</h2>
+      </div>
+      <div class="slide-number">08 / 14</div>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; gap: 32px; align-items: center;">
+      <div class="bg-card" style="flex: 1; padding: 36px; text-align: center; border-color: #ef4444;">
+        <div class="mono accent-red" style="font-size: 48px; font-weight: 800; margin-bottom: 12px;">80</div>
+        <h3 contenteditable="true" style="font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px;">Контрпримеров на один байт</h3>
+        <p contenteditable="true" style="font-size: 15px; color: #94a3b8;">
+          80 несоответствий v1 — на offset 0 в сессиях s2 и s3.
+        </p>
+      </div>
+
+      <div class="bg-card" style="flex: 1.2; padding: 36px;">
+        <div class="mono" style="font-size: 14px; color: #f59e0b; margin-bottom: 12px;">4 НЕЗАВИСИМЫЕ СЕССИИ + ЖУРНАЛ ДЕЙСТВИЙ</div>
+        <p contenteditable="true" style="font-size: 18px; color: #e2e8f0; line-height: 1.6; margin-bottom: 20px;">
+          Значение <span class="mono accent-amber">2</span> повторяется в независимых сессиях корпуса и напрямую связано с действием <span class="accent-green">«изменить настройку»</span> в журнале устройств.
+        </p>
+        <div class="mono" style="background: #111318; padding: 12px 16px; border-radius: 8px; font-size: 14px; color: #ef4444;">
+          02 00 00 03 13 00 55 — команда 2 вне ожидаемого набора [1]
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Команда HTTP 418 · кейс #02 · Мадригал</span>
+      <span>Результаты</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: Results Progression -->
+  <div class="slide-container" id="slide9">
+    <div class="slide-header">
+      <div>
+        <div class="slide-tag">РЕЗУЛЬТАТЫ</div>
+        <h2 class="slide-title" contenteditable="true">Что получилось: 60 из 140 → 140 из 140</h2>
+      </div>
+      <div class="slide-number">09 / 14</div>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 32px;">
+      <div style="display: flex; gap: 32px; align-items: center;">
+        <div class="bg-card" style="flex: 1; padding: 36px; text-align: center; opacity: 0.7;">
+          <div class="mono" style="font-size: 16px; color: #ef4444; font-weight: 700; margin-bottom: 8px;">ВЕРСИЯ v1</div>
+          <div class="mono" style="font-size: 56px; font-weight: 800; color: #ef4444; margin-bottom: 8px;">0.43</div>
+          <p contenteditable="true" style="font-size: 15px; color: #94a3b8;">Было 60 matched из 140<br>и 80 контрпримеров</p>
+        </div>
+
+        <i class="fa-solid fa-angles-right accent-green" style="font-size: 36px;"></i>
+
+        <div class="bg-card" style="flex: 1.2; padding: 36px; text-align: center; border-color: #10b981; background: rgba(16, 185, 129, 0.05);">
+          <div class="mono" style="font-size: 16px; color: #10b981; font-weight: 700; margin-bottom: 8px;">ВЕРСИЯ v2</div>
+          <div class="mono" style="font-size: 64px; font-weight: 800; color: #10b981; margin-bottom: 8px;">1.00</div>
+          <p contenteditable="true" style="font-size: 16px; color: #f8fafc; font-weight: 600;">Стало 140 matched из 140<br>и ноль контрпримеров</p>
+        </div>
+      </div>
+
+      <div style="text-align: center; background: #1a1c23; padding: 16px; border-radius: 8px; border: 1px solid #2a2d37;">
+        <p contenteditable="true" style="font-size: 15px; color: #94a3b8; margin: 0;">
+          На корпусе уточнения. Отдельно проверено на реальном датасете: <span class="mono accent-green">45 + 45, precision 1.00</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Команда HTTP 418 · кейс #02 · Мадригал</span>
+      <span>Результаты</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: IP Reassembly -->
+  <div class="slide-container" id="slide10">
+    <div class="slide-header">
+      <div>
+        <div class="slide-tag">РЕЗУЛЬТАТЫ</div>
+        <h2 class="slide-title" contenteditable="true">Осколки IP собираются в одно сообщение</h2>
+      </div>
+      <div class="slide-number">10 / 14</div>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; gap: 24px;">
+      <div class="bg-card" style="flex: 1; padding: 32px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div class="mono" style="font-size: 20px; font-weight: 700; color: #38bdf8; margin-bottom: 12px;">IPv4 Reassembly</div>
+          <p contenteditable="true" style="font-size: 16px; color: #e2e8f0; line-height: 1.5; margin-bottom: 16px;">
+            Группирует по <span class="mono accent-amber">id</span> и <span class="mono accent-amber">protocol</span>, offset в единицах по 8 байт. Неполный фрагмент не собирается.
+          </p>
+        </div>
+        <div class="mono" style="font-size: 13px; background: #111318; padding: 12px; border-radius: 6px; color: #10b981;">
+          status: reassembled_from
+        </div>
+      </div>
+
+      <div class="bg-card" style="flex: 1; padding: 32px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div class="mono" style="font-size: 20px; font-weight: 700; color: #f59e0b; margin-bottom: 12px;">IPv6 Reassembly</div>
+          <p contenteditable="true" style="font-size: 16px; color: #e2e8f0; line-height: 1.5; margin-bottom: 16px;">
+            Группирует по <span class="mono accent-amber">id</span>. Перекрытие категорически не допускается — датаграмма отбрасывается.
+          </p>
+        </div>
+        <div class="mono" style="font-size: 13px; background: #111318; padding: 12px; border-radius: 6px; color: #ef4444;">
+          перекрытие отклонено
+        </div>
+      </div>
+
+      <div class="bg-card" style="flex: 1; padding: 32px; display: flex; flex-direction: column; justify-content: center; text-align: center; border-color: #3b82f6;">
+        <div class="mono accent-blue" style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">12</div>
+        <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 12px;">тестов фрагментации</div>
+        <p contenteditable="true" style="font-size: 14px; color: #94a3b8;">
+          «Дырка» — это <span class="mono accent-amber">incomplete</span>, а не ноль: байты не угадываются, пока не покрыт каждый байт до конца.
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Команда HTTP 418 · кейс #02 · Мадригал</span>
+      <span>Результаты</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 11: Dataset Breakdown -->
+  <div class="slide-container" id="slide11">
+    <div class="slide-header">
+      <div>
+        <div class="slide-tag">РЕЗУЛЬТАТЫ</div>
+        <h2 class="slide-title" contenteditable="true">Набор организаторов разобран целиком</h2>
+      </div>
+      <div class="slide-number">11 / 14</div>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; gap: 32px; align-items: center;">
+      <div class="bg-card" style="flex: 1; padding: 32px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div style="position: relative; width: 180px; height: 180px; display: flex; align-items: center; justify-content: center;">
+          <svg width="180" height="180" viewBox="0 0 36 36" style="transform: rotate(-90deg);">
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#27272a" stroke-width="3.8"></path>
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#10b981" stroke-width="3.8" stroke-dasharray="50, 100"></path>
+          </svg>
+          <div style="position: absolute; text-align: center;">
+            <div class="mono" style="font-size: 42px; font-weight: 800; color: #fff;">90</div>
+            <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">СЕССИЙ</div>
+          </div>
+        </div>
+        <div style="margin-top: 20px; font-size: 15px; color: #e2e8f0; text-align: center;">
+          <span class="accent-green" style="font-weight: 700;">45 запросов</span> + <span class="accent-green" style="font-weight: 700;">45 ответов</span><br>Все <span class="mono accent-green">matched</span>
+        </div>
+      </div>
+
+      <div style="flex: 1.2; display: flex; flex-direction: column; gap: 16px;">
+        <div class="bg-card" style="padding: 24px; display: flex; align-items: center; gap: 20px;">
+          <i class="fa-solid fa-stopwatch accent-amber" style="font-size: 32px;"></i>
+          <div>
+            <div class="mono" style="font-size: 28px; font-weight: 800; color: #fff;">12 с</div>
+            <div style="font-size: 14px; color: #94a3b8;">Общее время обработки 95.66 МиБ</div>
+          </div>
+        </div>
+
+        <div class="bg-card" style="padding: 24px; display: flex; align-items: center; gap: 20px;">
+          <i class="fa-solid fa-memory accent-blue" style="font-size: 32px;"></i>
+          <div>
+            <div class="mono" style="font-size: 28px; font-weight: 800; color: #fff;">350 МиБ</div>
+            <div style="font-size: 14px; color: #94a3b8;">Пик памяти (9% от бюджета 4 ГиБ)</div>
+          </div>
+        </div>
+
+        <div class="bg-card" style="padding: 24px; display: flex; align-items: center; gap: 20px;">
+          <i class="fa-solid fa-network-wired accent-green" style="font-size: 32px;"></i>
+          <div>
+            <div class="mono" style="font-size: 28px; font-weight: 800; color: #fff;">250 000</div>
+            <div style="font-size: 14px; color: #94a3b8;">Пакетов в 1000 сессиях</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Команда HTTP 418 · кейс #02 · Мадригал</span>
+      <span>Результаты</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 12: Demo -->
+  <div class="slide-container" id="slide12">
+    <div class="slide-header">
+      <div>
+        <div class="slide-tag">ДЕМОНСТРАЦИЯ</div>
+        <h2 class="slide-title" contenteditable="true">Демонстрация: живое окно и запись прогона</h2>
+      </div>
+      <div class="slide-number">12 / 14</div>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; gap: 32px; align-items: center;">
+      <div class="bg-card" style="flex: 1.5; padding: 24px; background: #090a0c; border-color: #3b82f6;">
+        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+          <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
+          <div style="width: 12px; height: 12px; border-radius: 50%; background: #f59e0b;"></div>
+          <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981;"></div>
+          <span class="mono" style="font-size: 12px; color: #64748b; margin-left: 12px;">Madrigal Protocol Inspector (PySide6)</span>
+        </div>
+        <div class="mono" style="font-size: 12px; color: #38bdf8; line-height: 1.6;">
+          &gt; Session s1 selected [A to B]<br>
+          &gt; Schema version: 1.0.0<br>
+          &gt; Rule matched: corpus_request_v2<br>
+          &gt; Status: <span class="accent-green">MATCHED (100%)</span><br>
+          &gt; Diagnostic logs: 0 errors, 0 gaps
+        </div>
+      </div>
+
+      <div class="bg-card" style="flex: 1; padding: 32px; display: flex; flex-direction: column; justify-content: center;">
+        <i class="fa-solid fa-desktop accent-blue" style="font-size: 40px; margin-bottom: 20px;"></i>
+        <h3 contenteditable="true" style="font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 12px;">Единое окно анализа</h3>
+        <p contenteditable="true" style="font-size: 15px; color: #94a3b8; line-height: 1.6;">
+          Сессии, байты, интерпретация, происхождение и диагностика в одном UI. Резерв — запись прогона (2:22).
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Команда HTTP 418 · кейс #02 · Мадригал</span>
+      <span>Демонстрация</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 13: Limitations & Scope -->
+  <div class="slide-container" id="slide13">
+    <div class="slide-header">
+      <div>
+        <div class="slide-tag">ГРАНИЦЫ И ИТОГ</div>
+        <h2 class="slide-title" contenteditable="true">Границы применения и итоги</h2>
+      </div>
+      <div class="slide-number">13 / 14</div>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; gap: 24px; align-items: center;">
+      <div class="bg-card" style="flex: 1; padding: 32px; display: flex; flex-direction: column;">
+        <h3 contenteditable="true" style="font-size: 14px; font-family: 'JetBrains Mono'; color: #ef4444; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px;">ЧТО МЫ НЕ УТВЕРЖДАЕМ</h3>
+        <ul style="list-style: none; font-size: 16px; color: #e2e8f0; display: flex; flex-direction: column; gap: 16px;">
+          <li contenteditable="true" style="display: flex; gap: 12px; align-items: flex-start;">
+            <i class="fa-solid fa-triangle-exclamation accent-red" style="margin-top: 4px;"></i>
+            <span>Смысл байта флагов не установлен: в корпусе он постоянен</span>
+          </li>
+          <li contenteditable="true" style="display: flex; gap: 12px; align-items: flex-start;">
+            <i class="fa-solid fa-triangle-exclamation accent-red" style="margin-top: 4px;"></i>
+            <span>Поле значения остаётся гипотезой, а не фактом</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="bg-card" style="flex: 1; padding: 32px; display: flex; flex-direction: column;">
+        <h3 contenteditable="true" style="font-size: 14px; font-family: 'JetBrains Mono'; color: #f59e0b; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px;">ЧТО ОСТАЛОСЬ ЗА РАМКАМИ</h3>
+        <ul style="list-style: none; font-size: 16px; color: #e2e8f0; display: flex; flex-direction: column; gap: 16px;">
+          <li contenteditable="true" style="display: flex; gap: 12px; align-items: flex-start;">
+            <i class="fa-solid fa-circle-info accent-amber" style="margin-top: 4px;"></i>
+            <span>Альтернативные чтения берутся из заданного набора</span>
+          </li>
+          <li contenteditable="true" style="display: flex; gap: 12px; align-items: flex-start;">
+            <i class="fa-solid fa-circle-info accent-amber" style="margin-top: 4px;"></i>
+            <span>Интерпретация верна для проверенных захватов и молчит вне них</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Команда HTTP 418 · кейс #02 · Мадригал</span>
+      <span>Границы и итог</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 14: Final Slide -->
+  <div class="slide-container" id="slide14" style="background: linear-gradient(135deg, #0d0d0f 0%, #170c10 100%); justify-content: center; align-items: center; text-align: center;">
+    <div style="max-width: 800px;">
+      <div class="mono accent-green" style="font-size: 14px; letter-spacing: 2px; margin-bottom: 16px; font-weight: 700;">РЕЛИЗ v1.0.0</div>
+      <h1 contenteditable="true" style="font-size: 44px; font-weight: 800; color: #ffffff; margin-bottom: 24px; line-height: 1.2;">
+        Инструмент превращает байты в проверяемое знание
+      </h1>
+      
+      <div class="bg-card" style="padding: 20px 32px; display: inline-flex; align-items: center; gap: 16px; margin-bottom: 40px; border-color: #991b1b;">
+        <i class="fa-brands fa-github" style="font-size: 28px; color: #fff;"></i>
+        <span class="mono" style="font-size: 18px; color: #f8fafc;">github.com/Pavel1778/madrigal-protocol-lab</span>
+      </div>
+
+      <div style="display: flex; justify-content: center; gap: 48px; font-family: 'JetBrains Mono'; font-size: 16px; color: #94a3b8;">
+        <div>Сабадаш Павел <span class="accent-red">@Pasha1778</span></div>
+        <div>Предков Никита <span class="accent-red">@petruan</span></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
