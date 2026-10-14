@@ -234,3 +234,28 @@ tr:last-child td { border-bottom: none; }
   .topbar { flex-wrap: wrap; }
   .legend { display: none; }
 }
+
+/* -- forms -------------------------------------------------------------- */
+
+.form { margin: 0 0 16px; }
+.field-row { display: flex; gap: 12px; align-items: center; margin: 0 0 10px; }
+.field-row > span { color: var(--text-muted); min-width: 160px; font-size: 0.85rem; }
+.field-row input[type="file"] { color: var(--text); }
+.field-row--stacked { align-items: flex-start; flex-direction: column; gap: 6px; }
+.field-row--stacked textarea {
+  width: 100%;
+  min-height: 220px;
+  background: var(--surface-inset, #131516);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  line-height: 1.3;
+  resize: vertical;
+}
+.steps { margin: 0 0 16px; padding-left: 20px; line-height: 1.3; }
+.steps li { margin-bottom: 8px; }
+.button--accent { border-color: var(--accent); color: #fff; }
+

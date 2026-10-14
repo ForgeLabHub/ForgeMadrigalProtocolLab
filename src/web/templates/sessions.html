@@ -8,6 +8,13 @@
     <code>{{ source_file or capture_id }}</code>.
     Pick a session and a direction to inspect the bytes.
   </p>
+  {% if not has_rule %}
+  <p class="muted">
+    No rule is loaded, so every byte is uncovered. Open the
+    <a href="/rule">rule editor</a> to describe the messages, or load the
+    example rule that ships with the project.
+  </p>
+  {% endif %}
   <div id="session-list">
     {% include "_sessions.html" %}
   </div>

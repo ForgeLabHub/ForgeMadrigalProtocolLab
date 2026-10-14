@@ -16,9 +16,11 @@ from __future__ import annotations
 import argparse
 import socket
 import sys
+import tempfile
 from pathlib import Path
+from typing import Annotated
 
-from fastapi import FastAPI, Form, Request
+from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -60,6 +62,8 @@ def create_app(
 
     Opening is lazy-safe: when ``capture`` is given it is opened now, so a
     startup mistake is reported immediately rather than on the first request.
+    Without one the interface still starts and offers an upload form, so the
+    page is usable without a command-line argument.
     """
     app = FastAPI(title="Protocol laboratory (web)", docs_url=None, redoc_url=None)
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
@@ -70,6 +74,7 @@ def create_app(
     templates = _templates()
     app.state.templates = templates
     app.state.engine = None
+    app.state.uploads = Path(tempfile.mkdtemp(prefix="protocol-lab-uploads-"))
 
     if capture is not None:
         app.state.engine = WebEngine.open(capture, rule)
@@ -84,11 +89,87 @@ def create_app(
 
     @app.get("/", response_class=HTMLResponse)
     async def index(request: Request) -> HTMLResponse:
-        engine = _require_engine(app)
+        engine = app.state.engine
+        if engine is None:
+            return templates.TemplateResponse(
+                request,
+                "welcome.html",
+                {"request": request, "uploads": True},
+            )
         return templates.TemplateResponse(
             request,
             "sessions.html",
             _session_context(request, engine),
+        )
+
+    @app.get("/rule", response_class=HTMLResponse)
+    async def rule_form(request: Request) -> HTMLResponse:
+        """The rule editor page: paste a rule, upload one, or load the example."""
+        engine = _require_engine(app)
+        text = ""
+        if engine.rule_path is not None and engine.rule_path.is_file():
+            text = engine.rule_path.read_text(encoding="utf-8")
+        return templates.TemplateResponse(
+            request,
+            "rule.html",
+            {
+                **_session_context(request, engine),
+                "rule_text": text,
+            },
+        )
+
+    @app.post("/rule", response_class=HTMLResponse)
+    async def rule_save(request: Request, rule_text: str = Form("")) -> HTMLResponse:
+        """Apply rule text to the running capture and return to the sessions."""
+        engine = _require_engine(app)
+        engine.set_rule_text(rule_text)
+        return RedirectResponse(url="/", status_code=303)
+
+    @app.post("/rule/example", response_class=HTMLResponse)
+    async def rule_example(request: Request) -> HTMLResponse:
+        """Load the rule from ``examples/`` that ships with the project."""
+        engine = _require_engine(app)
+        example = REPO_ROOT / "examples" / "corpus_rule_v1.json"
+        engine.set_rule_path(example)
+        return RedirectResponse(url="/rule", status_code=303)
+
+    @app.post("/upload")
+    async def upload(
+        capture: Annotated[UploadFile, File()],
+        rule: Annotated[UploadFile | None, File()] = None,
+    ) -> RedirectResponse:
+        """Accept an uploaded capture (and optional rule) and open it.
+
+        The upload is written to a temporary directory owned by the app, so a
+        page with no ``--capture`` argument is still usable. The name is taken
+        from the upload, never hard-coded.
+        """
+        uploads: Path = app.state.uploads
+        uploads.mkdir(parents=True, exist_ok=True)
+        name = Path(capture.filename or "capture.bin").name
+        target = uploads / name
+        target.write_bytes(await capture.read())
+
+        rule_path: Path | None = None
+        if rule is not None and rule.filename:
+            rule_name = Path(rule.filename).name
+            rule_path = uploads / rule_name
+            rule_path.write_bytes(await rule.read())
+
+        engine = app.state.engine
+        if engine is None:
+            app.state.engine = WebEngine.open(target, rule_path)
+        else:
+            engine.replace_capture(target, rule_path)
+        return RedirectResponse(url="/", status_code=303)
+
+    @app.get("/open-capture", response_class=HTMLResponse)
+    async def open_capture_form(request: Request) -> HTMLResponse:
+        """The upload form, reachable even before a capture is open."""
+        return templates.TemplateResponse(
+            request,
+            "open_capture.html",
+            _session_context(request, app.state.engine),
         )
 
     @app.get("/sessions", response_class=HTMLResponse)
@@ -210,9 +291,7 @@ def create_app(
         info = engine.provenance(row.session_id, resolved, offset) if resolved else None
         if info is None:
             return _not_found(templates, f"offset {offset} is outside the stream")
-        return templates.TemplateResponse(
-            request, "_provenance.html", {"info": info}
-        )
+        return templates.TemplateResponse(request, "_provenance.html", {"info": info})
 
     @app.get("/export/report", response_class=HTMLResponse)
     async def export_report(
@@ -269,7 +348,9 @@ def _status_counters(messages: list) -> dict[str, int]:
     return counters
 
 
-def _session_context(request: Request, engine: WebEngine) -> dict:
+def _session_context(request: Request, engine: WebEngine | None) -> dict:
+    if engine is None:
+        return {"request": request, "has_rule": False}
     return {
         "request": request,
         "capture_id": engine.capture_id,
@@ -298,9 +379,13 @@ def main(argv: list[str] | None = None) -> int:
         prog="python -m src.web.app",
         description="Serve the local web interface for a capture and a rule.",
     )
-    parser.add_argument("--capture", type=Path, help="normalized JSON, or a raw pcap/pcapng")
+    parser.add_argument(
+        "--capture", type=Path, help="normalized JSON, or a raw pcap/pcapng"
+    )
     parser.add_argument("--rule", type=Path, default=None, help="rule JSON or YAML")
-    parser.add_argument("--port", type=int, default=8765, help="TCP port (default 8765)")
+    parser.add_argument(
+        "--port", type=int, default=8765, help="TCP port (default 8765)"
+    )
     parser.add_argument(
         "--host",
         default="127.0.0.1",

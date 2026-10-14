@@ -11,8 +11,10 @@
           hx-vals='{"session": "{{ session.session_id }}", "direction": "{{ direction }}"}'
           hx-target="#messages"
           hx-swap="innerHTML">Apply rule</button>
+  <a class="button" href="/rule" title="Edit or replace the rule">Edit rule</a>
   {% else %}
   <span class="muted">No rule loaded — every byte is <b>uncovered</b>.</span>
+  <a class="button" href="/rule" title="Write, paste or load a rule">Add a rule</a>
   {% endif %}
   <span class="spacer"></span>
   <span class="legend">

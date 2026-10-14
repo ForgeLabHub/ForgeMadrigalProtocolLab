@@ -223,12 +223,52 @@ def test_capture_with_wrong_shape_is_400() -> None:
         WebEngine.open(REPO_ROOT / "pyproject.toml")
 
 
-@corpus_required
-def test_no_capture_open_returns_400() -> None:
+def test_no_capture_open_shows_upload_page() -> None:
+    # Without a --capture argument the page is still useful: it explains the
+    # flow and offers an upload, rather than failing with a 400.
     empty = TestClient(create_app(None, None))
     response = empty.get("/")
+    assert response.status_code == 200
+    assert "Open a capture" in response.text
+    assert "/open-capture" in response.text
+
+
+# -- upload and rule editor -------------------------------------------------
+
+
+def test_upload_opens_a_capture_without_a_startup_argument() -> None:
+    empty = TestClient(create_app(None, None))
+    with RAW_PCAP.open("rb") as handle:
+        response = empty.post(
+            "/upload",
+            files={"capture": (RAW_PCAP.name, handle, "application/octet-stream")},
+            follow_redirects=False,
+        )
+    assert response.status_code == 303
+    page = empty.get("/")
+    assert page.status_code == 200
+    assert "Sessions" in page.text
+
+
+def test_rule_page_loads_the_example_rule(client: TestClient) -> None:
+    response = client.post("/rule/example", follow_redirects=False)
+    assert response.status_code == 303
+    page = client.get("/rule")
+    assert page.status_code == 200
+    assert "corpus_request" in page.text
+
+
+def test_rule_page_rejects_bad_text(client: TestClient) -> None:
+    response = client.post("/rule", data={"rule_text": "not a rule"})
     assert response.status_code == 400
-    assert "--capture" in response.text
+    assert "rule" in response.text.lower()
+
+
+def test_rule_page_applies_pasted_text(client: TestClient) -> None:
+    text = RULE.read_text(encoding="utf-8")
+    response = client.post("/rule", data={"rule_text": text}, follow_redirects=False)
+    assert response.status_code == 303
+    assert client.get("/").status_code == 200
 
 
 # -- no rule ----------------------------------------------------------------

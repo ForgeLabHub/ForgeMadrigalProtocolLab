@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Rule{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Rule</h1>
+  <p class="muted">
+    A rule cuts a direction into messages and names their fields. Paste a
+    document, upload one, or load the example that ships with the project. The
+    rule is checked before it is applied, and the reason is shown when it is
+    rejected.
+  </p>
+
+  <form class="form" method="post" action="/rule">
+    <label class="field-row field-row--stacked">
+      <span>rule document (JSON or YAML)</span>
+      <textarea name="rule_text" rows="16" spellcheck="false"
+                placeholder="rule JSON or YAML">{{ rule_text }}</textarea>
+    </label>
+    <div class="toolbar">
+      <button class="button button--accent" type="submit">Apply rule</button>
+      <span class="spacer"></span>
+      <a class="button" href="/">Back to sessions</a>
+    </div>
+  </form>
+
+  <form class="form" method="post" action="/rule/example">
+    <div class="toolbar">
+      <button class="button" type="submit">Load example rule</button>
+      <span class="muted">Replaces the current rule with the project example.</span>
+    </div>
+  </form>
+</section>
+{% endblock %}
