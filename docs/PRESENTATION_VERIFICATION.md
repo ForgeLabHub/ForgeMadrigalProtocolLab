@@ -34,15 +34,16 @@ Per-page headings, from the source HTML:
       3  TCP разрезает сообщения посередине
       4  Дано и требуется
       5  Путь исследователя
-      6  Гипотеза ≠ Правило
-      7  От интерпретации можно вернуться к исходным данным
-      8  Правило проверяется на всём корпусе сразу
-      9  Контрпример важнее метрики
-     10  Что получилось: 60 из 140 → 140 из 140
-     11  Набор организаторов разобран целиком
-     12  Демонстрация: живое окно и запись прогона
-     13  Границы применения и итоги
-     14  Инструмент превращает байты в проверяемое знание
+      6  Три модуля связаны форматами, а не вызовами
+      7  Гипотеза ≠ Правило
+      8  От интерпретации можно вернуться к исходным данным
+      9  Правило проверяется на всём корпусе сразу
+     10  Контрпример важнее метрики
+     11  Что получилось: 60 из 140 → 140 из 140
+     12  Набор организаторов разобран целиком
+     13  Демонстрация: живое окно и запись прогона
+     14  Границы применения и итоги
+     15  Инструмент превращает байты в проверяемое знание
 
 No page is blank; each carries a heading or a section number.
 
@@ -53,20 +54,19 @@ No page is blank; each carries a heading or a section number.
 | 1 | Тема | yes | 1 |
 | 2 | Состав команды с фото и ролями | yes | 2 |
 | 3 | Технический стек | yes | 1 |
-| 4 | Архитектура | yes | 5 |
-| 5 | Функционал и киллер-фичи | yes | 7, 8, 9 |
-| 6 | Скриншоты или скринкаст | yes | 12 |
-| 7 | QR на GitHub | yes | 14 |
-| 8 | Демонстрация отдельным блоком | yes | 12 |
-| 9 | Направления развития | yes | 13 |
+| 4 | Архитектура | yes | 6 |
+| 5 | Функционал и киллер-фичи | yes | 8, 9, 10 |
+| 6 | Скриншоты или скринкаст | yes | 13 |
+| 7 | QR на GitHub | yes | 15 |
+| 8 | Демонстрация отдельным блоком | yes | 13 |
+| 9 | Направления развития | yes | 14 |
 
 Nine of nine present.
 
 - Requirement 3: the stack line «Python 3.12 · PySide6 · dpkt · pytest · Docker»
   sits on the title slide.
-- Requirement 4: the «Путь исследователя» slide shows the pipeline
-  (capture → сессии → правила → отчёт); the module contracts (JSON Schema) are
-  stated in the speaker script.
+- Requirement 4: the «Три модуля» slide shows the module breakdown and the JSON
+  Schema contracts; the «Путь исследователя» slide shows the pipeline.
 - Requirement 6: the demo slide plays the committed screencast. The deck carries
   no standalone GUI screenshots; those are added after the UX overhaul.
 - Requirement 7: `presentation/public/qr_repo.png` and `qr_release.png` are
@@ -79,7 +79,7 @@ and prints without a web server and without the rest of the repository.
 
 ## Final slide
 
-Slide 14 is a closing slide, not a "Вопросы" slide. It carries the one-line
+Slide 15 is a closing slide, not a "Вопросы" slide. It carries the one-line
 conclusion «Инструмент превращает байты в проверяемое знание», the repository
 line with its GitHub glyph, the two QR codes (repository and release) with
 captions, and the contact line with both members' Telegram handles. It carries no
@@ -99,7 +99,7 @@ background; on the light theme the dark originals are used.
 
 | fact | value | command |
 | --- | --- | --- |
-| slides | 14, 16:9 | `python -c "import zipfile;print(len([n for n in zipfile.ZipFile('presentation/slide.pptx').namelist() if n.startswith('ppt/slides/slide') and n.endswith('.xml')]))"` |
+| slides | 15, 16:9 | `python -c "import zipfile;print(len([n for n in zipfile.ZipFile('presentation/slide.pptx').namelist() if n.startswith('ppt/slides/slide') and n.endswith('.xml')]))"` |
 | per slide | one full-bleed image, the rendered page | python-pptx scan |
 | zip timestamps | pinned to 1980-01-01 | `python -c "import zipfile;print({i.date_time for i in zipfile.ZipFile('presentation/slide.pptx').infolist()})"` |
 
