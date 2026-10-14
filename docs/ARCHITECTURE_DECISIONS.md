@@ -191,7 +191,13 @@ entry, not editing this one.
   widget once it is built.
 - **Consequences.** Widgets that build their own labels expose a
   `retranslate_ui()`; the window calls it on every registered view when the
-  language changes, so a switch is live and needs no restart. English is the
-  source language and needs no catalogue. The compiled `.qm` is committed so the
-  installed binary works without a Qt toolchain. The language choice is a
-  `QSettings` value under the `madrigal/protocol-lab` scope.
+  language changes, so a switch is live and needs no restart. Strings the window
+  assembles itself, such as the rule-status line and the provenance card, are
+  kept as a renderer and rebuilt on a switch rather than stored as finished text,
+  which would otherwise freeze in the language it was built in. Both languages
+  ship a compiled catalogue: English is the source language, so its catalogue
+  mirrors the source strings one for one, and it is committed alongside the
+  Russian one so neither language falls back to a half-translated interface. The
+  compiled `.qm` is committed so the installed binary works without a Qt
+  toolchain. The language choice is a `QSettings` value under the
+  `madrigal/protocol-lab` scope.

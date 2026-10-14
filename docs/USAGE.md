@@ -172,17 +172,19 @@ desktop locale and falls back to English when no catalogue matches. The choice i
 stored with `QSettings` and restored on the next launch; switching languages
 relabels the open window immediately without reloading the capture.
 
-The translations live in `src/ui/locale/`. English is the source language, so it
-needs no catalogue; Russian is compiled from `madrigal_ru.ts` into
-`madrigal_ru.qm`, and the `.qm` is committed so the window works without a Qt
-toolchain. After adding or changing a string, refresh the catalogue:
+The translations live in `src/ui/locale/`. English is the source language, so
+its catalogue mirrors the source strings one for one and is filled by a script
+rather than translated by hand; Russian is compiled from `madrigal_ru.ts` into
+`madrigal_ru.qm`. Both `.qm` files are committed so the window works without a
+Qt toolchain. After adding or changing a string, refresh both catalogues:
 
 ```
 scripts/update_translations.sh
 ```
 
-The script scans the window sources, updates the `.ts` in place (keeping the
-existing translations) and recompiles the `.qm`.
+The script scans the window sources, updates each `.ts` in place (keeping the
+hand-written Russian translations), fills the English catalogue from the source
+strings and recompiles both `.qm` files.
 
 ## 7.2 Settings
 

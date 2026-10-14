@@ -7,9 +7,11 @@
 ## Интерфейсные строки и переводы
 
 Исходные строки интерфейса — английские, в вызовах `tr()`. Русский перевод лежит
-в `src/ui/locale/madrigal_ru.ts` (источник правды, хранится в git) и собирается в
-`src/ui/locale/madrigal_ru.qm` (тоже хранится, чтобы окно работало без
-инструментов Qt).
+в `src/ui/locale/madrigal_ru.ts` (источник правды для русского, хранится в git) и
+собирается в `src/ui/locale/madrigal_ru.qm` (тоже хранится, чтобы окно работало
+без инструментов Qt). Английский каталог `madrigal_en.ts` собирается тем же
+скриптом и заполняется один в один исходными строками — он тоже хранится вместе
+с `.qm`, чтобы обе локали шли в поставке.
 
 После добавления или изменения любой строки `tr()`:
 
@@ -17,8 +19,9 @@
 scripts/update_translations.sh
 ```
 
-Скрипт вызывает `pyside6-lupdate` (обновляет `.ts` на месте, сохраняя уже
-переведённые строки) и `pyside6-lrelease` (пересобирает `.qm`).
+Скрипт вызывает `pyside6-lupdate` (обновляет оба `.ts` на месте, сохраняя уже
+переведённые строки), заполняет английский каталог из исходных строк и
+`pyside6-lrelease` (пересобирает оба `.qm`).
 
 ### Обязательный шаг после обновления каталога
 
@@ -29,11 +32,12 @@ scripts/update_translations.sh
 `obsolete`.
 
 После `scripts/update_translations.sh` удалите блоки `<message>`, у которых
-`<translation>` помечена `type="vanished"` или `type="unfinished"`, и пересоберите
-`.qm`:
+`<translation>` помечена `type="vanished"` или `type="unfinished"`, из обоих
+каталогов и пересоберите `.qm`:
 
 ```
 .venv/bin/pyside6-lrelease src/ui/locale/madrigal_ru.ts -qm src/ui/locale/madrigal_ru.qm
+.venv/bin/pyside6-lrelease src/ui/locale/madrigal_en.ts -qm src/ui/locale/madrigal_en.qm
 ```
 
 Проверка:
@@ -42,8 +46,8 @@ scripts/update_translations.sh
 QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests/ui/test_i18n.py -q
 ```
 
-Файл `.ts` должен содержать только завершённые переводы: `grep -c 'type="unfinished"' src/ui/locale/madrigal_ru.ts` возвращает `0`, как и для
-`type="vanished"`.
+Файлы `.ts` должны содержать только завершённые переводы: `grep -c 'type="unfinished"' src/ui/locale/madrigal_ru.ts` возвращает `0`, как и для
+`type="vanished"` и для английского каталога.
 
 ### Ловушка `self.tr(переменная)`
 

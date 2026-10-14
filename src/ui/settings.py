@@ -130,6 +130,20 @@ class SettingsDialog(QtWidgets.QDialog):
             | QtWidgets.QDialogButtonBox.StandardButton.Cancel
             | QtWidgets.QDialogButtonBox.StandardButton.Apply
         )
+        # Qt's own translations for the standard buttons are not guaranteed to
+        # be installed, so the captions are set from this catalogue instead of
+        # left to the platform. That keeps the dialog fully in the active
+        # language rather than half English on a machine without Qt's Russian
+        # translations.
+        buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText(
+            self.tr("OK")
+        )
+        buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setText(
+            self.tr("Cancel")
+        )
+        buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Apply).setText(
+            self.tr("Apply")
+        )
         buttons.accepted.connect(self._on_ok)
         buttons.rejected.connect(self._on_cancel)
         buttons.button(QtWidgets.QDialogButtonBox.StandardButton.Apply).clicked.connect(
@@ -156,8 +170,11 @@ class SettingsDialog(QtWidgets.QDialog):
         ):
             theme.addItem(label, mode)
         language = QtWidgets.QComboBox()
-        language.addItem("Русский", "ru")
-        language.addItem("English", "en")
+        # The language names are translated too: shown in the interface language
+        # rather than always in their own, so the Russian build has no English
+        # word in the picker and the English build has no Russian one.
+        language.addItem(self.tr("Russian"), "ru")
+        language.addItem(self.tr("English"), "en")
         language.addItem(self.tr("System"), "system")
         self._set_combo(theme, get(self._initial, "general", "theme"))
         self._set_combo(language, get(self._initial, "general", "language"))

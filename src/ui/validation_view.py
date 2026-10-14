@@ -235,6 +235,7 @@ class ValidationView(QtWidgets.QWidget):
 
     def set_provenance(self, lines: list[str]) -> None:
         """Fill the provenance inspector with the chain for a selected byte."""
+        self._provenance_lines = list(lines)
         self.provenance.setText(
             "\n".join(lines) if lines else self.tr("No byte selected")
         )
@@ -581,6 +582,9 @@ class ValidationView(QtWidgets.QWidget):
         self.apply_button.setText(self.tr("Apply to current direction"))
         self.apply_capture_button.setText(self.tr("Apply to whole capture"))
         self.build_button.setText(self.tr("Build rule..."))
+        self.build_button.setToolTip(
+            self.tr("Describe the message in a form instead of writing JSON by hand")
+        )
         self.example_button.setText(self.tr("Load example"))
         self.example_button.setToolTip(self.tr("Load the first rule from examples/"))
         self.edit_toggle.setText(
@@ -599,6 +603,7 @@ class ValidationView(QtWidgets.QWidget):
             self._context.setText(self.tr("no capture open"))
         self._tabs.setTabText(0, self.tr("Rule"))
         self._tabs.setTabToolTip(0, self.tr("Rule"))
+        self._refresh_apply_state()
         self.messages_table.setHorizontalHeaderLabels(
             [self.tr("offset"), self.tr("len"), self.tr("status"), self.tr("fields")]
         )
@@ -616,6 +621,10 @@ class ValidationView(QtWidgets.QWidget):
             self._context.setText(
                 self.tr("session {0}   {1}").format(self._session_id, self._direction)
             )
+        # The provenance inspector and the rule-status line are stored as
+        # content, not as controls, so they are re-rendered here from what is
+        # kept rather than left in the previous language.
+        self.set_provenance(getattr(self, "_provenance_lines", []))
 
     def apply_theme(self) -> None:
         """Recolour the status line and rebuild the table in the active theme."""

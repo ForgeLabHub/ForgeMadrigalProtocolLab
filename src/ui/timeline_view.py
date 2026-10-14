@@ -49,7 +49,6 @@ class TimelineView(QtWidgets.QWidget):
         layout.addWidget(self.table, 1)
 
         self._offsets: list[int] = []
-        self._column_labels = _COLUMNS
         self._report = None
         self.retranslate_ui()
 
@@ -65,14 +64,16 @@ class TimelineView(QtWidgets.QWidget):
         for correlation in report.correlated:
             agreement = self.tr("matches")
             if correlation.value_conflicts:
-                agreement = self.tr("conflicts: {0}").format("; ".join(correlation.value_conflicts))
+                agreement = self.tr("conflicts: {0}").format(
+                    "; ".join(correlation.value_conflicts)
+                )
             elif not correlation.value_agreements:
                 agreement = self.tr("no shared field")
             rows.append(
                 (
                     _format_time(correlation.message_timestamp),
                     correlation.entry.action or "",
-                    f"offset {correlation.message_offset}",
+                    self.tr("offset {0}").format(correlation.message_offset),
                     agreement,
                 )
             )
@@ -80,7 +81,7 @@ class TimelineView(QtWidgets.QWidget):
         for row, cells in enumerate(rows):
             for column, text in enumerate(cells):
                 item = QtWidgets.QTableWidgetItem(text)
-                if column == 3 and text.startswith("conflicts"):
+                if column == 3 and report.correlated[row].value_conflicts:
                     item.setForeground(QtCore.Qt.GlobalColor.red)
                 self.table.setItem(row, column, item)
             offset = report.correlated[row].message_offset
@@ -116,9 +117,22 @@ class TimelineView(QtWidgets.QWidget):
         if self._report is not None:
             self.show_correlation(self._report)
 
+    def _column_headers(self) -> list[str]:
+        """The translated column captions.
+
+        Literal ``tr`` calls rather than a loop over the column names:
+        ``lupdate`` only extracts a string it can see at the call site.
+        """
+        return [
+            self.tr("time"),
+            self.tr("action"),
+            self.tr("message"),
+            self.tr("agreement"),
+        ]
+
     def retranslate_ui(self) -> None:
         """Apply the captions in the active interface language."""
-        self.table.setHorizontalHeaderLabels([self.tr(c) for c in self._column_labels])
+        self.table.setHorizontalHeaderLabels(self._column_headers())
         if not self.table.rowCount():
             self.clear()
 

@@ -27,6 +27,22 @@ class _CounterexampleModel(QtCore.QAbstractTableModel):
 
     _HEADERS = ("#", "session", "offset", "bytes", "why")
 
+    def _header_text(self, section: int) -> str:
+        """The translated caption for a column.
+
+        Literal ``translate`` calls rather than indexing a table built from
+        ``_HEADERS``: lupdate only extracts a string it can see at the call
+        site, and a table built at import time would freeze the language.
+        """
+        captions = (
+            QtCore.QCoreApplication.translate("CorpusDialog", "#"),
+            QtCore.QCoreApplication.translate("CorpusDialog", "session"),
+            QtCore.QCoreApplication.translate("CorpusDialog", "offset"),
+            QtCore.QCoreApplication.translate("CorpusDialog", "bytes"),
+            QtCore.QCoreApplication.translate("CorpusDialog", "why"),
+        )
+        return captions[section]
+
     def __init__(self, parent: QtCore.QObject | None = None) -> None:
         super().__init__(parent)
         self._rows: list = []
@@ -51,9 +67,7 @@ class _CounterexampleModel(QtCore.QAbstractTableModel):
         if orientation != QtCore.Qt.Orientation.Horizontal:
             return None
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
-            return QtCore.QCoreApplication.translate(
-                "CorpusDialog", self._HEADERS[section]
-            )
+            return self._header_text(section)
         return None
 
     def data(self, index, role=QtCore.Qt.ItemDataRole.DisplayRole):

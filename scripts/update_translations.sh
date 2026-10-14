@@ -36,11 +36,24 @@ SOURCES=(
     src/ui/rule_builder.py
     src/ui/timeline_view.py
 )
-TS="src/ui/locale/madrigal_ru.ts"
-QM="src/ui/locale/madrigal_ru.qm"
+TS_RU="src/ui/locale/madrigal_ru.ts"
+QM_RU="src/ui/locale/madrigal_ru.qm"
+TS_EN="src/ui/locale/madrigal_en.ts"
+QM_EN="src/ui/locale/madrigal_en.qm"
 
-"$LUPDATE" "${SOURCES[@]}" -ts "$TS"
-"$LRELEASE" "$TS" -qm "$QM"
+# Russian carries hand-written translations. -no-obsolete drops messages whose
+# source string no longer exists, so the catalogue never keeps a stale entry.
+"$LUPDATE" "${SOURCES[@]}" -no-obsolete -ts "$TS_RU"
+"$LRELEASE" "$TS_RU" -qm "$QM_RU"
 
-echo "updated: $TS"
-echo "compiled: $QM"
+# English is the source language, so its catalogue mirrors the source strings
+# one for one. It is regenerated and filled so it is complete and checkable,
+# not left half-unfinished.
+"$LUPDATE" "${SOURCES[@]}" -no-obsolete -ts "$TS_EN"
+python3 scripts/fill_english_catalogue.py "$TS_EN"
+"$LRELEASE" "$TS_EN" -qm "$QM_EN"
+
+echo "updated: $TS_RU"
+echo "compiled: $QM_RU"
+echo "updated: $TS_EN"
+echo "compiled: $QM_EN"

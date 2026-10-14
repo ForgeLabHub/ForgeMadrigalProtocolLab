@@ -7,8 +7,9 @@ English and wrapped in :meth:`QObject.tr`, ``pyside6-lrelease`` compiles the
 library is involved.
 
 The choice is stored with ``QSettings`` so it survives a restart. ``system``
-follows the desktop locale; ``en`` needs no catalogue because English is the
-source language, so selecting it simply unloads the translator.
+follows the desktop locale. Both languages ship a compiled catalogue, so the
+window is fully translated whichever of ``ru`` or ``en`` is in effect; if a
+catalogue is missing the source strings are shown instead.
 """
 
 from __future__ import annotations
@@ -84,20 +85,23 @@ class LanguageManager(QtCore.QObject):
     def _install(self) -> None:
         """Load the catalogue for the current preference, if one exists.
 
-        The previous translator is always removed first so switching back to
-        English (or to a language with no catalogue) restores the source
-        strings rather than leaving the old translation installed.
+        The previous translator is always removed first, so switching language
+        replaces the catalogue rather than layering one over another. Both
+        ``ru`` and ``en`` ship a compiled catalogue; if one is missing the
+        window falls back to the source strings.
         """
         if self._translator is not None:
             self._app.removeTranslator(self._translator)
             self._translator = None
         language = self.language
-        if language == "en":
-            return
         path = LOCALE_DIR / f"{_CATALOGUE}_{language}.qm"
         if not path.is_file():
             return
-        translator = QtCore.QTranslator(self)
+        # Parented to the application, not to this manager: the catalogue must
+        # outlive any manager that happens to be collected while it is still
+        # installed, otherwise the installed translator would be destroyed
+        # underneath the application.
+        translator = QtCore.QTranslator(self._app)
         if translator.load(str(path)):
             self._app.installTranslator(translator)
             self._translator = translator

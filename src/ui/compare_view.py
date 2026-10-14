@@ -37,19 +37,18 @@ def _colours() -> dict[object, str]:
     }
 
 
-_LEGEND_NAMES = (
-    ("equal", EQUAL),
-    ("changed", CHANGED),
-    ("inserted", INSERTED),
-    ("deleted", DELETED),
-)
-
-
 def legend_labels() -> dict[object, str]:
-    """Translated captions for the compare legend, keyed by diff ``kind``."""
+    """Translated captions for the compare legend, keyed by diff ``kind``.
+
+    Each caption is a literal ``translate`` call rather than a loop over the
+    kind names: ``lupdate`` only extracts a string it can see at the call site,
+    so a caption built from a variable would never reach the catalogue.
+    """
     return {
-        kind: QtCore.QCoreApplication.translate("CompareView", name)
-        for name, kind in _LEGEND_NAMES
+        EQUAL: QtCore.QCoreApplication.translate("CompareView", "equal"),
+        CHANGED: QtCore.QCoreApplication.translate("CompareView", "changed"),
+        INSERTED: QtCore.QCoreApplication.translate("CompareView", "inserted"),
+        DELETED: QtCore.QCoreApplication.translate("CompareView", "deleted"),
     }
 
 

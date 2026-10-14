@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import logging
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
 from PySide6 import QtCore, QtGui, QtWidgets
@@ -128,6 +129,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self._corpus_dialog = None
         self._last_offset: int | None = None
         self._settings: dict = read_settings()
+        # The last rule-status line is kept as a renderer rather than as a
+        # finished string, so a language switch can rebuild it in the new
+        # language instead of leaving the previous one on screen.
+        self._rule_status_render: Callable[[], str] | None = None
+        self._rule_status_error = False
 
         self._build_menu()
         self._build_central()
@@ -148,7 +154,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 "Open a capture (Ctrl+O): pcap, pcapng or normalized JSON."
             )
         )
-        self.validation_view.set_rule_status(self.tr("no rule applied yet"))
+        self._set_rule_status(lambda: self.tr("no rule applied yet"))
         self.validation_view.set_provenance([])
         self.validation_view.set_ready(capture=False, rule=False)
         self.timeline_view.clear()
@@ -175,6 +181,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # window or losing the loaded state.
         self._menus: dict[str, QtWidgets.QMenu] = {}
         self._actions: dict[str, QtGui.QAction] = {}
+        self._action_tips: dict[QtGui.QAction, str] = {}
 
         file_menu = bar.addMenu("")
         self._menus["file"] = file_menu
@@ -183,7 +190,7 @@ class MainWindow(QtWidgets.QMainWindow):
             "Open &demo",
             self.open_demo,
             "Ctrl+D",
-            tip="Load the small capture, rule and journal that ship with the tool, for a first look",
+            tip=self.tr("Load the small capture, rule and journal that ship with the tool, for a first look"),
         )
         file_menu.addSeparator()
         self._actions["open_capture"] = self._action(
@@ -191,7 +198,7 @@ class MainWindow(QtWidgets.QMainWindow):
             "Open &normalized capture...",
             self.open_capture_dialog,
             "Ctrl+O",
-            tip="Open a capture: a raw .pcap/.pcapng is normalized on the fly, a normalized JSON is read as is",
+            tip=self.tr("Open a capture: a raw .pcap/.pcapng is normalized on the fly, a normalized JSON is read as is"),
         )
         self._actions["open_rule"] = self._action(
             file_menu, "Open &rule...", self.open_rule_dialog, "Ctrl+R"
@@ -201,7 +208,7 @@ class MainWindow(QtWidgets.QMainWindow):
             "&Build rule...",
             self.build_rule,
             "Ctrl+B",
-            tip="Describe the message in a form instead of writing JSON by hand",
+            tip=self.tr("Describe the message in a form instead of writing JSON by hand"),
         )
         self._actions["save_result"] = self._action(
             file_menu, "&Save result...", self.save_result_dialog, "Ctrl+S"
@@ -211,7 +218,7 @@ class MainWindow(QtWidgets.QMainWindow):
             "&Import PCAP...",
             self.import_pcap,
             None,
-            tip="Read a raw .pcap/.pcapng and save its normalized JSON next to it",
+            tip=self.tr("Read a raw .pcap/.pcapng and save its normalized JSON next to it"),
         )
         file_menu.addSeparator()
         self._actions["quit"] = self._action(file_menu, "&Quit", self.close, "Ctrl+Q")
@@ -232,7 +239,7 @@ class MainWindow(QtWidgets.QMainWindow):
             "Check on &corpus...",
             self.show_corpus_check,
             "F7",
-            tip="Show the rule's reach over the whole capture and its counterexamples",
+            tip=self.tr("Show the rule's reach over the whole capture and its counterexamples"),
         )
 
         report_menu = bar.addMenu("")
@@ -264,7 +271,7 @@ class MainWindow(QtWidgets.QMainWindow):
             "Zoom &in",
             self.zoom_in,
             "Ctrl+=",
-            tip="Enlarge the bytes and the session tree (Ctrl+Plus)",
+            tip=self.tr("Enlarge the bytes and the session tree (Ctrl+Plus)"),
         )
         self._actions["zoom_in_alt"] = QtGui.QAction("Zoom in", self)
         self._actions["zoom_in_alt"].setShortcut(QtGui.QKeySequence("Ctrl++"))
@@ -275,14 +282,14 @@ class MainWindow(QtWidgets.QMainWindow):
             "Zoom &out",
             self.zoom_out,
             "Ctrl+-",
-            tip="Shrink the bytes and the session tree (Ctrl+Minus)",
+            tip=self.tr("Shrink the bytes and the session tree (Ctrl+Minus)"),
         )
         self._actions["zoom_reset"] = self._action(
             view_menu,
             "&Reset zoom",
             self.zoom_reset,
             "Ctrl+0",
-            tip="Restore the default byte and tree size",
+            tip=self.tr("Restore the default byte and tree size"),
         )
         view_menu.addSeparator()
 
@@ -341,6 +348,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if tip:
             action.setToolTip(tip)
             action.setStatusTip(tip)
+            # Keep the source tip so :meth:`_relabel_menu` can re-translate it
+            # on a language switch; a QAction stores the translated string only.
+            self._action_tips[action] = tip
         action.triggered.connect(slot)
         menu.addAction(action)
         return action
@@ -389,9 +399,16 @@ class MainWindow(QtWidgets.QMainWindow):
             action = self._actions.get(key)
             if action is not None:
                 action.setText(label)
+        for action, tip in self._action_tips.items():
+            action.setToolTip(self.tr(tip))
+            action.setStatusTip(self.tr(tip))
+        self._actions["toggle_timeline"].setToolTip(
+            self.tr("Show the fourth column: the message timeline against the journal")
+        )
         system_label = self.tr("System")
+        language_labels = {"ru": self.tr("Russian"), "en": self.tr("English")}
         for code, action in self._language_actions.items():
-            action.setText(system_label if code == "system" else action.text())
+            action.setText(language_labels.get(code, system_label))
 
     def _build_central(self) -> None:
         # Two screens share the central area: the empty-state welcome screen and
@@ -782,7 +799,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.timeline_view.retranslate_ui()
         self._timeline_box.setTitle(self.tr("Timeline"))
         self.welcome_view.retranslate_ui()
-        if self._capture_name:
+        self._refresh_rule_status()
+        if self._capture is not None and self._last_offset is not None:
+            self._show_provenance(self._last_offset)
+        else:
             self._set_provenance_text(self._capture_summary())
 
     def _refresh_title(self) -> None:
@@ -978,9 +998,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self._rule.previous_rule = previous_rule
         self._rule.previous_report = previous_report
         self.validation_view.set_rule_text(self._rule.text)
-        self.validation_view.set_rule_status(
-            self.tr("loaded {0}  rule v{1}").format(
-                Path(path).name, self._rule.rule.rule_version
+        self._set_rule_status(
+            lambda: self.tr("loaded {0}  rule v{1}").format(
+                self._rule.path.name if self._rule.path else "",
+                self._rule.rule.rule_version,
             )
         )
         self.validation_view.set_rule_overview(self._rule.rule, applied=False)
@@ -1008,9 +1029,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if dialog.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         self.validation_view.set_rule_text(dialog.rule_text())
-        self.validation_view.set_rule_status(
-            self.tr("rule built; apply it to check it")
-        )
+        self._set_rule_status(lambda: self.tr("rule built; apply it to check it"))
 
     def _current_message_bytes(self) -> bytes:
         """The bytes of the message the last-clicked byte belongs to, or a slice.
@@ -1045,8 +1064,8 @@ class MainWindow(QtWidgets.QMainWindow):
         """Load the first example rule, or report that none is present."""
         examples = sorted((REPO_ROOT / "examples").glob("*.json"))
         if not examples:
-            self.validation_view.set_rule_status(
-                self.tr("no example rule found"), error=True
+            self._set_rule_status(
+                lambda: self.tr("no example rule found"), error=True
             )
             return
         self.load_rule(examples[0])
@@ -1089,8 +1108,8 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             self._rule.reload(self.validation_view.rule_text())
         except Exception as exc:
-            self.validation_view.set_rule_status(
-                self.tr("rule error: {0}").format(exc), error=True
+            self._set_rule_status(
+                lambda exc=exc: self.tr("rule error: {0}").format(exc), error=True
             )
             return
         application = self._rule.apply(self._capture, self._session_id, self._direction)
@@ -1101,8 +1120,10 @@ class MainWindow(QtWidgets.QMainWindow):
         stream = self._capture.stream(self._session_id, self._direction)
         self.hex_view.set_annotations(annotations_from_application(application, stream))
         counts = ", ".join(f"{k}={v}" for k, v in sorted(application.counts.items()))
-        self.validation_view.set_rule_status(
-            self.tr("rule v{0}  {1}").format(application.rule.rule_version, counts)
+        self._set_rule_status(
+            lambda counts=counts: self.tr("rule v{0}  {1}").format(
+                application.rule.rule_version, counts
+            )
         )
         self._notify(
             self.tr("applied rule v{0} to {1} {2}").format(
@@ -1145,8 +1166,8 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             self._rule.reload(self.validation_view.rule_text())
         except Exception as exc:
-            self.validation_view.set_rule_status(
-                self.tr("rule error: {0}").format(exc), error=True
+            self._set_rule_status(
+                lambda exc=exc: self.tr("rule error: {0}").format(exc), error=True
             )
             return
         self._begin_run()
@@ -1166,8 +1187,10 @@ class MainWindow(QtWidgets.QMainWindow):
         directions = (self._rule.rule.direction,) if self._rule.rule.direction else ()
         self._show_hypotheses(self._rule.rule, self._corpus_messages(directions))
         counts = ", ".join(f"{k}={v}" for k, v in sorted(report.counts().items()))
-        self.validation_view.set_rule_status(
-            self.tr("rule v{0} over the capture: {1}  counterexamples={2}").format(
+        self._set_rule_status(
+            lambda counts=counts, report=report: self.tr(
+                "rule v{0} over the capture: {1}  counterexamples={2}"
+            ).format(
                 self._rule.rule.rule_version, counts, len(report.contradictions)
             )
         )
@@ -1314,6 +1337,23 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         self._show_corpus_dialog(self._corpus_report)
 
+    def _set_rule_status(self, render: Callable[[], str], error: bool = False) -> None:
+        """Show a rule-status line built by ``render`` in the active language.
+
+        ``render`` is kept so the line can be rebuilt on a language switch; the
+        window never stores the finished string alone.
+        """
+        self._rule_status_render = render
+        self._rule_status_error = error
+        self.validation_view.set_rule_status(render(), error=error)
+
+    def _refresh_rule_status(self) -> None:
+        """Rebuild the rule-status line in the active language, if there is one."""
+        if self._rule_status_render is not None:
+            self.validation_view.set_rule_status(
+                self._rule_status_render(), error=self._rule_status_error
+            )
+
     def _set_provenance_text(self, text: str) -> None:
         """Show *text* on the status line, reserving room for it and tooltipping it.
 
@@ -1387,8 +1427,9 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             write_result(result, path)
         except Exception as exc:
-            self.validation_view.set_rule_status(
-                self.tr("could not save result: {0}").format(exc), error=True
+            self._set_rule_status(
+                lambda exc=exc: self.tr("could not save result: {0}").format(exc),
+                error=True,
             )
             self._notify(self.tr("could not save the result"))
             return

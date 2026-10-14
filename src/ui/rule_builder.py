@@ -345,15 +345,31 @@ class RuleBuilderDialog(QtWidgets.QDialog):
         row.addWidget(hint)
         return page
 
+    def _field_column_headers(self) -> list[str]:
+        """The translated captions for the field table.
+
+        Literal ``tr`` calls rather than a loop over ``_FIELD_COLUMNS``:
+        lupdate only extracts a string it can see at the call site, so a
+        caption taken from a variable never reaches the catalogue.
+        """
+        return [
+            self.tr("name"),
+            self.tr("offset"),
+            self.tr("type"),
+            self.tr("order"),
+            self.tr("length"),
+            self.tr("values"),
+            self.tr("hypothesis"),
+            self.tr("expected"),
+        ]
+
     def _build_fields(self) -> QtWidgets.QGroupBox:
         box = QtWidgets.QGroupBox(self.tr("Fields: what each byte range means"))
         layout = QtWidgets.QVBoxLayout(box)
         layout.setSpacing(6)
 
         self.fields_table = QtWidgets.QTableWidget(0, len(_FIELD_COLUMNS))
-        self.fields_table.setHorizontalHeaderLabels(
-            [self.tr(column) for column in _FIELD_COLUMNS]
-        )
+        self.fields_table.setHorizontalHeaderLabels(self._field_column_headers())
         self.fields_table.verticalHeader().setVisible(False)
         self.fields_table.setSelectionBehavior(
             QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows
