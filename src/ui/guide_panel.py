@@ -26,6 +26,11 @@ class _Step(QtWidgets.QFrame):
     def __init__(self, number: int, title: str, hint: str, action: str | None) -> None:
         super().__init__()
         self.setObjectName("guideStep")
+        # A step must not widen the window: its title and button are longer in
+        # Russian, and the strip above the workspace has to stay shrinkable.
+        self.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Ignored, QtWidgets.QSizePolicy.Policy.Preferred
+        )
         layout = QtWidgets.QHBoxLayout(self)
         layout.setContentsMargins(8, 4, 8, 4)
         layout.setSpacing(6)
@@ -38,7 +43,6 @@ class _Step(QtWidgets.QFrame):
         self.title = QtWidgets.QLabel(title)
         self.title.setObjectName("guideStepTitle")
         layout.addWidget(self.title)
-
         # The hint is kept for the caption text and the translations, but shown
         # as a tooltip: a paragraph per step would push the workspace off screen.
         self.hint = QtWidgets.QLabel(hint)
@@ -83,6 +87,13 @@ class GuidePanel(QtWidgets.QFrame):
     def __init__(self) -> None:
         super().__init__()
         self.setObjectName("guidePanel")
+        # The strip must never dictate the window minimum width: its longest
+        # caption (the status line, the Russian step buttons) is wider than the
+        # workspace can afford, and a guide that forces a 1300 px window defeats
+        # the narrow-window layout it is meant to sit above.
+        self.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Ignored, QtWidgets.QSizePolicy.Policy.Preferred
+        )
 
         outer = QtWidgets.QVBoxLayout(self)
         outer.setContentsMargins(10, 6, 10, 8)
@@ -95,8 +106,10 @@ class GuidePanel(QtWidgets.QFrame):
         head.addWidget(self.title)
         self.status = QtWidgets.QLabel()
         self.status.setObjectName("guideStatus")
-        head.addWidget(self.status)
-        head.addStretch(1)
+        self.status.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Ignored, QtWidgets.QSizePolicy.Policy.Preferred
+        )
+        head.addWidget(self.status, 1)
         self.hide_button = QtWidgets.QPushButton()
         self.hide_button.setObjectName("guideDismiss")
         self.hide_button.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
