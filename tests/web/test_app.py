@@ -53,6 +53,32 @@ def client_no_rule() -> TestClient:
     return TestClient(create_app(CAPTURE, None))
 
 
+@pytest.fixture()
+def client_empty() -> TestClient:
+    return TestClient(create_app())
+
+
+# -- bundled demo -----------------------------------------------------------
+
+
+def test_welcome_offers_the_bundled_demo(client_empty: TestClient) -> None:
+    response = client_empty.get("/")
+    assert response.status_code == 200
+    assert 'href="/demo"' in response.text
+
+
+def test_demo_opens_the_bundled_capture_and_rule(client_empty: TestClient) -> None:
+    response = client_empty.get("/demo", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/"
+    # The engine now holds the demo capture and its rule, so the next page is
+    # the session list rather than the welcome page again.
+    sessions = client_empty.get("/")
+    assert sessions.status_code == 200
+    assert "s1" in sessions.text
+    assert "Sessions" in sessions.text
+
+
 # -- pages ------------------------------------------------------------------
 
 

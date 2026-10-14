@@ -49,11 +49,19 @@ from .settings import (
     read_settings,
     write_settings,
 )
+from .timeline_view import TimelineView
 from .validation_view import ValidationView
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_REPORT = REPO_ROOT / "REPORT.md"
 APP_ICON = REPO_ROOT / "assets" / "icons" / "app" / "madrigal-protocol-lab.svg"
+
+# The small worked example that ships with the tool, so the first-run window can
+# offer a one-click investigation instead of an empty view.
+SAMPLE_DIR = Path(__file__).resolve().parent / "samples"
+SAMPLE_CAPTURE = SAMPLE_DIR / "demo_capture.normalized.json"
+SAMPLE_RULE = SAMPLE_DIR / "demo_rule.json"
+SAMPLE_JOURNAL = SAMPLE_DIR / "demo_journal.txt"
 # The desktop id, without the ``.desktop`` suffix Qt expects. The installed file
 # keeps the suffix: /usr/share/applications/madrigal-protocol-lab.desktop.
 APP_DESKTOP_FILE = "madrigal-protocol-lab"
@@ -116,6 +124,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._theme_manager = None
         self._language_manager: LanguageManager | None = None
         self._capture_name: str = ""
+        self._journal: list = []
         self._settings: dict = read_settings()
 
         self._build_menu()
@@ -132,11 +141,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.hex_view.show_hint(
             self.tr(
                 "no capture loaded\n\n"
-                "Open a normalized capture (Ctrl+O), pick a session and a direction,\n"
-                "then load a rule (Ctrl+R) or press Load example in the Rule tab."
+                "Open a normalized capture (Ctrl+O) or press Open demo (Ctrl+D)\n"
+                "for the built-in example, then load a rule (Ctrl+R)."
             )
         )
         self.validation_view.set_rule_status(self.tr("no rule applied yet"))
+        self.timeline_view.clear()
 
     # -- construction ------------------------------------------------------
 
@@ -151,6 +161,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
         file_menu = bar.addMenu("")
         self._menus["file"] = file_menu
+        self._actions["open_demo"] = self._action(
+            file_menu,
+            "Open &demo",
+            self.open_demo,
+            "Ctrl+D",
+            tip="Load the small capture, rule and journal that ship with the tool, for a first look",
+        )
+        file_menu.addSeparator()
         self._actions["open_capture"] = self._action(
             file_menu,
             "Open &normalized capture...",
@@ -306,6 +324,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for key, label in labels.items():
             self._menus[key].setTitle(label)
         sources = {
+            "open_demo": self.tr("Open &demo"),
             "open_capture": self.tr("Open &normalized capture..."),
             "open_rule": self.tr("Open &rule..."),
             "build_rule": self.tr("&Build rule..."),
@@ -379,6 +398,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self._bytes_box = self._wrap(self.tr("Bytes"), centre)
         splitter.addWidget(self._bytes_box)
 
+        self.timeline_view = TimelineView()
+        self.timeline_view.messageSelected.connect(self.reveal_offset)
+        self._timeline_box = self._wrap(self.tr("Timeline"), self.timeline_view)
+        splitter.addWidget(self._timeline_box)
+
         self.right_tabs = QtWidgets.QTabWidget()
         # The right dock is narrow and its captions are longer in Russian; elide
         # them and keep the full text in a tooltip rather than letting the bar
@@ -405,7 +429,8 @@ class MainWindow(QtWidgets.QMainWindow):
         splitter.setStretchFactor(0, 0)
         splitter.setStretchFactor(1, 1)
         splitter.setStretchFactor(2, 0)
-        splitter.setSizes([300, 720, 420])
+        splitter.setStretchFactor(3, 0)
+        splitter.setSizes([280, 660, 300, 400])
 
         # The guide sits above the three panels so the very first thing on a
         # fresh window is the order of work, not an empty hex view. It hides
@@ -704,6 +729,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.hypotheses_view.retranslate_ui()
         self.session_tree.retranslate_ui()
         self.hex_view.retranslate_ui()
+        self.timeline_view.retranslate_ui()
+        self._timeline_box.setTitle(self.tr("Timeline"))
         self.guide_panel.retranslate_ui()
         if self._capture_name:
             self._set_provenance_text(self._capture_summary())
@@ -749,6 +776,59 @@ class MainWindow(QtWidgets.QMainWindow):
             )
         else:
             self.guide_panel.set_session_ready(False)
+
+    def open_demo(self) -> None:
+        """Open the small capture, rule and journal that ship with the tool.
+
+        This is the one-click path for a first-time reader: a real investigation
+        appears without them having to find a file or write a rule. A missing
+        sample is reported rather than silently ignored.
+        """
+        if not SAMPLE_CAPTURE.is_file():
+            self._notify(self.tr("the built-in demo is not available"))
+            return
+        self.open_capture(SAMPLE_CAPTURE)
+        if SAMPLE_RULE.is_file():
+            self.load_rule(SAMPLE_RULE)
+        if SAMPLE_JOURNAL.is_file():
+            self.load_journal(SAMPLE_JOURNAL)
+        self.apply_to_capture()
+        self._notify(self.tr("opened the built-in demo"))
+
+    def load_journal(self, path: str | Path) -> None:
+        """Load an action journal and line it up with the current messages.
+
+        The journal is the operator's own note of what they did. Pairing it with
+        the decoded messages is what turns a value on the wire into evidence for
+        a field's meaning, so it is offered as a first-class action.
+        """
+        from ..hypothesis.journal import correlate
+        from ..hypothesis.journal import load_journal as _load
+
+        if self._capture is None or self._rule is None:
+            self._notify(self.tr("open a capture and a rule before a journal"))
+            return
+        try:
+            entries = _load(path)
+        except Exception as exc:
+            self._notify(self.tr("could not read the journal: {0}").format(exc))
+            return
+        self._journal = entries
+        report = correlate(self._corpus_messages(()), entries)
+        self.timeline_view.show_correlation(report)
+        self._notify(self.tr("journal: {0}").format(report.summary()))
+
+    def open_journal_dialog(self) -> None:
+        """Prompt for an action journal and load it."""
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self,
+            self.tr("Open action journal"),
+            self._start_dir(SAMPLE_DIR),
+            "Journals (*.txt *.csv *.md);;All files (*)",
+        )
+        if path:
+            self._remember_dir(path)
+            self.load_journal(path)
 
     def _start_dir(self, fallback: Path) -> str:
         """The directory a file dialog should open at.

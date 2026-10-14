@@ -89,6 +89,18 @@ def test_window_opens_raw_pcap_and_applies_rule(app):
     window.close()
 
 
+def test_window_opens_the_bundled_demo(app):
+    # The first-run path: one call must leave a capture, its rule and the
+    # journal all in place, so a newcomer sees a worked investigation.
+    window = MainWindow()
+    window.open_demo()
+    assert window._capture is not None
+    assert window._rule is not None
+    assert window._journal  # the demo journal paired at least one action
+    assert window._capture_name.endswith("demo_capture.normalized.json")
+    window.close()
+
+
 def test_window_reports_unknown_capture(app, tmp_path):
     window = MainWindow()
     bad = tmp_path / "mystery.dat"

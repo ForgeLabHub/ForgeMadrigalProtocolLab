@@ -24,6 +24,7 @@
   </ol>
   <div class="toolbar">
     <a class="button button--accent" href="/open-capture">Open a capture</a>
+    {% if demo_available %}<a class="button" href="/demo" title="Load a small capture that ships with the tool, plus a matching rule">Open the built-in demo</a>{% endif %}
   </div>
 </section>
 {% endblock %}
