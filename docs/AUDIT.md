@@ -84,7 +84,7 @@ strings in the public API.
 start of the audit (119 tests, 1 skipped); the second is the state after the
 boundary tests added in this iteration (177 tests, 1 skipped). The counts in
 this section are the historical ones from that iteration; the suite has since
-grown to 846 tests on the current `main` (781 on the archived `v1.0.0` tag;
+grown to 849 tests on the current `main` (781 on the archived `v1.0.0` tag;
 section 11).
 
 Before:
@@ -183,7 +183,7 @@ and every command in `README.md` and `docs/USAGE.md` was run:
 - `python -m src.project.cli create/add-capture/open/export/import` round trip
   reports `"broken": []`.
 - `pytest tests/ -q` gives 177 passed, 1 skipped (the historical count of that
-  iteration; the suite is 846 tests on the current `main`, 781 on the archived
+  iteration; the suite is 849 tests on the current `main`, 781 on the archived
   `v1.0.0` tag, section 11).
 
 At the time of this check the rule path in sections 4 and 6 of
@@ -259,7 +259,7 @@ nothing.
 After the merge:
 
 - `pytest tests/ -q` reports 385 passed (the historical count at that merge;
-  the suite is 846 tests on the current `main`, 781 on the archived `v1.0.0`
+  the suite is 849 tests on the current `main`, 781 on the archived `v1.0.0`
   tag, section 11).
 - `ruff check . --select "E4,E7,E9,F" --ignore E501` reports All checks passed.
 - CI run 37983669575 is green: the test matrix (3.12 and 3.13 on

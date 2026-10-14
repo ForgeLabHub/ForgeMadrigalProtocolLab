@@ -37,3 +37,14 @@ Daily checkpoint of the work. One entry per day: done, broken, next.
 - Broken: none. Full suite 846 passed, `ruff check .` clean.
 - Next: usability pass for a first-time user (hypothesis wizard, bundled sample
   project); the start guide, rule builder and provenance card are already in.
+
+## 2026-10-14 (ux-select merged)
+
+- Done: `feat/ux-select` merged into `main` (PR #59) — the bundled demo
+  (`src/ui/samples/`, `File -> Open demo`, web `GET /demo`), the timeline view
+  and the web status guidance. Documentation resynced: the suite is now
+  **849 tests** (615 without the Qt UI tests), `ruff check .` clean.
+- Broken: none. The test count had drifted in the docs (846 -> 849); the figure
+  now matches `main`.
+- Next: full GUI usability overhaul (`ux/full-overhaul`) — empty-state screen,
+  Russian-only strings, rule wizard, provenance inspector.
