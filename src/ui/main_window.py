@@ -171,6 +171,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self._actions["save_result"] = self._action(
             file_menu, "&Save result...", self.save_result_dialog, "Ctrl+S"
         )
+        self._actions["import_pcap"] = self._action(
+            file_menu,
+            "&Import PCAP...",
+            self.import_pcap,
+            None,
+            tip="Read a raw .pcap/.pcapng and save its normalized JSON next to it",
+        )
         file_menu.addSeparator()
         self._actions["quit"] = self._action(file_menu, "&Quit", self.close, "Ctrl+Q")
 
@@ -303,6 +310,7 @@ class MainWindow(QtWidgets.QMainWindow):
             "open_rule": self.tr("Open &rule..."),
             "build_rule": self.tr("&Build rule..."),
             "save_result": self.tr("&Save result..."),
+            "import_pcap": self.tr("&Import PCAP..."),
             "quit": self.tr("&Quit"),
             "apply_direction": self.tr("&Apply to current direction"),
             "apply_capture": self.tr("Apply to &whole capture"),
@@ -791,6 +799,45 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(
                 self, self.tr("Cannot open capture"), str(exc)
             )
+
+    def import_pcap(self) -> None:
+        """Read a raw capture, write its normalized JSON, then open it.
+
+        Opening a pcap directly normalizes it in memory only; this action also
+        keeps the normalized document, which is the form the rest of the
+        pipeline and the project work with. The output name is derived from the
+        input file, never hard-coded.
+        """
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self,
+            self.tr("Import PCAP"),
+            self._start_dir(REPO_ROOT),
+            "Captures (*.pcap *.pcapng)",
+        )
+        if not path:
+            return
+        self._remember_dir(path)
+        source = Path(path)
+        out = source.with_name(f"{source.stem}.normalized.json")
+        try:
+            from ..capture.export import export_capture
+            from ..capture.pipeline import normalize
+
+            capture = normalize(source)
+            export_capture(
+                capture.sessions,
+                out,
+                source_file=str(capture.source_file),
+                capture_id=capture.capture_id,
+                streams=capture.streams,
+            )
+        except Exception as exc:
+            QtWidgets.QMessageBox.warning(
+                self, self.tr("Cannot import capture"), str(exc)
+            )
+            return
+        self._open_capture_reported(out)
+        self._notify(self.tr("wrote {0}").format(out.name))
 
     def load_rule(self, path: str | Path) -> None:
         """Load a rule file, keeping the previous rule and report for diffing."""

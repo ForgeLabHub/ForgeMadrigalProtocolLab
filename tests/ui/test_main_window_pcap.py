@@ -26,7 +26,13 @@ except ImportError as exc:  # pragma: no cover - depends on the runner
     pytest.skip(f"Qt runtime unavailable: {exc}", allow_module_level=True)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-NORMALIZED = REPO_ROOT / "tests" / "corpus" / "reference_export" / "corpus_capture_01.normalized.json"
+NORMALIZED = (
+    REPO_ROOT
+    / "tests"
+    / "corpus"
+    / "reference_export"
+    / "corpus_capture_01.normalized.json"
+)
 PCAP = REPO_ROOT / "tests" / "corpus" / "real" / "research" / "01_configuration.pcap"
 PCAPNG = REPO_ROOT / "tests" / "corpus" / "real" / "research" / "02_variations.pcapng"
 
@@ -90,4 +96,24 @@ def test_window_reports_unknown_capture(app, tmp_path):
     with pytest.raises(CaptureModelError):
         window.open_capture(bad)
     assert window._capture is None
+    window.close()
+
+
+def test_import_pcap_writes_and_opens_normalized_json(app, tmp_path, monkeypatch):
+    """Importing a pcap keeps the normalized document, not just memory state."""
+    import shutil
+
+    source = tmp_path / "probe.pcapng"
+    shutil.copy(PCAPNG, source)
+    window = MainWindow()
+    monkeypatch.setattr(
+        QtWidgets.QFileDialog,
+        "getOpenFileName",
+        staticmethod(lambda *args, **kwargs: (str(source), "")),
+    )
+    window.import_pcap()
+    normalized = source.with_name("probe.normalized.json")
+    assert normalized.is_file(), "the normalized document is written next to the input"
+    assert window._capture is not None
+    assert window._capture_name == normalized.name
     window.close()
