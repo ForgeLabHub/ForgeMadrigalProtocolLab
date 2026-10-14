@@ -140,6 +140,21 @@ inspect the bytes with their packet provenance, and open a rule and its results.
 The report and the machine-readable result are the durable output; the interface
 is a viewer over them.
 
+A capture can be opened two ways from `File`: `Open normalized capture` reads a
+normalized JSON or a raw `.pcap`/`.pcapng`, and `Import PCAP` additionally writes
+the normalized document next to the input as `<name>.normalized.json`. The start
+guide above the workspace walks through the same order — open a capture, pick a
+session, describe the messages, apply the rule, export the report — and marks
+each step as it is done; `Hide` collapses it and `Help -> Show start guide`
+brings it back.
+
+A rule can be written by hand in the `Rule` tab of the interpretation panel, or
+built from a form with `File -> Build rule...` (`Ctrl+B`). The builder covers the
+framing (length-prefixed, fixed-size, marker-based, manual) and one row per field
+(name, offset, type, byte order, length, enum values, hypothesis flag, expected
+values), and shows the generated document live; the result is loaded into the
+editor, where attributes the form does not cover can still be added.
+
 ## 7.1 Interface language
 
 The window ships with an English and a Russian interface. Choose the language
