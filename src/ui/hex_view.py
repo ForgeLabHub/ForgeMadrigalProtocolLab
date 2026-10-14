@@ -367,8 +367,8 @@ class HexView(QtWidgets.QPlainTextEdit):
         fmt.setBackground(brush)
         fmt.setForeground(QtGui.QColor(foreground))
         cursor = self.textCursor()
-        cursor.setPosition(_byte_char_index(start))
-        cursor.setPosition(_byte_char_index(end - 1) + 2, QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(self._char_index(start))
+        cursor.setPosition(self._char_index(end - 1) + 2, QtGui.QTextCursor.MoveMode.KeepAnchor)
         selection.cursor = cursor
         selection.format = fmt
         return selection
@@ -470,19 +470,17 @@ class HexView(QtWidgets.QPlainTextEdit):
     def _char_index(self, offset: int) -> int:
         """Document character index of the first hex digit of ``offset``.
 
-        Honours the optional offset column: the character offset of a byte moves
-        with the prefix, so the shown-offset index is shifted back when the
-        offset column is hidden.
+        The rendered line length depends on whether the offset column is shown,
+        so the line stride and the in-line prefix are both read from the current
+        geometry rather than from the module defaults. Using the shown-offset
+        geometry while the column is hidden would place a selection inside the
+        previous line, which made the annotations drift and the last line
+        collapse.
         """
-        base = _byte_char_index(offset)
-        return base if self._show_offset else base - _PREFIX
-
-
-def _byte_char_index(offset: int) -> int:
-    """Document character index of ``offset`` with the offset column shown."""
-    line = offset // _BYTES_PER_LINE
-    column = offset % _BYTES_PER_LINE
-    return line * (_LINE_LEN + 1) + _PREFIX + column * 3
+        line = offset // _BYTES_PER_LINE
+        column = offset % _BYTES_PER_LINE
+        line_length = self._prefix + _HEX_WIDTH + _BYTES_PER_LINE
+        return line * (line_length + 1) + self._prefix + column * 3
 
 
 def _line_spans(start: int, end: int) -> list[tuple[int, int]]:

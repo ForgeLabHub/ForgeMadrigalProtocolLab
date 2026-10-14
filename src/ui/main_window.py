@@ -18,6 +18,7 @@ from pathlib import Path
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from ..protocol.result import build_result, write_result
+from ..protocol.rule import load_rule_text
 from . import theme
 from .compare_view import CompareView
 from .constants import (
@@ -26,6 +27,7 @@ from .constants import (
     LEGEND_SWATCH_PX,
     PROGRESS_BAR_WIDTH,
 )
+from .guide_panel import GuidePanel
 from .hex_view import (
     LEGEND_KINDS,
     HexView,
@@ -154,43 +156,91 @@ class MainWindow(QtWidgets.QMainWindow):
             "Open &normalized capture...",
             self.open_capture_dialog,
             "Ctrl+O",
-            tip="Open a capture already normalized by src.capture.cli; a raw .pcap/.pcapng is not read here",
+            tip="Open a capture: a raw .pcap/.pcapng is normalized on the fly, a normalized JSON is read as is",
         )
-        self._actions["open_rule"] = self._action(file_menu, "Open &rule...", self.open_rule_dialog, "Ctrl+R")
-        self._actions["save_result"] = self._action(file_menu, "&Save result...", self.save_result_dialog, "Ctrl+S")
+        self._actions["open_rule"] = self._action(
+            file_menu, "Open &rule...", self.open_rule_dialog, "Ctrl+R"
+        )
+        self._actions["build_rule"] = self._action(
+            file_menu,
+            "&Build rule...",
+            self.build_rule,
+            "Ctrl+B",
+            tip="Describe the message in a form instead of writing JSON by hand",
+        )
+        self._actions["save_result"] = self._action(
+            file_menu, "&Save result...", self.save_result_dialog, "Ctrl+S"
+        )
+        self._actions["import_pcap"] = self._action(
+            file_menu,
+            "&Import PCAP...",
+            self.import_pcap,
+            None,
+            tip="Read a raw .pcap/.pcapng and save its normalized JSON next to it",
+        )
         file_menu.addSeparator()
         self._actions["quit"] = self._action(file_menu, "&Quit", self.close, "Ctrl+Q")
 
         rule_menu = bar.addMenu("")
         self._menus["rule"] = rule_menu
-        self._actions["apply_direction"] = self._action(rule_menu, "&Apply to current direction", self.apply_rule, "F5")
-        self._actions["apply_capture"] = self._action(rule_menu, "Apply to &whole capture", self.apply_to_capture, "F6")
-        self._actions["compare_versions"] = self._action(rule_menu, "&Compare versions", self.show_version_diff)
+        self._actions["apply_direction"] = self._action(
+            rule_menu, "&Apply to current direction", self.apply_rule, "F5"
+        )
+        self._actions["apply_capture"] = self._action(
+            rule_menu, "Apply to &whole capture", self.apply_to_capture, "F6"
+        )
+        self._actions["compare_versions"] = self._action(
+            rule_menu, "&Compare versions", self.show_version_diff
+        )
 
         report_menu = bar.addMenu("")
         self._menus["report"] = report_menu
-        self._actions["show_report"] = self._action(report_menu, "Show &REPORT.md", self.show_report)
-        self._actions["export_markdown"] = self._action(report_menu, "&Export Markdown...", self.export_markdown)
-        self._actions["export_html"] = self._action(report_menu, "Export &HTML...", self.export_html)
+        self._actions["show_report"] = self._action(
+            report_menu, "Show &REPORT.md", self.show_report
+        )
+        self._actions["export_markdown"] = self._action(
+            report_menu, "&Export Markdown...", self.export_markdown
+        )
+        self._actions["export_html"] = self._action(
+            report_menu, "Export &HTML...", self.export_html
+        )
 
         view_menu = bar.addMenu("")
         self._menus["view"] = view_menu
-        self._actions["theme_dark"] = self._action(view_menu, "&Dark theme", lambda: self.set_theme_mode("dark"), "Ctrl+1")
-        self._actions["theme_light"] = self._action(view_menu, "&Light theme", lambda: self.set_theme_mode("light"), "Ctrl+2")
-        self._actions["theme_system"] = self._action(view_menu, "&System theme", lambda: self.set_theme_mode("system"), "Ctrl+3")
+        self._actions["theme_dark"] = self._action(
+            view_menu, "&Dark theme", lambda: self.set_theme_mode("dark"), "Ctrl+1"
+        )
+        self._actions["theme_light"] = self._action(
+            view_menu, "&Light theme", lambda: self.set_theme_mode("light"), "Ctrl+2"
+        )
+        self._actions["theme_system"] = self._action(
+            view_menu, "&System theme", lambda: self.set_theme_mode("system"), "Ctrl+3"
+        )
         view_menu.addSeparator()
         self._actions["zoom_in"] = self._action(
-            view_menu, "Zoom &in", self.zoom_in, "Ctrl+=", tip="Enlarge the bytes and the session tree (Ctrl+Plus)"
+            view_menu,
+            "Zoom &in",
+            self.zoom_in,
+            "Ctrl+=",
+            tip="Enlarge the bytes and the session tree (Ctrl+Plus)",
         )
         self._actions["zoom_in_alt"] = QtGui.QAction("Zoom in", self)
         self._actions["zoom_in_alt"].setShortcut(QtGui.QKeySequence("Ctrl++"))
         self._actions["zoom_in_alt"].triggered.connect(self.zoom_in)
         self.addAction(self._actions["zoom_in_alt"])
         self._actions["zoom_out"] = self._action(
-            view_menu, "Zoom &out", self.zoom_out, "Ctrl+-", tip="Shrink the bytes and the session tree (Ctrl+Minus)"
+            view_menu,
+            "Zoom &out",
+            self.zoom_out,
+            "Ctrl+-",
+            tip="Shrink the bytes and the session tree (Ctrl+Minus)",
         )
         self._actions["zoom_reset"] = self._action(
-            view_menu, "&Reset zoom", self.zoom_reset, "Ctrl+0", tip="Restore the default byte and tree size"
+            view_menu,
+            "&Reset zoom",
+            self.zoom_reset,
+            "Ctrl+0",
+            tip="Restore the default byte and tree size",
         )
         view_menu.addSeparator()
 
@@ -211,19 +261,28 @@ class MainWindow(QtWidgets.QMainWindow):
         ):
             action = QtGui.QAction(label, self)
             action.setCheckable(True)
-            action.triggered.connect(lambda _checked=False, c=code: self.set_language(c))
+            action.triggered.connect(
+                lambda _checked=False, c=code: self.set_language(c)
+            )
             self._language_group.addAction(action)
             self._language_menu.addAction(action)
             self._language_actions[code] = action
 
         help_menu = bar.addMenu("")
         self._menus["help"] = help_menu
-        self._actions["quick_help"] = self._action(help_menu, "&Quick help", self.show_help, "F1")
+        self._actions["show_guide"] = self._action(
+            help_menu, "Show &start guide", self.show_guide
+        )
+        self._actions["quick_help"] = self._action(
+            help_menu, "&Quick help", self.show_help, "F1"
+        )
         self._actions["about"] = self._action(help_menu, "&About", self.show_about)
 
         self._relabel_menu()
 
-    def _action(self, menu, text, slot, shortcut: str | None = None, tip: str | None = None) -> QtGui.QAction:
+    def _action(
+        self, menu, text, slot, shortcut: str | None = None, tip: str | None = None
+    ) -> QtGui.QAction:
         action = QtGui.QAction(text, self)
         if shortcut:
             action.setShortcut(shortcut)
@@ -249,7 +308,9 @@ class MainWindow(QtWidgets.QMainWindow):
         sources = {
             "open_capture": self.tr("Open &normalized capture..."),
             "open_rule": self.tr("Open &rule..."),
+            "build_rule": self.tr("&Build rule..."),
             "save_result": self.tr("&Save result..."),
+            "import_pcap": self.tr("&Import PCAP..."),
             "quit": self.tr("&Quit"),
             "apply_direction": self.tr("&Apply to current direction"),
             "apply_capture": self.tr("Apply to &whole capture"),
@@ -265,6 +326,7 @@ class MainWindow(QtWidgets.QMainWindow):
             "zoom_out": self.tr("Zoom &out"),
             "zoom_reset": self.tr("&Reset zoom"),
             "settings": self.tr("&Settings..."),
+            "show_guide": self.tr("Show &start guide"),
             "quick_help": self.tr("&Quick help"),
             "about": self.tr("&About"),
         }
@@ -344,7 +406,25 @@ class MainWindow(QtWidgets.QMainWindow):
         splitter.setStretchFactor(1, 1)
         splitter.setStretchFactor(2, 0)
         splitter.setSizes([300, 720, 420])
-        self.setCentralWidget(splitter)
+
+        # The guide sits above the three panels so the very first thing on a
+        # fresh window is the order of work, not an empty hex view. It hides
+        # itself once a capture, a rule and an applied rule are all present.
+        self.guide_panel = GuidePanel()
+        self.guide_panel.openCaptureRequested.connect(self.open_capture_dialog)
+        self.guide_panel.openRuleRequested.connect(self.open_rule_dialog)
+        self.guide_panel.applyRequested.connect(self.apply_rule)
+        self.guide_panel.dismissRequested.connect(
+            lambda: self.guide_panel.setVisible(False)
+        )
+
+        container = QtWidgets.QWidget()
+        container_layout = QtWidgets.QVBoxLayout(container)
+        container_layout.setContentsMargins(0, 0, 0, 0)
+        container_layout.setSpacing(6)
+        container_layout.addWidget(self.guide_panel)
+        container_layout.addWidget(splitter, 1)
+        self.setCentralWidget(container)
 
     def _wrap(self, title: str, widget: QtWidgets.QWidget) -> QtWidgets.QGroupBox:
         box = QtWidgets.QGroupBox(title)
@@ -400,7 +480,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.validation_view.applyRequested.connect(self.apply_rule)
         self.validation_view.applyCaptureRequested.connect(self.apply_to_capture)
         self.validation_view.loadExampleRequested.connect(self.load_example_rule)
-        self.validation_view.ruleValidityChanged.connect(self.validation_view.show_rule_validity)
+        self.validation_view.buildRuleRequested.connect(self.build_rule)
+        self.validation_view.ruleValidityChanged.connect(
+            self.validation_view.show_rule_validity
+        )
         self.validation_view.counterexampleSelected.connect(self._reveal_counterexample)
         self.hypotheses_view.messageSelected.connect(self.reveal_offset)
 
@@ -439,6 +522,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.hypotheses_view,
         ):
             view.apply_theme()
+        self.guide_panel.apply_theme()
         self.report_view.setFont(theme.mono_font(FONT_SIZE_BODY))
         self.diff_view.setFont(theme.mono_font(FONT_SIZE_BODY))
 
@@ -472,7 +556,10 @@ class MainWindow(QtWidgets.QMainWindow):
         """Apply a byte and tree font size, clamped and reflected in the menu."""
         hex_size = max(ZOOM_MIN_FONT, min(ZOOM_MAX_FONT, int(hex_size)))
         tree_size = max(TREE_MIN_FONT, min(TREE_MAX_FONT, int(tree_size)))
-        if (hex_size, tree_size) == (self.hex_view.font_size, self.session_tree.font_size):
+        if (hex_size, tree_size) == (
+            self.hex_view.font_size,
+            self.session_tree.font_size,
+        ):
             return
         self.hex_view.set_font_size(hex_size)
         self.session_tree.set_font_size(tree_size)
@@ -485,7 +572,11 @@ class MainWindow(QtWidgets.QMainWindow):
         store.setValue("editor/hex_font_size", hex_size)
         store.setValue("editor/tree_font_size", tree_size)
         self._update_zoom_actions()
-        self._notify(self.tr("zoom {0}%").format(round(hex_size / int(DEFAULTS["editor"]["hex_font_size"]) * 100)))
+        self._notify(
+            self.tr("zoom {0}%").format(
+                round(hex_size / int(DEFAULTS["editor"]["hex_font_size"]) * 100)
+            )
+        )
 
     def _update_zoom_actions(self) -> None:
         """Disable the zoom actions that would have no effect at a limit."""
@@ -536,7 +627,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.set_theme_mode(theme_mode)
 
             language = str(general.get("language", "system"))
-            if self._language_manager is None or self._language_manager.preference != language:
+            if (
+                self._language_manager is None
+                or self._language_manager.preference != language
+            ):
                 self.set_language(language)
 
         self.hex_view.set_font_size(
@@ -610,6 +704,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.hypotheses_view.retranslate_ui()
         self.session_tree.retranslate_ui()
         self.hex_view.retranslate_ui()
+        self.guide_panel.retranslate_ui()
         if self._capture_name:
             self._set_provenance_text(self._capture_summary())
 
@@ -624,10 +719,9 @@ class MainWindow(QtWidgets.QMainWindow):
         """The status-line summary of the open capture, in the active language."""
         if self._capture is None:
             return self.tr("no byte selected")
-        diagnostics = (
-            ", ".join(f"{d.type}@{d.offset}" for d in self._capture.diagnostics)
-            or self.tr("none")
-        )
+        diagnostics = ", ".join(
+            f"{d.type}@{d.offset}" for d in self._capture.diagnostics
+        ) or self.tr("none")
         return self.tr("{0} sessions  capture_id {1}  diagnostics {2}").format(
             len(self._capture.sessions), self._capture.capture_id[:19], diagnostics
         )
@@ -647,10 +741,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self._capture_name = Path(path).name
         self._refresh_title()
         self._set_provenance_text(self._capture_summary())
+        self.guide_panel.set_capture(self._capture_name)
         if model.sessions:
             self._on_direction_selected(
-                model.sessions[0].session_id, model.directions(model.sessions[0].session_id)[0]
+                model.sessions[0].session_id,
+                model.directions(model.sessions[0].session_id)[0],
             )
+        else:
+            self.guide_panel.set_session_ready(False)
 
     def _start_dir(self, fallback: Path) -> str:
         """The directory a file dialog should open at.
@@ -684,7 +782,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def open_capture_dialog(self) -> None:
         """Prompt for a normalized capture file and open it."""
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, self.tr("Open normalized capture"), self._start_dir(REPO_ROOT), "Captures (*.json *.pcap *.pcapng)"
+            self,
+            self.tr("Open capture"),
+            self._start_dir(REPO_ROOT),
+            "Captures (*.json *.pcap *.pcapng)",
         )
         if path:
             self._remember_dir(path)
@@ -695,7 +796,48 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             self.open_capture(path)
         except CaptureModelError as exc:
-            QtWidgets.QMessageBox.warning(self, self.tr("Cannot open capture"), str(exc))
+            QtWidgets.QMessageBox.warning(
+                self, self.tr("Cannot open capture"), str(exc)
+            )
+
+    def import_pcap(self) -> None:
+        """Read a raw capture, write its normalized JSON, then open it.
+
+        Opening a pcap directly normalizes it in memory only; this action also
+        keeps the normalized document, which is the form the rest of the
+        pipeline and the project work with. The output name is derived from the
+        input file, never hard-coded.
+        """
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self,
+            self.tr("Import PCAP"),
+            self._start_dir(REPO_ROOT),
+            "Captures (*.pcap *.pcapng)",
+        )
+        if not path:
+            return
+        self._remember_dir(path)
+        source = Path(path)
+        out = source.with_name(f"{source.stem}.normalized.json")
+        try:
+            from ..capture.export import export_capture
+            from ..capture.pipeline import normalize
+
+            capture = normalize(source)
+            export_capture(
+                capture.sessions,
+                out,
+                source_file=str(capture.source_file),
+                capture_id=capture.capture_id,
+                streams=capture.streams,
+            )
+        except Exception as exc:
+            QtWidgets.QMessageBox.warning(
+                self, self.tr("Cannot import capture"), str(exc)
+            )
+            return
+        self._open_capture_reported(out)
+        self._notify(self.tr("wrote {0}").format(out.name))
 
     def load_rule(self, path: str | Path) -> None:
         """Load a rule file, keeping the previous rule and report for diffing."""
@@ -706,13 +848,43 @@ class MainWindow(QtWidgets.QMainWindow):
         self._rule.previous_report = previous_report
         self.validation_view.set_rule_text(self._rule.text)
         self.validation_view.set_rule_status(
-            self.tr("loaded {0}  rule v{1}").format(Path(path).name, self._rule.rule.rule_version)
+            self.tr("loaded {0}  rule v{1}").format(
+                Path(path).name, self._rule.rule.rule_version
+            )
+        )
+        self.guide_panel.set_rule(Path(path).name)
+
+    def build_rule(self) -> None:
+        """Open the form-based rule builder, seeded with the rule in the editor.
+
+        The builder works on the document, so a rule already loaded is offered
+        for editing rather than forcing a rewrite from an empty form.
+        """
+        from .rule_builder import RuleBuilderDialog
+
+        seed = None
+        text = self.validation_view.rule_text().strip()
+        if text:
+            try:
+                seed = load_rule_text(text)
+            except Exception:
+                seed = None
+        dialog = RuleBuilderDialog(seed, self)
+        dialog.setFont(theme.body_font(FONT_SIZE_BODY))
+        if dialog.exec() != QtWidgets.QDialog.DialogCode.Accepted:
+            return
+        self.validation_view.set_rule_text(dialog.rule_text())
+        self.validation_view.set_rule_status(
+            self.tr("rule built; apply it to check it")
         )
 
     def open_rule_dialog(self) -> None:
         """Prompt for a rule file and load it."""
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, self.tr("Open rule"), self._start_dir(REPO_ROOT / "examples"), "Rules (*.json *.yaml *.yml)"
+            self,
+            self.tr("Open rule"),
+            self._start_dir(REPO_ROOT / "examples"),
+            "Rules (*.json *.yaml *.yml)",
         )
         if path:
             self._remember_dir(path)
@@ -722,7 +894,9 @@ class MainWindow(QtWidgets.QMainWindow):
         """Load the first example rule, or report that none is present."""
         examples = sorted((REPO_ROOT / "examples").glob("*.json"))
         if not examples:
-            self.validation_view.set_rule_status(self.tr("no example rule found"), error=True)
+            self.validation_view.set_rule_status(
+                self.tr("no example rule found"), error=True
+            )
             return
         self.load_rule(examples[0])
 
@@ -740,6 +914,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.direction_combo.setCurrentText(direction)
         self.direction_combo.blockSignals(False)
         self.validation_view.set_context(session_id, direction)
+        self.guide_panel.set_session_ready(True)
         self._render_stream()
 
     def _on_direction_changed(self, direction: str) -> None:
@@ -763,12 +938,15 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             self._rule.reload(self.validation_view.rule_text())
         except Exception as exc:
-            self.validation_view.set_rule_status(self.tr("rule error: {0}").format(exc), error=True)
+            self.validation_view.set_rule_status(
+                self.tr("rule error: {0}").format(exc), error=True
+            )
             return
         application = self._rule.apply(self._capture, self._session_id, self._direction)
         self.validation_view.show_application(application)
         self.compare_view.show_application(application)
         self._show_hypotheses(self._rule.rule, application.messages)
+        self.guide_panel.set_applied(True)
         stream = self._capture.stream(self._session_id, self._direction)
         self.hex_view.set_annotations(annotations_from_application(application, stream))
         counts = ", ".join(f"{k}={v}" for k, v in sorted(application.counts.items()))
@@ -816,14 +994,19 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             self._rule.reload(self.validation_view.rule_text())
         except Exception as exc:
-            self.validation_view.set_rule_status(self.tr("rule error: {0}").format(exc), error=True)
+            self.validation_view.set_rule_status(
+                self.tr("rule error: {0}").format(exc), error=True
+            )
             return
         self._begin_run()
         self._set_progress(20)
         report = verify_rule_on_corpus(self._rule.rule, self._capture)
         self._set_progress(100)
         self._end_run()
-        if self._rule.previous_report is not None and self._rule.previous_report.rule_id == report.rule_id:
+        if (
+            self._rule.previous_report is not None
+            and self._rule.previous_report.rule_id == report.rule_id
+        ):
             self._show_report_diff(self._rule.previous_report, report)
         self._rule.corpus_report = report
         self._corpus_report = report
@@ -836,7 +1019,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 self._rule.rule.rule_version, counts, len(report.contradictions)
             )
         )
-        self._notify(self.tr("verified rule over the whole capture: {0}").format(counts))
+        self._notify(
+            self.tr("verified rule over the whole capture: {0}").format(counts)
+        )
 
     def _show_report_diff(self, report_a, report_b) -> None:
         from ..hypothesis.diff import diff_reports, format_report_diff
@@ -866,15 +1051,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self.hex_view.scroll_to_byte(offset)
         self._show_provenance(offset)
 
-    def _reveal_counterexample(self, session_id: str, direction: str, offset: int, length: int = 1) -> None:
+    def _reveal_counterexample(
+        self, session_id: str, direction: str, offset: int, length: int = 1
+    ) -> None:
         """Jump to a counterexample, switching session or direction if needed.
 
         A corpus counterexample can live in a direction other than the one on
         screen, so the tree selection is moved first, then the message bytes are
         highlighted as a block.
         """
-        if session_id and direction and (
-            session_id != self._session_id or direction != self._direction
+        if (
+            session_id
+            and direction
+            and (session_id != self._session_id or direction != self._direction)
         ):
             self.session_tree.select_direction(session_id, direction)
         self.hex_view.highlight_range(offset, length)
@@ -915,7 +1104,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self._provenance_label.setText(text)
         self._provenance_label.setToolTip(text)
         metrics = QtGui.QFontMetrics(self._provenance_label.font())
-        reserve = _PROVENANCE_CHAR_CAP if len(text) > _PROVENANCE_CHAR_CAP else len(text)
+        reserve = (
+            _PROVENANCE_CHAR_CAP if len(text) > _PROVENANCE_CHAR_CAP else len(text)
+        )
         width = metrics.horizontalAdvance(text[:reserve]) + _PROVENANCE_LABEL_PADDING
         self._provenance_label.setMinimumWidth(width)
 
@@ -939,7 +1130,12 @@ class MainWindow(QtWidgets.QMainWindow):
         if not source.is_file():
             self._notify(self.tr("{0} is not available").format(source.name))
             return
-        path, _ = QtWidgets.QFileDialog.getSaveFileName(self, self.tr("Export report"), str(source.parent / source.name), file_filter)
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            self.tr("Export report"),
+            str(source.parent / source.name),
+            file_filter,
+        )
         if not path:
             return
         text = source.read_text(encoding="utf-8")
@@ -958,7 +1154,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if self._rule is None or self._rule.root is None:
             self._notify(self.tr("apply a rule before saving a result"))
             return
-        path, _ = QtWidgets.QFileDialog.getSaveFileName(self, self.tr("Save result"), self._output_dir(REPO_ROOT), "JSON (*.json)")
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, self.tr("Save result"), self._output_dir(REPO_ROOT), "JSON (*.json)"
+        )
         if not path:
             return
         self._remember_dir(path)
@@ -968,7 +1166,9 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             write_result(result, path)
         except Exception as exc:
-            self.validation_view.set_rule_status(self.tr("could not save result: {0}").format(exc), error=True)
+            self.validation_view.set_rule_status(
+                self.tr("could not save result: {0}").format(exc), error=True
+            )
             self._notify(self.tr("could not save the result"))
             return
         self._notify(self.tr("wrote {0}").format(path))
@@ -980,20 +1180,27 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr("Quick help"),
             self.tr(
                 "Order of work\n"
-                "1. File - Open normalized capture (Ctrl+O).\n"
+                "The Start here panel on the workspace lists the same steps and\n"
+                "marks the ones already done. Help - Show start guide brings it back.\n"
+                "1. File - Open capture (Ctrl+O).\n"
                 "2. Pick a session, then a direction.\n"
-                "3. Rule - Open rule (Ctrl+R), or Load example in the Rule tab.\n"
+                "3. Rule - Build rule (Ctrl+B) for a form, Open rule (Ctrl+R), or Load example.\n"
                 "4. F5 applies the rule to the current direction; F6 to the whole capture.\n"
                 "5. Read the Counterexamples tab; clicking a row jumps to the bytes.\n"
                 "\n"
                 "Keys\n"
-                "Ctrl+O open capture   Ctrl+R open rule   Ctrl+S save result\n"
+                "Ctrl+O open capture   Ctrl+B build rule   Ctrl+R open rule   Ctrl+S save result\n"
                 "F5 apply direction    F6 apply capture   F1 this help\n"
                 "\n"
                 "The bytes are the source of truth. A rule is an interpretation; a\n"
                 "mismatch is a counterexample kept against it, not discarded."
             ),
         )
+
+    def show_guide(self) -> None:
+        """Bring the start guide back after it was hidden."""
+        self.guide_panel.setVisible(True)
+        self.guide_panel.raise_()
 
     def show_about(self) -> None:
         """Show the about dialog."""
@@ -1047,13 +1254,15 @@ def _markdown_to_html(text: str) -> str:
     token = theme.current()
     out: list[str] = [
         "<!DOCTYPE html><html><head><meta charset='utf-8'>",
-        (f"<style>body{{background:{token.background};color:{token.text_primary};"
-        f"font-family:{token.font_body},sans-serif;"
-        "max-width:960px;margin:2rem auto;padding:0 1rem} "
-        f"h1,h2,h3{{font-family:{token.font_heading},sans-serif;color:{token.text_primary}}} "
-        "table{border-collapse:collapse;margin:1rem 0} "
-        f"td,th{{border:1px solid {token.border};padding:4px 8px}} "
-        f"code{{color:{token.accent}}}</style>"),
+        (
+            f"<style>body{{background:{token.background};color:{token.text_primary};"
+            f"font-family:{token.font_body},sans-serif;"
+            "max-width:960px;margin:2rem auto;padding:0 1rem} "
+            f"h1,h2,h3{{font-family:{token.font_heading},sans-serif;color:{token.text_primary}}} "
+            "table{border-collapse:collapse;margin:1rem 0} "
+            f"td,th{{border:1px solid {token.border};padding:4px 8px}} "
+            f"code{{color:{token.accent}}}</style>"
+        ),
         "</head><body>",
     ]
     in_table = False
@@ -1075,7 +1284,9 @@ def _markdown_to_html(text: str) -> str:
             in_table = False
         if stripped.startswith("#"):
             level = len(stripped) - len(stripped.lstrip("#"))
-            out.append(f"<h{level}>{html_module.escape(stripped[level:].strip())}</h{level}>")
+            out.append(
+                f"<h{level}>{html_module.escape(stripped[level:].strip())}</h{level}>"
+            )
         elif stripped:
             out.append(f"<p>{html_module.escape(stripped)}</p>")
     if in_table:
@@ -1113,7 +1324,11 @@ def main(argv: list[str] | None = None) -> int:
         prog="src.ui.main_window",
         description="Open the protocol laboratory window.",
     )
-    parser.add_argument("--capture", type=Path, help="normalized capture JSON or raw PCAP/PCAPNG to open")
+    parser.add_argument(
+        "--capture",
+        type=Path,
+        help="normalized capture JSON or raw PCAP/PCAPNG to open",
+    )
     parser.add_argument("--rule", type=Path, help="rule JSON or YAML to open")
     args, qt_argv = parser.parse_known_args(argv)
 
@@ -1127,7 +1342,9 @@ def main(argv: list[str] | None = None) -> int:
             print(str(exc), file=sys.stderr)
             return 2
 
-    app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([sys.argv[0], *qt_argv])
+    app = QtWidgets.QApplication.instance() or QtWidgets.QApplication(
+        [sys.argv[0], *qt_argv]
+    )
     app.setApplicationName("Madrigal protocol laboratory")
     associate_with_desktop_entry(app)
     app.setWindowIcon(app_icon())

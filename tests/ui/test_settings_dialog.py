@@ -160,7 +160,10 @@ def test_cancel_restores_previous(window):
     dialog._on_cancel()
     assert dialog.result() == QtWidgets.QDialog.DialogCode.Rejected
     # The stored value is unchanged and the window keeps the old font size.
-    assert settings_mod.read_settings()["editor"]["hex_font_size"] == before["editor"]["hex_font_size"]
+    assert (
+        settings_mod.read_settings()["editor"]["hex_font_size"]
+        == before["editor"]["hex_font_size"]
+    )
     assert window.hex_view._font_size == window._settings["editor"]["hex_font_size"]
 
 
@@ -209,6 +212,30 @@ def test_show_offset_toggle(window):
     assert not first.startswith("00000000")
 
 
+def test_annotations_follow_bytes_when_offset_hidden(window):
+    """Byte highlighting must not shift when the offset column is hidden.
+
+    The rendered line stride changes with the offset column, so an annotation
+    computed from the shown-offset geometry lands inside the previous line. Every
+    annotated byte must still resolve to the selection that covers it.
+    """
+    from src.ui.model import MATCHED, ByteAnnotation
+
+    data = bytes(range(64))
+    window.hex_view.set_stream(data, [ByteAnnotation(kind=MATCHED) for _ in data])
+    window.hex_view.set_show_offset(False)
+    window.hex_view.set_show_offset(True)
+    window.hex_view.set_show_offset(False)
+    selections = window.hex_view.extraSelections()
+    assert selections, "the stream carries annotations"
+    stride = len(window.hex_view.document().firstBlock().text()) + 1
+    for selection in selections:
+        start = selection.cursor.selectionStart()
+        assert start % stride == 0, "a selection must start on the first byte column"
+    last = selections[-1].cursor
+    assert last.selectionEnd() > last.selectionStart(), "the last line keeps its bytes"
+
+
 def test_settings_signal_emits_mapping(app, isolated_settings):
     dialog = SettingsDialog()
     captured: list[dict] = []
@@ -217,7 +244,71 @@ def test_settings_signal_emits_mapping(app, isolated_settings):
     assert captured and captured[0]["advanced"]["log_level"] == "INFO"
 
 
+def test_start_guide_marks_progress(window):
+    """The guide walks capture, session, rule and apply, then hides itself."""
+    guide = window.guide_panel
+    assert not guide.isHidden(), "the guide is shown on a fresh window"
+    assert guide.step_capture.property("state") == "next"
+
+    window.open_capture(
+        REPO_ROOT
+        / "tests"
+        / "corpus"
+        / "reference_export"
+        / "corpus_capture_01.normalized.json"
+    )
+    assert guide.step_capture.property("state") == "done"
+    assert guide.step_session.property("state") == "done"
+    assert guide.step_rule.property("state") == "next"
+
+    window.load_rule(REPO_ROOT / "examples" / "corpus_rule_v1.json")
+    assert guide.step_rule.property("state") == "done"
+    assert guide.step_apply.property("state") == "next"
+
+    window.apply_rule()
+    assert guide.isHidden(), "the guide steps aside once the workspace is in use"
+
+
+def test_start_guide_can_be_shown_again(window):
+    window.guide_panel.setVisible(False)
+    assert window.guide_panel.isHidden()
+    window.show_guide()
+    assert not window.guide_panel.isHidden()
+
+
+def test_start_guide_stays_a_thin_strip(window):
+    """The guide must not eat the workspace it introduces."""
+    guide = window.guide_panel
+    guide.setVisible(True)
+    window.resize(1024, 768)
+    window.show()
+    for _ in range(3):
+        QtWidgets.QApplication.processEvents()
+    assert guide.height() < window.height() // 4
+
+
+def test_start_guide_keeps_the_step_hints_as_tooltips(window):
+    """The hint text is preserved, but rendered as a tooltip, not a paragraph."""
+    guide = window.guide_panel
+    step = guide.step_capture
+    assert "Ctrl+O" in step.hint.text()
+    assert step.toolTip() == step.hint.text()
+    assert step.hint.isHidden()
+
+
+def test_capture_action_names_both_accepted_forms(window):
+    """The menu must not claim that a raw pcap is rejected, because it is read."""
+    tip = window._actions["open_capture"].toolTip()
+    assert "pcap" in tip.lower()
+    assert "not read" not in tip.lower()
+
+
 def test_logging_level_is_valid_choice(app, isolated_settings):
     dialog = SettingsDialog()
     level = dialog._widgets["advanced"]["log_level"]
-    assert [level.itemData(i) for i in range(level.count())] == ["DEBUG", "INFO", "WARNING", "ERROR"]
+    assert [level.itemData(i) for i in range(level.count())] == [
+        "DEBUG",
+        "INFO",
+        "WARNING",
+        "ERROR",
+    ]

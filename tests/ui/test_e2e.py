@@ -29,7 +29,7 @@ try:
 
     from src.project.project import Project
     from src.ui import theme
-    from src.ui.hex_view import _byte_char_index, annotations_from_stream
+    from src.ui.hex_view import annotations_from_stream
     from src.ui.main_window import open_default_window
 except ImportError as exc:  # pragma: no cover - depends on the runner
     pytest.skip(f"Qt runtime unavailable: {exc}", allow_module_level=True)
@@ -137,11 +137,11 @@ def test_step05_click_byte_offset_4_shows_packet_and_seq(window, app):
     window.session_tree.select_direction("s1", "A_to_B")
     window.reveal_offset(4)
     # The edit cursor sits on the clicked byte.
-    assert window.hex_view.textCursor().selectionStart() == _byte_char_index(4)
+    assert window.hex_view.textCursor().selectionStart() == window.hex_view._char_index(4)
 
     # Simulate the real mouse click on the byte cell and read the status bar.
     cursor = window.hex_view.textCursor()
-    cursor.setPosition(_byte_char_index(4))
+    cursor.setPosition(window.hex_view._char_index(4))
     window.hex_view.setTextCursor(cursor)
     rect = window.hex_view.cursorRect(cursor)
     QtTest.QTest.mouseClick(
@@ -209,7 +209,7 @@ def test_step08_counterexample_click_moves_the_hex_cursor(window, app):
     app.processEvents()
 
     after = window.hex_view.textCursor().selectionStart()
-    assert after == _byte_char_index(counter.offset)
+    assert after == window.hex_view._char_index(counter.offset)
     assert after != before or counter.offset == 0
     assert f"offset {counter.offset}" in window._provenance_label.text()
 

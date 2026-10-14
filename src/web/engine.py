@@ -21,7 +21,7 @@ from pathlib import Path
 from src.capture.export import export_capture
 from src.capture.pipeline import normalize
 from src.protocol.engine import MessageResult, apply_rule
-from src.protocol.rule import Rule, RuleError, load_rule
+from src.protocol.rule import Rule, RuleError, load_rule, parse_rule
 from src.protocol.stream import (
     Capture,
     CaptureError,
@@ -112,9 +112,7 @@ class WebEngine:
     # -- construction ------------------------------------------------------
 
     @classmethod
-    def open(
-        cls, capture: str | Path, rule: str | Path | None = None
-    ) -> WebEngine:
+    def open(cls, capture: str | Path, rule: str | Path | None = None) -> WebEngine:
         """Open a capture (normalized JSON or raw PCAP) and an optional rule.
 
         Raises:
@@ -161,6 +159,54 @@ class WebEngine:
     @property
     def rule_version(self) -> int:
         return self._rule.rule_version if self._rule else 0
+
+    def set_rule_text(self, text: str) -> None:
+        """Replace the active rule from the text of a rule document.
+
+        Raises:
+            WebEngineError: If the text is not a well-formed rule, so the caller
+                can report the exact reason instead of a traceback.
+        """
+        from src.protocol.rule import load_rule_text
+
+        try:
+            document = load_rule_text(text)
+        except Exception as exc:
+            raise WebEngineError(f"rule is not valid JSON or YAML: {exc}") from exc
+        try:
+            self._rule = parse_rule(document)
+        except RuleError as exc:
+            raise WebEngineError(f"rule does not match the schema: {exc}") from exc
+        self.rule_path = None
+
+    def set_rule_path(self, path: str | Path) -> None:
+        """Replace the active rule from a file on disk."""
+        rule_path = Path(path)
+        try:
+            self._rule = load_rule(str(rule_path))
+        except FileNotFoundError as exc:
+            raise WebEngineError(f"rule not found: {rule_path}") from exc
+        except (RuleError, OSError) as exc:
+            raise WebEngineError(f"could not read the rule: {exc}") from exc
+        self.rule_path = rule_path
+
+    def replace_capture(self, path: str | Path, rule: str | Path | None = None) -> None:
+        """Open a different capture, keeping the current rule unless given one."""
+        capture_path = Path(path)
+        try:
+            data = _read_capture(capture_path)
+        except WebEngineError:
+            raise
+        except Exception as exc:
+            raise WebEngineError(f"could not read the capture: {exc}") from exc
+        try:
+            parsed = capture_from_dict(data)
+        except CaptureError as exc:
+            raise WebEngineError(f"capture does not match the contract: {exc}") from exc
+        self._capture = parsed
+        self.capture_path = capture_path
+        if rule is not None:
+            self.set_rule_path(rule)
 
     # -- sessions ----------------------------------------------------------
 
@@ -366,12 +412,18 @@ class WebEngine:
 
     # -- report ------------------------------------------------------------
 
-    def report_html(self, session_id: str | None = None, direction: str | None = None) -> str:
+    def report_html(
+        self, session_id: str | None = None, direction: str | None = None
+    ) -> str:
         """Render the current interpretation as a self-contained HTML page."""
         from src.report.html import _STYLESHEET  # the same brand stylesheet
 
         sessions = self.sessions()
-        target = self.session(session_id) if session_id else (sessions[0] if sessions else None)
+        target = (
+            self.session(session_id)
+            if session_id
+            else (sessions[0] if sessions else None)
+        )
         counters: list[dict] = []
         rows_html: list[str] = []
         if target is not None:
@@ -539,22 +591,29 @@ def _report_body(investigation: dict, rows_html: list[str]) -> str:
     )
     counters = investigation["counterexamples"]
     if counters:
-        counter_html = "<ul>" + "".join(
-            "<li>"
-            f"{_escape(c['session_id'])} {_escape(c['direction'])} offset "
-            f"{c['offset']} len {c['length']} <code>{_escape(c['bytes_hex'])}</code>"
-            "</li>"
-            for c in counters
-        ) + "</ul>"
+        counter_html = (
+            "<ul>"
+            + "".join(
+                "<li>"
+                f"{_escape(c['session_id'])} {_escape(c['direction'])} offset "
+                f"{c['offset']} len {c['length']} <code>{_escape(c['bytes_hex'])}</code>"
+                "</li>"
+                for c in counters
+            )
+            + "</ul>"
+        )
     else:
         counter_html = '<p class="muted">No counterexamples for this selection.</p>'
     table = (
         "<table><thead><tr><th>session</th><th>direction</th><th>offset</th>"
         "<th>length</th><th>status</th><th>bytes</th></tr></thead><tbody>"
-        + ("".join(rows_html) or '<tr><td colspan="6" class="muted">no messages</td></tr>')
+        + (
+            "".join(rows_html)
+            or '<tr><td colspan="6" class="muted">no messages</td></tr>'
+        )
         + "</tbody></table>"
     )
-    return f"""<h1>{_escape(investigation['title'])}</h1>
+    return f"""<h1>{_escape(investigation["title"])}</h1>
 <p class="muted">Generated by the local web interface. The bytes are the source of truth.</p>
 <h2>Scope</h2>
 <table>{scope_rows}</table>

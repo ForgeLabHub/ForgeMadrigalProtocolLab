@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Protocol laboratory{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Protocol laboratory</h1>
+  <p class="muted">
+    Inspect an undocumented TCP exchange: read the sessions, follow one
+    direction byte by byte, describe the messages with a rule, and see where the
+    rule holds and where it is contradicted.
+  </p>
+  <ol class="steps">
+    <li><b>Open a capture.</b> Upload a normalized JSON, or a raw
+      <code>.pcap</code>/<code>.pcapng</code> that is normalized on upload.</li>
+    <li><b>Pick a session and a direction.</b> The hex view shows the bytes and,
+      under them, the packet each byte came from.</li>
+    <li><b>Describe the messages.</b> Write a rule in the
+      <a href="/rule">rule editor</a>, or load the example rule that ships with
+      the project.</li>
+    <li><b>Apply the rule.</b> Every message is classified: matched, mismatched,
+      incomplete, ambiguous or uncovered. Mismatched messages are the
+      counterexamples to look at first.</li>
+    <li><b>Export the report.</b> The interpretation of every session is written
+      to a self-contained HTML page.</li>
+  </ol>
+  <div class="toolbar">
+    <a class="button button--accent" href="/open-capture">Open a capture</a>
+  </div>
+</section>
+{% endblock %}

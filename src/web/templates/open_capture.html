@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Open a capture{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Open a capture</h1>
+  <p class="muted">
+    Upload a normalized capture JSON, or a raw <code>.pcap</code>/<code>.pcapng</code>
+    that is normalized on upload. A rule is optional and can be added later.
+  </p>
+  <form class="form" method="post" action="/upload" enctype="multipart/form-data">
+    <label class="field-row">
+      <span>capture</span>
+      <input type="file" name="capture" accept=".json,.pcap,.pcapng" required>
+    </label>
+    <label class="field-row">
+      <span>rule (optional)</span>
+      <input type="file" name="rule" accept=".json,.yaml,.yml">
+    </label>
+    <div class="toolbar">
+      <button class="button button--accent" type="submit">Open</button>
+      <span class="spacer"></span>
+      <a class="button" href="/">Back</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

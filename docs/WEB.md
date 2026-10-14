@@ -28,9 +28,12 @@ python -m src.web.app --capture out/cap01.json --rule examples/corpus_rule_v1.js
 Then open <http://127.0.0.1:8765>.
 
 - `--capture` accepts a normalized `*.normalized.json` file, or a raw
-  `.pcap`/`.pcapng` that is normalized in memory on open.
+  `.pcap`/`.pcapng` that is normalized in memory on open. It may be omitted: the
+  page then opens with an upload form, and a capture can be chosen from the
+  browser.
 - `--rule` is optional. Without it the bytes are still shown and framed, but no
-  message is judged: every byte is `uncovered`.
+  message is judged: every byte is `uncovered`. A rule can also be pasted,
+  uploaded or taken from `examples/` on the `/rule` page.
 - `--port` defaults to `8765`.
 
 The server binds `127.0.0.1` only. Passing any other `--host` is refused, so the
@@ -59,10 +62,13 @@ conflicted, because `main` rewrote it in the submission format.
 
 ## What it does
 
-- Open a capture and list its sessions, with endpoints, roles and diagnostics.
+- Open a capture by command line or by uploading one in the page, and list its
+  sessions, with endpoints, roles and diagnostics.
 - Pick a session and a direction.
 - View the reassembled bytes as hex, with matched/mismatched/gap/ambiguity
   highlighting.
+- Write, paste, upload or load the example rule on the `/rule` page; a rejected
+  rule reports the reason instead of being applied.
 - Apply the rule to a direction and read the per-message verdicts.
 - Click a byte to see its provenance: packet index, TCP sequence number and
   timestamp.
@@ -76,11 +82,14 @@ stylesheet and `htmx.min.js` are served locally, so the page needs no network.
 
 By design, and to keep the scope honest:
 
-- no rule editor or rule diff/versioning
+- no form-based rule builder (the desktop window has one) — the web editor takes
+  a rule document as text or a file
+- no rule diff/versioning in the page
 - no metrics, charts or journal correlation
 - no alternative-hypothesis search
 - no theme switch (one dark theme, the brand)
-- no accounts, sessions, database or persistence — all state is in memory
+- no accounts, sessions, database or persistence — all state is in memory, and
+  an uploaded capture is written to a temporary directory owned by the process
 
 ## Errors
 
