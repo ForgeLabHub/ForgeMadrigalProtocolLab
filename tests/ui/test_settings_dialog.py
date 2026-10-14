@@ -209,6 +209,30 @@ def test_show_offset_toggle(window):
     assert not first.startswith("00000000")
 
 
+def test_annotations_follow_bytes_when_offset_hidden(window):
+    """Byte highlighting must not shift when the offset column is hidden.
+
+    The rendered line stride changes with the offset column, so an annotation
+    computed from the shown-offset geometry lands inside the previous line. Every
+    annotated byte must still resolve to the selection that covers it.
+    """
+    from src.ui.model import MATCHED, ByteAnnotation
+
+    data = bytes(range(64))
+    window.hex_view.set_stream(data, [ByteAnnotation(kind=MATCHED) for _ in data])
+    window.hex_view.set_show_offset(False)
+    window.hex_view.set_show_offset(True)
+    window.hex_view.set_show_offset(False)
+    selections = window.hex_view.extraSelections()
+    assert selections, "the stream carries annotations"
+    stride = len(window.hex_view.document().firstBlock().text()) + 1
+    for selection in selections:
+        start = selection.cursor.selectionStart()
+        assert start % stride == 0, "a selection must start on the first byte column"
+    last = selections[-1].cursor
+    assert last.selectionEnd() > last.selectionStart(), "the last line keeps its bytes"
+
+
 def test_settings_signal_emits_mapping(app, isolated_settings):
     dialog = SettingsDialog()
     captured: list[dict] = []
