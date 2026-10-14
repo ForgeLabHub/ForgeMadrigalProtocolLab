@@ -21,32 +21,39 @@ repository's own code. Every number is from `docs/METRICS.md`.
 | `assets/madrigal-mark.png` | the square monogram used as a watermark |
 | `assets/brand/` | three abstract background textures from the case owner's site |
 | `public/` | assets the deck serves: fonts, logo, QR codes, member photos |
-| `public/screencast-poster.png` | a spare poster frame baked from `screencast.mp4` (not shown on any slide) |
+| `public/screencast-poster.png` | the poster frame shown on slide 12 under `screencast.mp4` |
 | `defense_script.md` | the 5- and 10-minute speaker routes, one section per slide |
 | `Q_and_A.md` | the questions asked after the talk and the prepared answers |
 | `VIDEO.md` | shot list for the reserve screen recording |
-| `screencast.mp4` | the reserve recording of a full run (2:22, H.264, no sound) |
+| `screencast.mp4` | the reserve recording of a full run (2:22, H.264, no sound), embedded on slide 12 |
 | `record_demo.py` | drives the real window through the demo scenario for the recording |
-| `screencast.py` | the same driver on a real (xvfb) display so `ffmpeg -f x11grab` can record it |
 | `generate_screenshots.py` | renders the eleven window captures offscreen |
 | `make_assets.py` | panel crops, QR codes and the round member photos |
 | `make_brand.py` | builds the «Мадригал» wordmark and monogram |
 | `generate_qr.py` | writes the repository and release QR codes |
+| `make_deck_pptx.py` | packages a rendered deck PDF into a PPTX, one full-bleed page per slide |
 
 ## Building the deck
 
 The HTML is the source of truth. Both PDFs are printed from it with headless
-Chromium at a 2560×1440 page size; the PPTX packages one rendered page per slide
+Chromium; the `@media print` block in each file pins the page to 2560×1440 pt
+(16:9) with no margins and one slide per page, so the content fills the sheet.
+Without that block Chromium falls back to Letter, drops slides and leaves the
+lower half of every page blank. The PPTX packages one rendered page per slide
 with python-pptx. The dark theme is the HTML as authored; the light theme is a
 recolour of the same markup with the brand marks left dark and the surfaces
 lifted, so the layout and the copy are identical between the two.
 
 ```bash
 # print each theme to PDF (Chromium must be on PATH)
-chromium --headless --no-pdf-header-footer --print-to-pdf=slide.pdf \
+chromium --headless=new --no-pdf-header-footer --print-to-pdf=slide.pdf \
   "Презентация Madrigal Protocol Lab.html"
-chromium --headless --no-pdf-header-footer --print-to-pdf=slide-light.pdf \
+chromium --headless=new --no-pdf-header-footer --print-to-pdf=slide-light.pdf \
   "Презентация Madrigal Protocol Lab (светлая).html"
+
+# package the PDFs into PPTX (from the repository root)
+python -m presentation.make_deck_pptx presentation/slide.pdf presentation/slide.pptx
+python -m presentation.make_deck_pptx presentation/slide-light.pdf presentation/slide-light.pptx
 ```
 
 ## Regenerate the assets
@@ -64,9 +71,9 @@ python -m presentation.make_brand
 
 ## Notes
 
-- The deck is one file: fonts, logos, QR codes, screenshots and charts are all
-  inlined as `data:` URIs, so it opens and prints without a web server and
-  without the rest of the repository.
+- The deck is one file: fonts, logos, QR codes, screenshots, charts and the
+  reserve screencast are all inlined as `data:` URIs, so it opens, plays and
+  prints without a web server and without the rest of the repository.
 - Fonts (Tektur, Montserrat, JetBrains Mono) are bundled under `public/fonts/`
   and shipped in the HTML, so a machine without the families installed still
   shows the deck's own typefaces.

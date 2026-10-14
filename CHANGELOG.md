@@ -142,18 +142,19 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
 - Researcher annotations stored in the project (`src/project/annotations.py`),
   with `annotate` and `annotations` subcommands, and an Annotations section in
   both report renderers.
+- The reserve screencast is embedded in the deck: slide 12 plays
+  `public/screencast.mp4` in a `<video>` element (poster frame, controls, muted
+  autoplay), and the printed PDF/PPTX carry the poster frame.
 
 ### Changed
 
-- The deck was rebuilt as editable native PPTX text with click build-ins, then
-  reduced to nineteen slides with varied layouts and no overflow (PR #16,
-  PR #21, PR #25).
-- The final pass trimmed the animations to at most three click build-ins per
-  slide and a plain fade transition everywhere; the cover, the section
-  dividers, the recording slide and the closing slide are now static. The
-  recording slide's play badge moved to a 40 px marker in the bottom-right
-  corner, the metric note states that the 4 GiB budget is on a 16 GiB machine,
-  and the PPTX captions and labels were raised to 14 pt.
+- The deck was rebuilt as a single self-contained HTML file, printed to PDF and
+  packaged to PPTX as one full-bleed page per slide, reduced to fourteen slides
+  with varied layouts and no overflow (PR #16, PR #21, PR #25).
+- The deck is now static: no click build-ins and no transition animations. The
+  recording slide plays the reserve clip in place of a play badge, the metric
+  note states that the 4 GiB budget is on a 16 GiB machine, and the PDF and PPTX
+  carry the poster frame.
 - The defense script was split into a 5-minute and a 10-minute route with
   timings derived from the spoken text (PR #24).
 - The test counts across the documentation were refreshed to the merged
@@ -168,6 +169,10 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
 - The interface now fits small windows, and the Russian labels are complete,
   including the Settings theme names (PR #17).
 - The deck overflow and the reserve-clip length were corrected (PR #16, PR #23).
+- The printed deck filled only the top of each page: Chromium fell back to
+  Letter, so the content sat in the top two-thirds with a blank lower half. An
+  `@media print` block now pins the page to 2560×1440 pt (16:9) with no margins
+  and one slide per page, and the slides fill 92% of the height instead of 69%.
 - The stale "organizer captures not available" limit was replaced with the
   received-and-analysed state (PR #20, PR #26).
 

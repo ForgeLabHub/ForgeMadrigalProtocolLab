@@ -69,7 +69,8 @@ Nine of nine present.
   and «Предков Никита» with the rules and tests role.
 - Requirement 3: the stack line «Python 3.12 · PySide6 · dpkt · pytest · Docker»
   sits on the title slide; the architecture slide repeats the module breakdown.
-- Requirement 6: five GUI screenshots plus the committed screencast.
+- Requirement 6: five GUI screenshots plus the committed screencast, which slide
+  12 now plays in place of the live-window mock.
 - Requirement 7: `presentation/public/qr_repo.png` and `qr_release.png` are
   referenced by the closing slide and decode to the repository and the `v1.1.0`
   release; the per-member Telegram codes decode to `@Pasha1778` and `@petruan`.
@@ -124,11 +125,14 @@ same families through `src/ui/theme/fonts.py`.
 | served copy | `presentation/public/screencast.mp4` is a symlink to it | `ls -l presentation/public/screencast.mp4` |
 | codec, size | H.264, 1920x1080 | `ffprobe presentation/screencast.mp4` |
 | duration | 2:22 | `ffprobe presentation/screencast.mp4` |
+| shown on | slide 12, `<video src="public/screencast.mp4">` | `grep -c '<video' presentation/*.html` |
 
-The clip is not a slide of its own: the demo slide (12) shows the live-window
-screenshot and names the recording as its reserve in the caption. The clip stays
-a committed asset, played from the file system if the live window does not come
-up.
+The clip is embedded in the demo slide (12): the left card plays
+`presentation/public/screencast.mp4` in a `<video>` element with the poster frame
+`public/screencast-poster.png`, `controls`, `muted`, `loop` and `playsinline`.
+The printed PDF and PPTX therefore show the poster frame, and the HTML deck plays
+the recording in place. The clip stays a committed asset, played from the file
+system if the live window does not come up.
 
 ## Demo driver
 
