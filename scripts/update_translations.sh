@@ -31,6 +31,8 @@ SOURCES=(
     src/ui/hypotheses_view.py
     src/ui/validation_view.py
     src/ui/settings.py
+    src/ui/guide_panel.py
+    src/ui/rule_builder.py
 )
 TS="src/ui/locale/madrigal_ru.ts"
 QM="src/ui/locale/madrigal_ru.qm"

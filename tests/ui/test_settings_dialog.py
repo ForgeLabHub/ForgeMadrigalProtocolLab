@@ -276,6 +276,26 @@ def test_start_guide_can_be_shown_again(window):
     assert not window.guide_panel.isHidden()
 
 
+def test_start_guide_stays_a_thin_strip(window):
+    """The guide must not eat the workspace it introduces."""
+    guide = window.guide_panel
+    guide.setVisible(True)
+    window.resize(1024, 768)
+    window.show()
+    for _ in range(3):
+        QtWidgets.QApplication.processEvents()
+    assert guide.height() < window.height() // 4
+
+
+def test_start_guide_keeps_the_step_hints_as_tooltips(window):
+    """The hint text is preserved, but rendered as a tooltip, not a paragraph."""
+    guide = window.guide_panel
+    step = guide.step_capture
+    assert "Ctrl+O" in step.hint.text()
+    assert step.toolTip() == step.hint.text()
+    assert step.hint.isHidden()
+
+
 def test_capture_action_names_both_accepted_forms(window):
     """The menu must not claim that a raw pcap is rejected, because it is read."""
     tip = window._actions["open_capture"].toolTip()

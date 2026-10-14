@@ -5,9 +5,11 @@ in which order they are meant to be used. This panel names the four steps, marks
 the ones already done, and offers the button that performs the next one, so the
 tool can be driven without reading the manual first.
 
-The panel is a plain widget, not a dialog: it lives above the workspace and is
-hidden once a capture, a rule and an applied rule are all present, because by
-then the workspace itself shows what to do.
+The panel is a compact two-row strip above the workspace, not a dialog and not a
+block of prose: the steps sit side by side so the workspace keeps almost all of
+the window height. The longer hint for a step is a tooltip, not a paragraph. The
+strip hides itself once a capture, a rule and an applied rule are all present,
+because by then the workspace itself shows what to do.
 """
 
 from __future__ import annotations
@@ -19,38 +21,32 @@ from .constants import FONT_SIZE_BODY, FONT_SIZE_CAPTION
 
 
 class _Step(QtWidgets.QFrame):
-    """One numbered step: a title, a hint, an action and a done marker."""
+    """One numbered step: a title, a tooltip hint, an action and a done marker."""
 
     def __init__(self, number: int, title: str, hint: str, action: str | None) -> None:
         super().__init__()
         self.setObjectName("guideStep")
         layout = QtWidgets.QHBoxLayout(self)
-        layout.setContentsMargins(8, 6, 8, 6)
-        layout.setSpacing(8)
+        layout.setContentsMargins(8, 4, 8, 4)
+        layout.setSpacing(6)
 
         self.number = QtWidgets.QLabel(str(number))
         self.number.setObjectName("guideStepNumber")
-        self.number.setFixedWidth(18)
-        self.number.setAlignment(
-            QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignHCenter
-        )
+        self.number.setFixedWidth(14)
         layout.addWidget(self.number)
 
-        text = QtWidgets.QVBoxLayout()
-        text.setContentsMargins(0, 0, 0, 0)
-        text.setSpacing(1)
         self.title = QtWidgets.QLabel(title)
         self.title.setObjectName("guideStepTitle")
+        layout.addWidget(self.title)
+
+        # The hint is kept for the caption text and the translations, but shown
+        # as a tooltip: a paragraph per step would push the workspace off screen.
         self.hint = QtWidgets.QLabel(hint)
         self.hint.setObjectName("guideStepHint")
-        self.hint.setWordWrap(True)
-        text.addWidget(self.title)
-        text.addWidget(self.hint)
-        layout.addLayout(text, 1)
+        self.hint.setVisible(False)
 
         self.marker = QtWidgets.QLabel()
         self.marker.setObjectName("guideStepMarker")
-        self.marker.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         layout.addWidget(self.marker)
 
         self.button: QtWidgets.QPushButton | None = None
@@ -59,6 +55,8 @@ class _Step(QtWidgets.QFrame):
             self.button.setObjectName("guideStepAction")
             self.button.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
             layout.addWidget(self.button)
+
+        self.setToolTip(hint)
 
     def set_state(self, state: str) -> None:
         """Colour the step: ``done``, ``next`` or ``todo``."""
@@ -87,14 +85,17 @@ class GuidePanel(QtWidgets.QFrame):
         self.setObjectName("guidePanel")
 
         outer = QtWidgets.QVBoxLayout(self)
-        outer.setContentsMargins(12, 10, 12, 12)
-        outer.setSpacing(8)
+        outer.setContentsMargins(10, 6, 10, 8)
+        outer.setSpacing(6)
 
         head = QtWidgets.QHBoxLayout()
         head.setSpacing(8)
         self.title = QtWidgets.QLabel()
         self.title.setObjectName("guideTitle")
         head.addWidget(self.title)
+        self.status = QtWidgets.QLabel()
+        self.status.setObjectName("guideStatus")
+        head.addWidget(self.status)
         head.addStretch(1)
         self.hide_button = QtWidgets.QPushButton()
         self.hide_button.setObjectName("guideDismiss")
@@ -103,22 +104,24 @@ class GuidePanel(QtWidgets.QFrame):
         head.addWidget(self.hide_button)
         outer.addLayout(head)
 
-        self.status = QtWidgets.QLabel()
-        self.status.setObjectName("guideStatus")
-        self.status.setWordWrap(True)
-        outer.addWidget(self.status)
-
         self.step_capture = _Step(1, "", "", "")
         self.step_session = _Step(2, "", "", None)
         self.step_rule = _Step(3, "", "", "")
         self.step_apply = _Step(4, "", "", "")
+
+        # The four steps sit side by side: a stack of four hint rows was taller
+        # than the workspace it was meant to introduce.
+        steps = QtWidgets.QHBoxLayout()
+        steps.setSpacing(6)
         for step in (
             self.step_capture,
             self.step_session,
             self.step_rule,
             self.step_apply,
         ):
-            outer.addWidget(step)
+            steps.addWidget(step)
+        steps.addStretch(1)
+        outer.addLayout(steps)
         self.step_capture.button.clicked.connect(self.openCaptureRequested.emit)
         self.step_rule.button.clicked.connect(self.openRuleRequested.emit)
         self.step_apply.button.clicked.connect(self.applyRequested.emit)
@@ -189,7 +192,7 @@ class GuidePanel(QtWidgets.QFrame):
     def _status_text(self) -> str:
         if self._capture_name is None:
             return self.tr(
-                "Nothing is open yet. The tool reads a capture file (pcap, pcapng "
+                "Nothing is open yet: the tool reads a capture file (pcap, pcapng "
                 "or the normalized JSON) and a rule that says how to read it."
             )
         parts = [self.tr("capture: {0}").format(self._capture_name)]
@@ -234,6 +237,13 @@ class GuidePanel(QtWidgets.QFrame):
             )
         )
         self.step_apply.button.setText(self.tr("Apply to direction"))
+        for step in (
+            self.step_capture,
+            self.step_session,
+            self.step_rule,
+            self.step_apply,
+        ):
+            step.setToolTip(step.hint.text())
         self._refresh()
 
     def apply_theme(self) -> None:

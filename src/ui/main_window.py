@@ -153,7 +153,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._menus["file"] = file_menu
         self._actions["open_capture"] = self._action(
             file_menu,
-            "Open &capture...",
+            "Open &normalized capture...",
             self.open_capture_dialog,
             "Ctrl+O",
             tip="Open a capture: a raw .pcap/.pcapng is normalized on the fly, a normalized JSON is read as is",
@@ -306,7 +306,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for key, label in labels.items():
             self._menus[key].setTitle(label)
         sources = {
-            "open_capture": self.tr("Open &capture..."),
+            "open_capture": self.tr("Open &normalized capture..."),
             "open_rule": self.tr("Open &rule..."),
             "build_rule": self.tr("&Build rule..."),
             "save_result": self.tr("&Save result..."),
