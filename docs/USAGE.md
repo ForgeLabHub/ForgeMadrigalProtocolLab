@@ -142,18 +142,27 @@ is a viewer over them.
 
 A capture can be opened two ways from `File`: `Open normalized capture` reads a
 normalized JSON or a raw `.pcap`/`.pcapng`, and `Import PCAP` additionally writes
-the normalized document next to the input as `<name>.normalized.json`. The start
-guide above the workspace walks through the same order — open a capture, pick a
-session, describe the messages, apply the rule, export the report — and marks
-each step as it is done; `Hide` collapses it and `Help -> Show start guide`
-brings it back.
+the normalized document next to the input as `<name>.normalized.json`. Before
+anything is open the window shows an empty state with the order to follow — open
+a capture, pick a session, describe the messages, apply the rule, export the
+report — and marks each step as it is done; `Help -> Show start guide` brings the
+empty state back over the workspace.
 
 A rule can be written by hand in the `Rule` tab of the interpretation panel, or
 built from a form with `File -> Build rule...` (`Ctrl+B`). The builder covers the
 framing (length-prefixed, fixed-size, marker-based, manual) and one row per field
 (name, offset, type, byte order, length, enum values, hypothesis flag, expected
-values), and shows the generated document live; the result is loaded into the
-editor, where attributes the form does not cover can still be added.
+values), and shows the generated document live; when the builder is opened with a
+byte selected, the bytes of the message under the cursor are shown beside the
+form. The result is loaded into the editor, where attributes the form does not
+cover can still be added.
+
+The interpretation panel reports where the rule stands: the loaded rule and its
+framing, whether it has been applied to the current direction, the last verdict
+counts, and — for the byte under the cursor — the field that covers it and the
+chain back to the source packet. `Rule -> Check on corpus...` runs the rule over
+every capture in the project and lists the counterexamples in a separate window,
+each one a jump back to the byte in the hex view.
 
 ## 7.1 Interface language
 

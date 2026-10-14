@@ -79,6 +79,16 @@ def _format_expected(values: list | None) -> str:
     return ", ".join(str(value) for value in values)
 
 
+def _hex_dump(data: bytes, width: int = 16) -> str:
+    """A plain hex dump with byte offsets, used beside the field form."""
+    lines = []
+    for start in range(0, len(data), width):
+        chunk = data[start : start + width]
+        hexpart = " ".join(f"{byte:02x}" for byte in chunk).ljust(width * 3 - 1)
+        lines.append(f"{start:04x}  {hexpart}")
+    return "\n".join(lines)
+
+
 class _FieldRow:
     """The widgets of one field row, read back when the rule is generated."""
 
@@ -143,7 +153,10 @@ class RuleBuilderDialog(QtWidgets.QDialog):
     """Build a rule document from a framing form and a field table."""
 
     def __init__(
-        self, rule: dict | None = None, parent: QtWidgets.QWidget | None = None
+        self,
+        rule: dict | None = None,
+        parent: QtWidgets.QWidget | None = None,
+        message: bytes | None = None,
     ) -> None:
         super().__init__(parent)
         self.setWindowTitle(self.tr("Build rule"))
@@ -156,6 +169,11 @@ class RuleBuilderDialog(QtWidgets.QDialog):
         layout.addWidget(self._build_identity())
         layout.addWidget(self._build_framing())
         layout.addWidget(self._build_fields(), 1)
+        # The bytes of the message under the cursor sit beside the form so the
+        # field offsets can be read off the wire while they are typed. The pane is
+        # absent when the builder is opened with no capture.
+        if message:
+            layout.addWidget(self._build_message_pane(message))
         layout.addWidget(self._build_preview(), 1)
 
         buttons = QtWidgets.QDialogButtonBox(
@@ -354,6 +372,19 @@ class RuleBuilderDialog(QtWidgets.QDialog):
         buttons.addWidget(remove)
         buttons.addStretch(1)
         layout.addLayout(buttons)
+        return box
+
+    def _build_message_pane(self, message: bytes) -> QtWidgets.QGroupBox:
+        """A read-only hex dump of the message the form describes."""
+        box = QtWidgets.QGroupBox(self.tr("Message bytes"))
+        layout = QtWidgets.QVBoxLayout(box)
+        view = QtWidgets.QPlainTextEdit()
+        view.setReadOnly(True)
+        view.setFont(theme.mono_font(FONT_SIZE_BODY))
+        view.setLineWrapMode(QtWidgets.QPlainTextEdit.LineWrapMode.NoWrap)
+        view.setMaximumHeight(120)
+        view.setPlainText(_hex_dump(message))
+        layout.addWidget(view)
         return box
 
     def _build_preview(self) -> QtWidgets.QGroupBox:

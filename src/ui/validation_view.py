@@ -12,7 +12,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 from ..protocol.rule import ALL_FIELD_TYPES, load_rule_text, parse_rule
 from . import theme
-from .constants import FONT_SIZE_BODY
+from .constants import FONT_SIZE_BODY, FONT_SIZE_CAPTION
 from .layout import FlowLayout
 from .model import (
     MISMATCHED,
@@ -83,9 +83,40 @@ class ValidationView(QtWidgets.QWidget):
         rule_page = QtWidgets.QWidget()
         rule_layout = QtWidgets.QVBoxLayout(rule_page)
         rule_layout.setContentsMargins(0, 0, 0, 0)
+
+        # The overview is what a reader sees first: the rule's name, its state,
+        # its framing and its fields, in words. The document editor that produces
+        # the rule is one toggle away, not the default surface.
+        self._overview = QtWidgets.QWidget()
+        overview_layout = QtWidgets.QVBoxLayout(self._overview)
+        overview_layout.setContentsMargins(6, 6, 6, 6)
+        overview_layout.setSpacing(4)
+        self.rule_name = QtWidgets.QLabel()
+        self.rule_name.setObjectName("ruleName")
+        overview_layout.addWidget(self.rule_name)
+        self.rule_state = QtWidgets.QLabel()
+        self.rule_state.setProperty("role", "secondary")
+        overview_layout.addWidget(self.rule_state)
+        self.framing_label = QtWidgets.QLabel()
+        self.framing_label.setProperty("role", "secondary")
+        overview_layout.addWidget(self.framing_label)
+        self.fields_table = QtWidgets.QTableWidget(0, 3)
+        self.fields_table.setHorizontalHeaderLabels(["", "", ""])
+        self.fields_table.verticalHeader().setVisible(False)
+        self.fields_table.setEditTriggers(
+            QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers
+        )
+        self.fields_table.horizontalHeader().setSectionResizeMode(
+            2, QtWidgets.QHeaderView.ResizeMode.Stretch
+        )
+        self.fields_table.setFont(theme.body_font(FONT_SIZE_BODY))
+        overview_layout.addWidget(self.fields_table, 1)
+        rule_layout.addWidget(self._overview, 1)
+
         self.rule_edit = QtWidgets.QPlainTextEdit()
         self.rule_edit.setFont(theme.mono_font(FONT_SIZE_BODY))
         self.rule_edit.setPlaceholderText(self.tr("rule JSON or YAML"))
+        self.rule_edit.setVisible(False)
         self._completer = QtWidgets.QCompleter(sorted(ALL_FIELD_TYPES), self)
         self._completer.setWidget(self.rule_edit)
         self._completer.setCompletionMode(
@@ -116,6 +147,10 @@ class ValidationView(QtWidgets.QWidget):
         self.example_button.setToolTip(self.tr("Load the first rule from examples/"))
         self.example_button.clicked.connect(self.loadExampleRequested.emit)
         rule_buttons.addWidget(self.example_button)
+        self.edit_toggle = QtWidgets.QPushButton(self.tr("Edit JSON"))
+        self.edit_toggle.setCheckable(True)
+        self.edit_toggle.toggled.connect(self._toggle_editor)
+        rule_buttons.addWidget(self.edit_toggle)
         rule_layout.addLayout(rule_buttons)
         self.rule_status = QtWidgets.QLabel("")
         self.rule_status.setProperty("role", "secondary")
@@ -159,6 +194,89 @@ class ValidationView(QtWidgets.QWidget):
         self._direction = ""
         self._status_error = False
         self._message_count = 0
+
+        # The provenance inspector ties a selected byte to its packet. It is part
+        # of the primary workspace, not the status line, because a reader checks
+        # it constantly while deciding what a field means.
+        self.provenance = QtWidgets.QLabel()
+        self.provenance.setObjectName("provenanceCard")
+        self.provenance.setWordWrap(True)
+        self.provenance.setTextInteractionFlags(
+            QtCore.Qt.TextInteractionFlag.TextSelectableByMouse
+        )
+        self.provenance.setMinimumHeight(64)
+        layout.addWidget(self.provenance)
+
+        self.set_provenance([])
+        self._has_capture = False
+        self._has_rule = False
+        self._refresh_apply_state()
+        self.set_rule_overview(None, applied=False)
+
+    # -- readiness ---------------------------------------------------------
+
+    def set_ready(self, *, capture: bool, rule: bool) -> None:
+        """Record what is open so the apply button can gate itself.
+
+        Applying a rule needs both a capture and a rule. Until both are present
+        the apply buttons are disabled rather than left to fail on a click.
+        """
+        self._has_capture = bool(capture)
+        self._has_rule = bool(rule)
+        self._refresh_apply_state()
+
+    def _refresh_apply_state(self) -> None:
+        ready = self._has_capture and self._has_rule
+        for button in (self.apply_button, self.apply_capture_button):
+            button.setEnabled(ready)
+            button.setToolTip(
+                "" if ready else self.tr("Open a capture and a rule first")
+            )
+
+    def set_provenance(self, lines: list[str]) -> None:
+        """Fill the provenance inspector with the chain for a selected byte."""
+        self.provenance.setText(
+            "\n".join(lines) if lines else self.tr("No byte selected")
+        )
+
+    def set_rule_overview(self, rule, applied: bool) -> None:
+        """Fill the Rule overview from *rule*: its name, framing and fields."""
+        self._rule = rule
+        self._applied = applied
+        if rule is None:
+            self.rule_name.setText(self.tr("No rule loaded"))
+            self.rule_state.setText("")
+            self.framing_label.setText("")
+            self.fields_table.setRowCount(0)
+            return
+        self.rule_name.setText(self.tr("Rule: {0}").format(rule.name or rule.rule_id))
+        self.rule_state.setText(
+            self.tr("Status: checked") if applied else self.tr("Status: not checked")
+        )
+        self.framing_label.setText(
+            self.tr("Framing: {0}").format(_framing_label(rule.framing))
+        )
+        fields = rule.fields or []
+        self.fields_table.setRowCount(len(fields))
+        for row, field in enumerate(fields):
+            cells = (
+                field.name,
+                self.tr("offset {0}, {1}").format(field.offset, field.type),
+                self.tr("assumption") if field.hypothesis else "",
+            )
+            for column, text in enumerate(cells):
+                item = QtWidgets.QTableWidgetItem(str(text))
+                item.setForeground(QtGui.QColor(theme.current().text_secondary))
+                self.fields_table.setItem(row, column, item)
+        self.fields_table.resizeColumnsToContents()
+
+    def _toggle_editor(self, editing: bool) -> None:
+        """Switch the Rule tab between the overview and the JSON editor."""
+        self._overview.setVisible(not editing)
+        self.rule_edit.setVisible(editing)
+        self.edit_toggle.setText(
+            self.tr("View overview") if editing else self.tr("Edit JSON")
+        )
 
     # -- rule --------------------------------------------------------------
 
@@ -465,6 +583,20 @@ class ValidationView(QtWidgets.QWidget):
         self.build_button.setText(self.tr("Build rule..."))
         self.example_button.setText(self.tr("Load example"))
         self.example_button.setToolTip(self.tr("Load the first rule from examples/"))
+        self.edit_toggle.setText(
+            self.tr("View overview")
+            if self.edit_toggle.isChecked()
+            else self.tr("Edit JSON")
+        )
+        self.fields_table.setHorizontalHeaderLabels(
+            [self.tr("field"), self.tr("layout"), self.tr("note")]
+        )
+        if self._rule is not None:
+            self.set_rule_overview(self._rule, applied=getattr(self, "_applied", False))
+        else:
+            self.set_rule_overview(None, applied=False)
+        if not self._context.text() or not self._session_id:
+            self._context.setText(self.tr("no capture open"))
         self._tabs.setTabText(0, self.tr("Rule"))
         self._tabs.setTabToolTip(0, self.tr("Rule"))
         self.messages_table.setHorizontalHeaderLabels(
@@ -488,8 +620,37 @@ class ValidationView(QtWidgets.QWidget):
     def apply_theme(self) -> None:
         """Recolour the status line and rebuild the table in the active theme."""
         self._style_status()
+        self.provenance.setStyleSheet(
+            f"""
+            QLabel#provenanceCard {{
+                background: {theme.current().surface_alt};
+                border: 1px solid {theme.current().border};
+                border-radius: {theme.current().radius}px;
+                padding: 6px 8px;
+                color: {theme.current().text_secondary};
+                font-size: {FONT_SIZE_CAPTION}pt;
+            }}
+            """
+        )
+        self.provenance.setFont(theme.mono_font(FONT_SIZE_CAPTION))
+        self.rule_name.setFont(theme.heading_font(FONT_SIZE_BODY + 2))
         if self._application is not None:
             self.show_application(self._application)
+
+
+def _framing_label(framing) -> str:
+    """A short human label for a rule's framing section (a plain mapping)."""
+    if not isinstance(framing, dict):
+        return "-"
+    kind = str(framing.get("type", ""))
+    if kind == "length_prefixed":
+        size = framing.get("length_size", framing.get("size", 0))
+        return f"length_prefix ({size} bytes)"
+    if kind == "fixed_size":
+        return f"fixed_size ({framing.get('size', 0)} bytes)"
+    if kind == "marker_based":
+        return "marker_based"
+    return kind or "-"
 
 
 def _provenance_tooltip(message) -> str:
