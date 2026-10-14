@@ -129,9 +129,9 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
 - `docs/DEMO_CHEATSHEET.md` (a print-and-keep one-pager for the demo) and
   `presentation/Q_and_A.md` (fifteen defense questions in short form), linked
   from the README document list.
-- `presentation/fonts.py`, which embeds Tektur, Montserrat and JetBrains Mono
-  into `slides.pptx` as obfuscated `.fntdata` parts, so the deck renders its own
-  typefaces on a machine that has none of them installed.
+- The deck carries Tektur, Montserrat and JetBrains Mono, inlined into the
+  HTML, so it renders its own typefaces on a machine that has none of them
+  installed.
 - Field types `float`, `varint`, `tlv` and bit fields, decoded by the rule engine
   and covered by the rule schema.
 - CSV and JSONL result export: `write_result` picks the format from the output

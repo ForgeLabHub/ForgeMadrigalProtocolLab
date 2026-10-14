@@ -33,11 +33,6 @@ out/
 *.run
 *.whl
 
-# Presentation (Slidev) build artifacts
-presentation/node_modules/
-presentation/dist/
-presentation/.vite-cache/
-
 # Reserve video: large binary, rebuilt from presentation/VIDEO.md
 presentation/video.mp4
 
@@ -48,11 +43,8 @@ presentation/video.mp4
 # The dataset itself is committed under tests/corpus/real/; keep the duplicates out.
 sample_protocol.tar*
 
-# Slidev pptx export leaves per-click frames behind
-presentation/slides-*_[0-9]*.png
-
 # Incoming archives dropped in the repository root, and browser "save page"
-# bundles. The tracked presentation/presentation_html.zip is nested and stays.
+# bundles. Anything tracked under presentation/ is nested and stays.
 /*.zip
 /*.tar.gz
 /*.tgz

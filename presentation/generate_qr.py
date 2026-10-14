@@ -1,7 +1,7 @@
 """Generate the QR codes the deck shows.
 
 Two codes are needed: the repository and the release page. They are written to
-``presentation/public/`` so Slidev serves them as static assets. Run from the
+``presentation/public/`` and are inlined into the deck. Run from the
 repository root:
 
     python -m presentation.generate_qr

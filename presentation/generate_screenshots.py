@@ -7,7 +7,7 @@ presentation frame size (1920x1080). Before each grab any tooltip is hidden and
 the hover flags are cleared, so no tooltip or hover-only affordance appears and
 only widget content is captured.
 
-The images feed the slides in ``presentation/slides.md``. Run with the
+The images feed the slides of the deck. Run with the
 repository root as the working directory:
 
     QT_QPA_PLATFORM=offscreen python -m presentation.generate_screenshots

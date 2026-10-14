@@ -164,9 +164,9 @@ at their pinned versions: the specification fixes the versions, and moving
 - `git log --all -p | grep -iE 'ghp_|github_pat_'` returns no token. The only
   lines that match are the audit text itself, which quotes the search string.
 - `git ls-files | grep -i cache` finds no tracked cache directory.
-- The largest tracked files are the presentation media — `presentation_html.zip`
-  (1.5 MiB), `slides.pdf` and `slides.pptx` (1.3 MiB each). Nothing tracked
-  exceeds 5 MiB. `.git` is 31 MiB.
+- The largest tracked files are the presentation media — `slide.pdf`,
+  `slide-light.pdf`, `slide.pptx`, `slide-light.pptx` and
+  `presentation/screencast.mp4`. Nothing tracked exceeds 5 MiB. `.git` is 31 MiB.
 
 ## 8. Fresh-clone verification
 
@@ -275,7 +275,7 @@ the perceptual baseline comparison and the repository hygiene were merged into
 | Lint | `ruff check . --select "E4,E7,E9,F" --ignore E501`: All checks passed |
 | Coverage | 90% over `src/` (`pytest --cov=src`); the largest gap is `src/ui/` wiring |
 | CI | green on `main`: test matrix (3.12 and 3.13), `ui` matrix, `code-quality`, `dependency-audit` |
-| Largest tracked file | `presentation/presentation_html.zip`, 1.8 MiB, well under 5 MiB |
+| Largest tracked file | `presentation/screencast.mp4`, 1.0 MiB, well under 5 MiB |
 | Submission archive | `submission_20261012_1944.zip`, the published `v1.0.0` asset |
 | Fresh unpack | 780 passed, 1 skipped from a clean unpack of that asset |
 
@@ -364,17 +364,11 @@ safe, then by hand for the rest. The hand edits worth naming:
   `SIM115` pattern in test helpers.
 - `tests/integration/test_reference_report.py`: implicit string concatenation
   (`ISC001`).
-- `presentation/scripts/build_pptx.py`: `Inches()` calls moved out of function
-  defaults (`B008`).
+- `src/report/markdown.py`: a helper name shadowed a builtin (`A001`).
 
-Two automatic rewrites had to be followed up, because they changed more than
+One automatic rewrite had to be followed up, because it changed more than
 formatting:
 
-- `C408` turned the `dict(kind=...)` slide specs in `build_pptx.py` into `{...}`
-  literals. The presentation sync guard (`tests/project/test_presentation_sync.py`)
-  reads those specs from the source with `ast`; it now accepts both spellings and
-  collects only string *values*, never mapping keys, so nested spec keys such as
-  `accent`/`lead`/`text` are no longer mistaken for slide copy.
 - `UP042` turned `(str, Enum)` into `StrEnum` in `src/hypothesis/status.py` and
   `src/capture/session.py`. This supersedes the note in section 3 that kept the
   `str, Enum` spelling: the two are equivalent for the public contract, because
@@ -416,7 +410,7 @@ sync guard had to be taught to read.
 | `ruff check .` | All checks passed |
 | `ruff format --check .` | 100 files would be reformatted (still deferred) |
 | `mypy src/` | 114 findings in 13 files (still deferred) |
-| `presentation/slides.pdf`, `slides-light.pdf` | 14 pages, no blank page |
+| `presentation/slide.pdf`, `slide-light.pdf` | 14 pages, no blank page |
 
 The `mypy` findings are concentrated in three files: `src/protocol/engine.py`
 (75), `src/ui/main_window.py` (17) and `src/protocol/rule.py` (6). The engine

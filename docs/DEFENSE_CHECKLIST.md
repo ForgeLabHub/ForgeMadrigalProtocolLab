@@ -11,15 +11,15 @@ the repository at the final revision; re-run the command if the branch has moved
 - [ ] Тесты зелёные: `pytest tests/ -q` → **840 passed** на текущем `main`
       (на теге `v1.0.0`, который лежит в сдаваемом архиве, — **781 passed**; ≈ 8 min).
 - [ ] Линт чистый: `ruff check .` → All checks passed.
-- [ ] Дека: `presentation/slides.pdf` и `presentation/slides-light.pdf` — по **14 страниц**;
-      `presentation/slides.pptx` — 14 слайдов.
-      `pdfinfo presentation/slides.pdf | grep Pages` (нужен `poppler-utils`);
+- [ ] Дека: `presentation/slide.pdf` и `presentation/slide-light.pdf` — по **14 страниц**;
+      `presentation/slide.pptx` — 14 слайдов.
+      `pdfinfo presentation/slide.pdf | grep Pages` (нужен `poppler-utils`);
       без него слайды PPTX считаются стандартной библиотекой:
-      `python -c "import zipfile;z=zipfile.ZipFile('presentation/slides.pptx');print(len([n for n in z.namelist() if n.startswith('ppt/slides/slide') and n.endswith('.xml')]))"`
+      `python -c "import zipfile;z=zipfile.ZipFile('presentation/slide.pptx');print(len([n for n in z.namelist() if n.startswith('ppt/slides/slide') and n.endswith('.xml')]))"`
 - [ ] QR открываются: `zbarimg -q presentation/public/qr_repo.png` и
       `qr_release.png` декодируются в репозиторий и в релиз `v1.0.0`.
 - [ ] Релиз `v1.0.0` опубликован (не draft): 12 ассетов, включая
-      `submission_*.zip`, `slides.pdf` и `.deb`.
+      `submission_*.zip`, `slide.pdf` и `.deb`.
       `gh release view v1.0.0 --json isDraft,assets`
 - [ ] Ссылки в форме сдачи открываются в инкогнито (без входа в аккаунт).
 - [ ] Числа сверены с `docs/METRICS.md`, `docs/REAL_CORPUS_ANALYSIS.md`,
@@ -57,7 +57,7 @@ the repository at the final revision; re-run the command if the branch has moved
 git fetch --all --prune && git status -sb \
   && pytest tests/ -q \
   && ruff check . \
-  && pdfinfo presentation/slides.pdf | grep Pages \
+  && pdfinfo presentation/slide.pdf | grep Pages \
   && gh release view v1.0.0 --json isDraft,assets
 ```
 

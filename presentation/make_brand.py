@@ -28,7 +28,7 @@ FONTS = PRES / "public" / "fonts"
 
 WORD = "Мадригал"
 
-# Brand tokens, matching style.css (dark theme).
+# Brand tokens, matching the deck's dark theme.
 PLATE = (23, 19, 15, 255)          # #17130F, a warm near-black
 PLATE_EDGE = (255, 255, 255, 26)   # a hairline lighter than the plate
 TEXT = (244, 241, 236, 255)        # #F4F1EC

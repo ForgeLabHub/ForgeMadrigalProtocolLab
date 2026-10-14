@@ -25,14 +25,13 @@ done
 
 The ignore file covers the environments and tools in use: `.venv/`,
 `__pycache__/`, `.pytest_cache/`, `.mypy_cache/`, `.ruff_cache/`, `build/`,
-`dist/`, editor droppings, and the local scratch directories. The Slidev build
-output under `presentation/` (`node_modules/`, `dist/`, `.vite-cache/`) is
-ignored too. Capture files (`*.pcap`, `*.pcapng`) are ignored by default, with
-the fixtures, corpus, and reference exports re-included explicitly.
+`dist/`, editor droppings, and the local scratch directories. Capture files
+(`*.pcap`, `*.pcapng`) are ignored by default, with the fixtures, corpus, and
+reference exports re-included explicitly.
 
 Large generated binaries stay out of history: `presentation/video.mp4` is
 ignored and rebuilt from `presentation/VIDEO.md`. The committed artefacts
-(`slides.pdf`, `screencast.mp4`) are intentional deliverables.
+(`slide.pdf`, `slide.pptx`, `screencast.mp4`) are intentional deliverables.
 
 ## .gitattributes
 
@@ -83,5 +82,5 @@ hashes of the commits that made each change.
 
 ## .mailmap
 
-`.mailmap` folds the automated commit identity into the maintainer identity so
-`git shortlog` and `git log` attribute every commit to the person.
+`.mailmap` folds the historical author spellings into the maintainer's GitHub
+handle, so `git shortlog` and `git log` attribute every commit to one identity.

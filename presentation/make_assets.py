@@ -10,7 +10,7 @@ Everything here is derived from a committed source, nothing is drawn by hand:
   detected in the pixel data, so each slide can show the region it talks about
   at a readable scale instead of a shrunken 1920x1080 frame;
 * the two schematics of slides 3 and 5, which live in
-  ``presentation/assets/`` and are built by ``build_visualizations``.
+  ``presentation/assets/``.
 
 Run from the repository root:
 
