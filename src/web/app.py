@@ -26,12 +26,19 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .engine import WebEngine, WebEngineError
+from .guidance import status_meaning
 
 HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parents[1]
 TEMPLATES_DIR = HERE / "templates"
 STATIC_DIR = HERE / "static"
 FONTS_DIR = REPO_ROOT / "assets" / "fonts"
+
+# A small worked example that ships with the tool, so the web page can offer a
+# one-click demo instead of an empty form. Same files the desktop uses.
+SAMPLES_DIR = HERE.parent / "ui" / "samples"
+SAMPLE_CAPTURE = SAMPLES_DIR / "demo_capture.normalized.json"
+SAMPLE_RULE = SAMPLES_DIR / "demo_rule.json"
 
 # The byte-annotation and status colours, mirroring the desktop brand so the
 # web page and the application agree on what a verdict looks like.
@@ -51,6 +58,7 @@ def _templates() -> Jinja2Templates:
     templates.env.globals["status_class"] = lambda status: STATUS_CLASSES.get(
         status, "is-uncovered"
     )
+    templates.env.globals["status_meaning"] = status_meaning
     return templates
 
 
@@ -94,13 +102,27 @@ def create_app(
             return templates.TemplateResponse(
                 request,
                 "welcome.html",
-                {"request": request, "uploads": True},
+                {
+                    "request": request,
+                    "uploads": True,
+                    "demo_available": SAMPLE_CAPTURE.is_file(),
+                },
             )
         return templates.TemplateResponse(
             request,
             "sessions.html",
             _session_context(request, engine),
         )
+
+    @app.get("/demo")
+    async def open_demo() -> RedirectResponse:
+        # One click from the welcome page: open the bundled capture and its
+        # matching rule. A plain redirect, so a browser reload re-runs it.
+        if not SAMPLE_CAPTURE.is_file():
+            raise WebEngineError("the bundled demo is not available in this installation")
+        rule = SAMPLE_RULE if SAMPLE_RULE.is_file() else None
+        app.state.engine = WebEngine.open(SAMPLE_CAPTURE, rule)
+        return RedirectResponse(url="/", status_code=303)
 
     @app.get("/rule", response_class=HTMLResponse)
     async def rule_form(request: Request) -> HTMLResponse:

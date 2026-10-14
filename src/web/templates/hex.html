@@ -18,11 +18,11 @@
   {% endif %}
   <span class="spacer"></span>
   <span class="legend">
-    <span class="swatch swatch--matched"></span>matched
-    <span class="swatch swatch--mismatched"></span>mismatched
-    <span class="swatch swatch--gap"></span>gap
-    <span class="swatch swatch--ambiguous"></span>ambiguity
-    <span class="swatch swatch--uncovered"></span>uncovered
+    <span class="swatch swatch--matched" title="{{ status_meaning('matched') }}"></span>matched
+    <span class="swatch swatch--mismatched" title="{{ status_meaning('mismatched') }}"></span>mismatched
+    <span class="swatch swatch--gap" title="{{ status_meaning('incomplete') }}"></span>gap
+    <span class="swatch swatch--ambiguous" title="{{ status_meaning('ambiguous') }}"></span>ambiguity
+    <span class="swatch swatch--uncovered" title="{{ status_meaning('uncovered') }}"></span>uncovered
   </span>
 </div>
 
