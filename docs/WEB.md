@@ -39,6 +39,16 @@ Then open <http://127.0.0.1:8765>.
 The server binds `127.0.0.1` only. Passing any other `--host` is refused, so the
 interface cannot be exposed on the network by accident.
 
+This is by design and worth stating plainly: on a hosted or proxied URL the page
+returns **502 Bad Gateway**. That is not a fault — the app declines to bind
+`0.0.0.0`, so the proxy has nothing to forward to. To check the interface
+locally, run it and open the loopback address:
+
+```
+python -m src.web.app --port 12000
+# then open http://127.0.0.1:12000
+```
+
 ## Screenshot
 
 ![The hex view with a rule applied](web-screenshot.png)
@@ -53,7 +63,7 @@ Checked on the merged `main` (after the submission README rewrite) against
 `examples/corpus_rule_v1.json`: sessions → hex → apply → click byte →
 provenance. All three directions resolve, the rule reports `matched`, and the
 provenance card shows packet 3, seq 1001, ts 1700000000.004 for byte 0. The
-full suite passes at 781 tests. A capture of that run is in
+full suite passes at 846 tests. A capture of that run is in
 [screenshots/verify/web.png](screenshots/verify/web.png).
 
 The web module itself did not change during the merge; only `README.md`
