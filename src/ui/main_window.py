@@ -18,6 +18,7 @@ from pathlib import Path
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from ..protocol.result import build_result, write_result
+from ..protocol.rule import load_rule_text
 from . import theme
 from .compare_view import CompareView
 from .constants import (
@@ -160,6 +161,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self._actions["open_rule"] = self._action(
             file_menu, "Open &rule...", self.open_rule_dialog, "Ctrl+R"
         )
+        self._actions["build_rule"] = self._action(
+            file_menu,
+            "&Build rule...",
+            self.build_rule,
+            "Ctrl+B",
+            tip="Describe the message in a form instead of writing JSON by hand",
+        )
         self._actions["save_result"] = self._action(
             file_menu, "&Save result...", self.save_result_dialog, "Ctrl+S"
         )
@@ -293,6 +301,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sources = {
             "open_capture": self.tr("Open &capture..."),
             "open_rule": self.tr("Open &rule..."),
+            "build_rule": self.tr("&Build rule..."),
             "save_result": self.tr("&Save result..."),
             "quit": self.tr("&Quit"),
             "apply_direction": self.tr("&Apply to current direction"),
@@ -463,6 +472,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.validation_view.applyRequested.connect(self.apply_rule)
         self.validation_view.applyCaptureRequested.connect(self.apply_to_capture)
         self.validation_view.loadExampleRequested.connect(self.load_example_rule)
+        self.validation_view.buildRuleRequested.connect(self.build_rule)
         self.validation_view.ruleValidityChanged.connect(
             self.validation_view.show_rule_validity
         )
@@ -797,6 +807,30 @@ class MainWindow(QtWidgets.QMainWindow):
         )
         self.guide_panel.set_rule(Path(path).name)
 
+    def build_rule(self) -> None:
+        """Open the form-based rule builder, seeded with the rule in the editor.
+
+        The builder works on the document, so a rule already loaded is offered
+        for editing rather than forcing a rewrite from an empty form.
+        """
+        from .rule_builder import RuleBuilderDialog
+
+        seed = None
+        text = self.validation_view.rule_text().strip()
+        if text:
+            try:
+                seed = load_rule_text(text)
+            except Exception:
+                seed = None
+        dialog = RuleBuilderDialog(seed, self)
+        dialog.setFont(theme.body_font(FONT_SIZE_BODY))
+        if dialog.exec() != QtWidgets.QDialog.DialogCode.Accepted:
+            return
+        self.validation_view.set_rule_text(dialog.rule_text())
+        self.validation_view.set_rule_status(
+            self.tr("rule built; apply it to check it")
+        )
+
     def open_rule_dialog(self) -> None:
         """Prompt for a rule file and load it."""
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
@@ -1103,12 +1137,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 "marks the ones already done. Help - Show start guide brings it back.\n"
                 "1. File - Open capture (Ctrl+O).\n"
                 "2. Pick a session, then a direction.\n"
-                "3. Rule - Open rule (Ctrl+R), or Load example in the Rule tab.\n"
+                "3. Rule - Build rule (Ctrl+B) for a form, Open rule (Ctrl+R), or Load example.\n"
                 "4. F5 applies the rule to the current direction; F6 to the whole capture.\n"
                 "5. Read the Counterexamples tab; clicking a row jumps to the bytes.\n"
                 "\n"
                 "Keys\n"
-                "Ctrl+O open capture   Ctrl+R open rule   Ctrl+S save result\n"
+                "Ctrl+O open capture   Ctrl+B build rule   Ctrl+R open rule   Ctrl+S save result\n"
                 "F5 apply direction    F6 apply capture   F1 this help\n"
                 "\n"
                 "The bytes are the source of truth. A rule is an interpretation; a\n"

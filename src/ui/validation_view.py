@@ -40,7 +40,9 @@ def _field_summary(message) -> str:
         value = field.value
         field_marker = marker if field.hypothesis else ""
         if value is None:
-            parts.append(f"{field.field_name}: {field.reason or field.status.value}{field_marker}")
+            parts.append(
+                f"{field.field_name}: {field.reason or field.status.value}{field_marker}"
+            )
         else:
             parts.append(f"{field.field_name}={value}{field_marker}")
     return "  ".join(parts)
@@ -52,7 +54,10 @@ class ValidationView(QtWidgets.QWidget):
     applyRequested = QtCore.Signal()
     applyCaptureRequested = QtCore.Signal()
     loadExampleRequested = QtCore.Signal()
-    counterexampleSelected = QtCore.Signal(str, str, int, int)  # session, direction, offset, length
+    buildRuleRequested = QtCore.Signal()
+    counterexampleSelected = QtCore.Signal(
+        str, str, int, int
+    )  # session, direction, offset, length
     ruleLoaded = QtCore.Signal(str)
     ruleValidityChanged = QtCore.Signal(bool, str)  # valid, message
 
@@ -83,7 +88,9 @@ class ValidationView(QtWidgets.QWidget):
         self.rule_edit.setPlaceholderText(self.tr("rule JSON or YAML"))
         self._completer = QtWidgets.QCompleter(sorted(ALL_FIELD_TYPES), self)
         self._completer.setWidget(self.rule_edit)
-        self._completer.setCompletionMode(QtWidgets.QCompleter.CompletionMode.PopupCompletion)
+        self._completer.setCompletionMode(
+            QtWidgets.QCompleter.CompletionMode.PopupCompletion
+        )
         self._completer.setCaseSensitivity(QtCore.Qt.CaseSensitivity.CaseSensitive)
         self._completer.activated.connect(self._insert_completion)
         self.rule_edit.installEventFilter(self)
@@ -94,9 +101,17 @@ class ValidationView(QtWidgets.QWidget):
         self.apply_button.setProperty("accent", "true")
         self.apply_button.clicked.connect(self.applyRequested.emit)
         rule_buttons.addWidget(self.apply_button)
-        self.apply_capture_button = QtWidgets.QPushButton(self.tr("Apply to whole capture"))
+        self.apply_capture_button = QtWidgets.QPushButton(
+            self.tr("Apply to whole capture")
+        )
         self.apply_capture_button.clicked.connect(self.applyCaptureRequested.emit)
         rule_buttons.addWidget(self.apply_capture_button)
+        self.build_button = QtWidgets.QPushButton(self.tr("Build rule..."))
+        self.build_button.setToolTip(
+            self.tr("Describe the message in a form instead of writing JSON by hand")
+        )
+        self.build_button.clicked.connect(self.buildRuleRequested.emit)
+        rule_buttons.addWidget(self.build_button)
         self.example_button = QtWidgets.QPushButton(self.tr("Load example"))
         self.example_button.setToolTip(self.tr("Load the first rule from examples/"))
         self.example_button.clicked.connect(self.loadExampleRequested.emit)
@@ -115,8 +130,12 @@ class ValidationView(QtWidgets.QWidget):
         self.messages_table.setHorizontalHeaderLabels(
             [self.tr("offset"), self.tr("len"), self.tr("status"), self.tr("fields")]
         )
-        self.messages_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.messages_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.messages_table.setEditTriggers(
+            QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers
+        )
+        self.messages_table.setSelectionBehavior(
+            QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows
+        )
         self.messages_table.setFont(theme.body_font(FONT_SIZE_BODY))
         self.messages_table.verticalHeader().setVisible(False)
         header = self.messages_table.horizontalHeader()
@@ -169,7 +188,9 @@ class ValidationView(QtWidgets.QWidget):
         """Show which session and direction the panel is working on."""
         self._session_id = session_id
         self._direction = direction
-        self._context.setText(self.tr("session {0}   {1}").format(session_id, direction))
+        self._context.setText(
+            self.tr("session {0}   {1}").format(session_id, direction)
+        )
 
     # -- editor feedback ---------------------------------------------------
 
@@ -258,7 +279,9 @@ class ValidationView(QtWidgets.QWidget):
         elif message == "empty":
             self.set_rule_status("")
         else:
-            self.set_rule_status(self.tr("invalid rule: {0}").format(message), error=True)
+            self.set_rule_status(
+                self.tr("invalid rule: {0}").format(message), error=True
+            )
 
     # -- results -----------------------------------------------------------
 
@@ -267,7 +290,9 @@ class ValidationView(QtWidgets.QWidget):
         self.messages_table.setRowCount(1)
         self.messages_table.setSpan(0, 0, 1, 4)
         item = QtWidgets.QTableWidgetItem(
-            self.tr("no messages yet - apply a rule to this direction (F5) or to the capture (F6)")
+            self.tr(
+                "no messages yet - apply a rule to this direction (F5) or to the capture (F6)"
+            )
         )
         item.setForeground(QtGui.QColor(theme.current().text_secondary))
         self.messages_table.setItem(0, 0, item)
@@ -299,7 +324,12 @@ class ValidationView(QtWidgets.QWidget):
             item.setForeground(QtGui.QColor(theme.current().status_mismatched_text))
             item.setData(
                 QtCore.Qt.ItemDataRole.UserRole,
-                (application.session_id, application.direction, message.offset, message.length),
+                (
+                    application.session_id,
+                    application.direction,
+                    message.offset,
+                    message.length,
+                ),
             )
             item.setToolTip(_provenance_tooltip(message))
             self.counter_list.addItem(item)
@@ -307,13 +337,17 @@ class ValidationView(QtWidgets.QWidget):
             # A run with no mismatch in this direction is not a proof; say so,
             # and point at the corpus run, which is where mismatches appear.
             self.counter_list.addItem(
-                QtWidgets.QListWidgetItem(self.tr("no counterexamples in this direction"))
+                QtWidgets.QListWidgetItem(
+                    self.tr("no counterexamples in this direction")
+                )
             )
 
         counts = application.counts
         summary = "  ".join(f"{k}:{v}" for k, v in sorted(counts.items()))
         self._tabs.setTabText(1, self.tr("Messages ({0})").format(len(ordered)))
-        self._tabs.setTabText(2, self.tr("Counterexamples ({0})").format(len(counterexamples)))
+        self._tabs.setTabText(
+            2, self.tr("Counterexamples ({0})").format(len(counterexamples))
+        )
         if not self.rule_status.text():
             self.set_rule_status(
                 self.tr("rule v{0}  {1}").format(application.rule.rule_version, summary)
@@ -375,7 +409,10 @@ class ValidationView(QtWidgets.QWidget):
         shows one direction, and mixing directions into it would be misleading.
         """
         self.counter_list.clear()
-        for counter in sorted(report.contradictions, key=lambda c: (c.session_id, c.direction, c.message_offset)):
+        for counter in sorted(
+            report.contradictions,
+            key=lambda c: (c.session_id, c.direction, c.message_offset),
+        ):
             text = (
                 f"{counter.session_id} {counter.direction}  "
                 f"offset {counter.message_offset}  {counter.bytes_hex or ''}  {counter.reason or ''}"
@@ -384,7 +421,12 @@ class ValidationView(QtWidgets.QWidget):
             item.setForeground(QtGui.QColor(theme.current().status_mismatched_text))
             item.setData(
                 QtCore.Qt.ItemDataRole.UserRole,
-                (counter.session_id, counter.direction, counter.message_offset, counter.message_length),
+                (
+                    counter.session_id,
+                    counter.direction,
+                    counter.message_offset,
+                    counter.message_length,
+                ),
             )
             item.setToolTip(_counter_provenance_tooltip(counter))
             self.counter_list.addItem(item)
@@ -402,7 +444,8 @@ class ValidationView(QtWidgets.QWidget):
         return sum(
             1
             for row in range(self.counter_list.count())
-            if self.counter_list.item(row).data(QtCore.Qt.ItemDataRole.UserRole) is not None
+            if self.counter_list.item(row).data(QtCore.Qt.ItemDataRole.UserRole)
+            is not None
         )
 
     def show_message_count(self, count: int) -> None:
@@ -419,6 +462,7 @@ class ValidationView(QtWidgets.QWidget):
         self.rule_edit.setPlaceholderText(self.tr("rule JSON or YAML"))
         self.apply_button.setText(self.tr("Apply to current direction"))
         self.apply_capture_button.setText(self.tr("Apply to whole capture"))
+        self.build_button.setText(self.tr("Build rule..."))
         self.example_button.setText(self.tr("Load example"))
         self.example_button.setToolTip(self.tr("Load the first rule from examples/"))
         self._tabs.setTabText(0, self.tr("Rule"))
@@ -427,11 +471,19 @@ class ValidationView(QtWidgets.QWidget):
             [self.tr("offset"), self.tr("len"), self.tr("status"), self.tr("fields")]
         )
         self._tabs.setTabText(1, self.tr("Messages ({0})").format(self._message_count))
-        self._tabs.setTabToolTip(1, self.tr("Messages ({0})").format(self._message_count))
-        self._tabs.setTabText(2, self.tr("Counterexamples ({0})").format(self.counterexample_count))
-        self._tabs.setTabToolTip(2, self.tr("Counterexamples ({0})").format(self.counterexample_count))
+        self._tabs.setTabToolTip(
+            1, self.tr("Messages ({0})").format(self._message_count)
+        )
+        self._tabs.setTabText(
+            2, self.tr("Counterexamples ({0})").format(self.counterexample_count)
+        )
+        self._tabs.setTabToolTip(
+            2, self.tr("Counterexamples ({0})").format(self.counterexample_count)
+        )
         if self._context.text() and self._session_id:
-            self._context.setText(self.tr("session {0}   {1}").format(self._session_id, self._direction))
+            self._context.setText(
+                self.tr("session {0}   {1}").format(self._session_id, self._direction)
+            )
 
     def apply_theme(self) -> None:
         """Recolour the status line and rebuild the table in the active theme."""
@@ -457,7 +509,10 @@ def _provenance_tooltip(message) -> str:
 
 def _counter_provenance_tooltip(counter) -> str:
     """A tooltip for a corpus counterexample: session, direction and packets."""
-    parts = [f"{counter.session_id} {counter.direction}", f"offset {counter.message_offset}"]
+    parts = [
+        f"{counter.session_id} {counter.direction}",
+        f"offset {counter.message_offset}",
+    ]
     provenance = counter.provenance_range or {}
     packets = provenance.get("packets")
     if packets:
