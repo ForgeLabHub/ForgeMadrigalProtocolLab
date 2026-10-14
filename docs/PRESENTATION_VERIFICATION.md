@@ -33,12 +33,12 @@ Per-page headings, from the source HTML:
       2  Нас двое
       3  TCP разрезает сообщения посередине
       4  Дано и требуется
-      5  Три модуля связаны форматами, а не вызовами
-      6  От интерпретации можно вернуться к исходным данным
-      7  Правило проверяется на всём корпусе сразу
-      8  Контрпример важнее метрики
-      9  Что получилось: 60 из 140 → 140 из 140
-     10  Осколки IP собираются в одно сообщение
+      5  Путь исследователя
+      6  Гипотеза ≠ Правило
+      7  От интерпретации можно вернуться к исходным данным
+      8  Правило проверяется на всём корпусе сразу
+      9  Контрпример важнее метрики
+     10  Что получилось: 60 из 140 → 140 из 140
      11  Набор организаторов разобран целиком
      12  Демонстрация: живое окно и запись прогона
      13  Границы применения и итоги
@@ -52,25 +52,23 @@ No page is blank; each carries a heading or a section number.
 | --- | --- | --- | --- |
 | 1 | Тема | yes | 1 |
 | 2 | Состав команды с фото и ролями | yes | 2 |
-| 3 | Технический стек | yes | 1, 5 |
+| 3 | Технический стек | yes | 1 |
 | 4 | Архитектура | yes | 5 |
-| 5 | Функционал и киллер-фичи | yes | 6, 7, 8 |
-| 6 | Скриншоты или скринкаст | yes | 6, 7, 8, 12 |
+| 5 | Функционал и киллер-фичи | yes | 7, 8, 9 |
+| 6 | Скриншоты или скринкаст | yes | 12 |
 | 7 | QR на GitHub | yes | 14 |
 | 8 | Демонстрация отдельным блоком | yes | 12 |
 | 9 | Направления развития | yes | 13 |
 
 Nine of nine present.
 
-- Requirement 2: slide 2 shows the two real member photos,
-  `presentation/public/avatar_pavel_round.png` and
-  `avatar_nikita_round.png` (360x360, distinct files with distinct hashes), beside
-  both entries: «Сабадаш Павел» with the architecture, capture and interface role,
-  and «Предков Никита» with the rules and tests role.
 - Requirement 3: the stack line «Python 3.12 · PySide6 · dpkt · pytest · Docker»
-  sits on the title slide; the architecture slide repeats the module breakdown.
-- Requirement 6: five GUI screenshots plus the committed screencast, which slide
-  12 now plays in place of the live-window mock.
+  sits on the title slide.
+- Requirement 4: the «Путь исследователя» slide shows the pipeline
+  (capture → сессии → правила → отчёт); the module contracts (JSON Schema) are
+  stated in the speaker script.
+- Requirement 6: the demo slide plays the committed screencast. The deck carries
+  no standalone GUI screenshots; those are added after the UX overhaul.
 - Requirement 7: `presentation/public/qr_repo.png` and `qr_release.png` are
   referenced by the closing slide and decode to the repository and the `v1.1.0`
   release; the per-member Telegram codes decode to `@Pasha1778` and `@petruan`.

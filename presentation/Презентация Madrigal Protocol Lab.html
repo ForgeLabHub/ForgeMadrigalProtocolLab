@@ -247,13 +247,10 @@
         </div>
       </div>
 
-      <div class="bg-card" style="padding: 24px; text-align: center;">
-        <p style="font-size: 16px; color: #94a3b8; margin-bottom: 12px;">
-          Смещение поля длины оказалось на четыре байта позже, чем мы считали: одно правило, два чтения, поле длины остаётся на <span class="mono accent-amber">offset 2</span>.
+      <div class="bg-card" style="padding: 28px; text-align: center;">
+        <p style="font-size: 20px; color: #e2e8f0; font-weight: 600; margin: 0; line-height: 1.5;">
+          Без спецификации нельзя «посмотреть в байты» — нужно строить и проверять гипотезы.
         </p>
-        <div class="mono" style="font-size: 20px; font-weight: 700; letter-spacing: 4px; color: #f8fafc; background: #111318; padding: 12px; border-radius: 8px; display: inline-block;">
-          <span style="color:#ef4444;">01</span> 00 <span style="color:#10b981;">00 03</span> 13 00 55 02 00 00
-        </div>
       </div>
     </div>
 
@@ -263,65 +260,122 @@
     </div>
   </div>
 
-  <!-- SLIDE 5: Architecture / Modules -->
+  <!-- SLIDE 5: Researcher's Path -->
   <div class="slide-container" id="slide5">
     <div class="slide-header">
       <div>
-        <div class="slide-tag">АРХИТЕКТУРА</div>
-        <h2 class="slide-title">Три модуля связаны форматами, а не вызовами</h2>
+        <div class="slide-tag">МЕТОД</div>
+        <h2 class="slide-title">Путь исследователя</h2>
       </div>
       <div class="slide-number">05 / 14</div>
     </div>
 
-    <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 32px;">
-      <div style="display: flex; gap: 20px; align-items: center;">
-        <div class="bg-card" style="flex: 1; padding: 28px;">
-          <div class="mono" style="color: #ef4444; font-weight: 700; margin-bottom: 8px; font-size: 18px;">capture</div>
-          <p style="font-size: 15px; color: #94a3b8; margin-bottom: 16px;">pcap/pcapng → сессии</p>
-          <div class="mono" style="font-size: 12px; background: #111318; padding: 8px 12px; border-radius: 6px; color: #38bdf8;">
-            reassembly, provenance
+    <div style="flex-grow: 1; display: flex; align-items: center;">
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; width: 100%;">
+        <div class="bg-card" style="padding: 18px; display: flex; gap: 14px; align-items: flex-start;">
+          <div class="mono accent-blue" style="font-size: 26px; font-weight: 800; line-height: 1;">1</div>
+          <div>
+            <div style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px;">Открыть PCAP</div>
+            <div style="font-size: 13px; color: #94a3b8; line-height: 1.4;">Загрузить захват или журнал устройства</div>
           </div>
         </div>
-
-        <i class="fa-solid fa-arrow-right accent-red" style="font-size: 20px;"></i>
-
-        <div class="mono" style="font-size: 13px; color: #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 8px 12px; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px;">JSON</div>
-
-        <i class="fa-solid fa-arrow-right accent-red" style="font-size: 20px;"></i>
-
-        <div class="bg-card" style="flex: 1; padding: 28px;">
-          <div class="mono" style="color: #10b981; font-weight: 700; margin-bottom: 8px; font-size: 18px;">protocol + hypothesis</div>
-          <p style="font-size: 15px; color: #94a3b8; margin-bottom: 16px;">правила, фрейминг</p>
-          <div class="mono" style="font-size: 12px; background: #111318; padding: 8px 12px; border-radius: 6px; color: #38bdf8;">
-            контрпримеры, версии
+        <div class="bg-card" style="padding: 18px; display: flex; gap: 14px; align-items: flex-start;">
+          <div class="mono accent-blue" style="font-size: 26px; font-weight: 800; line-height: 1;">2</div>
+          <div>
+            <div style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px;">Выбрать сессию</div>
+            <div style="font-size: 13px; color: #94a3b8; line-height: 1.4;">Сессия и направление потока</div>
           </div>
         </div>
-
-        <i class="fa-solid fa-arrow-right accent-red" style="font-size: 20px;"></i>
-
-        <div class="mono" style="font-size: 13px; color: #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 8px 12px; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px;">JSON</div>
-
-        <i class="fa-solid fa-arrow-right accent-red" style="font-size: 20px;"></i>
-
-        <div class="bg-card" style="flex: 1; padding: 28px;">
-          <div class="mono" style="color: #3b82f6; font-weight: 700; margin-bottom: 8px; font-size: 18px;">ui</div>
-          <p style="font-size: 15px; color: #94a3b8; margin-bottom: 16px;">окно PySide6</p>
-          <div class="mono" style="font-size: 12px; background: #111318; padding: 8px 12px; border-radius: 6px; color: #38bdf8;">
-            исследование и просмотр
+        <div class="bg-card" style="padding: 18px; display: flex; gap: 14px; align-items: flex-start;">
+          <div class="mono accent-blue" style="font-size: 26px; font-weight: 800; line-height: 1;">3</div>
+          <div>
+            <div style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px;">Увидеть байты</div>
+            <div style="font-size: 13px; color: #94a3b8; line-height: 1.4;">Байты рядом с действиями устройства</div>
+          </div>
+        </div>
+        <div class="bg-card" style="padding: 18px; display: flex; gap: 14px; align-items: flex-start;">
+          <div class="mono accent-blue" style="font-size: 26px; font-weight: 800; line-height: 1;">4</div>
+          <div>
+            <div style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px;">Создать гипотезу</div>
+            <div style="font-size: 13px; color: #94a3b8; line-height: 1.4;">Предположить структуру поля</div>
+          </div>
+        </div>
+        <div class="bg-card" style="padding: 18px; display: flex; gap: 14px; align-items: flex-start;">
+          <div class="mono accent-blue" style="font-size: 26px; font-weight: 800; line-height: 1;">5</div>
+          <div>
+            <div style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px;">Превратить в правило</div>
+            <div style="font-size: 13px; color: #94a3b8; line-height: 1.4;">Гипотеза становится формальным правилом</div>
+          </div>
+        </div>
+        <div class="bg-card" style="padding: 18px; display: flex; gap: 14px; align-items: flex-start;">
+          <div class="mono accent-blue" style="font-size: 26px; font-weight: 800; line-height: 1;">6</div>
+          <div>
+            <div style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px;">Проверить на корпусе</div>
+            <div style="font-size: 13px; color: #94a3b8; line-height: 1.4;">Прогнать правило по всем захватам</div>
+          </div>
+        </div>
+        <div class="bg-card" style="padding: 18px; display: flex; gap: 14px; align-items: flex-start;">
+          <div class="mono accent-blue" style="font-size: 26px; font-weight: 800; line-height: 1;">7</div>
+          <div>
+            <div style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px;">Найти контрпример</div>
+            <div style="font-size: 13px; color: #94a3b8; line-height: 1.4;">Уточнить правило по несоответствию</div>
+          </div>
+        </div>
+        <div class="bg-card" style="padding: 18px; display: flex; gap: 14px; align-items: flex-start;">
+          <div class="mono accent-blue" style="font-size: 26px; font-weight: 800; line-height: 1;">8</div>
+          <div>
+            <div style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px;">Экспортировать отчёт</div>
+            <div style="font-size: 13px; color: #94a3b8; line-height: 1.4;">Сохранить проверяемый результат</div>
           </div>
         </div>
       </div>
+    </div>
 
-      <div style="text-align: center; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 20px; border-radius: 12px;">
+    <div class="footer-bar">
+      <span>Команда HTTP 418 · кейс #02 · Мадригал</span>
+      <span>Метод</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 5b: Hypothesis vs Rule -->
+  <div class="slide-container" id="slide5b">
+    <div class="slide-header">
+      <div>
+        <div class="slide-tag">ЯДРО ПРОЕКТА</div>
+        <h2 class="slide-title">Гипотеза ≠ Правило</h2>
+      </div>
+      <div class="slide-number">06 / 14</div>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 28px;">
+      <div style="display: flex; gap: 24px;">
+        <div class="bg-card" style="flex: 1; padding: 28px; border-color: #f59e0b;">
+          <div class="mono accent-amber" style="font-size: 16px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px;">Гипотеза</div>
+          <div class="mono" style="font-size: 18px; color: #f8fafc; margin-bottom: 16px;">«Кажется, value = байты 4–5»</div>
+          <ul style="list-style: none; font-size: 15px; color: #94a3b8; display: flex; flex-direction: column; gap: 8px;">
+            <li>Словами, с основанием</li>
+            <li>Статус: черновик / проверяется</li>
+          </ul>
+        </div>
+        <div class="bg-card" style="flex: 1; padding: 28px; border-color: #10b981;">
+          <div class="mono accent-green" style="font-size: 16px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px;">Правило</div>
+          <div class="mono" style="font-size: 18px; color: #f8fafc; margin-bottom: 16px;">offset: 2, size: 2, type: uint16</div>
+          <ul style="list-style: none; font-size: 15px; color: #94a3b8; display: flex; flex-direction: column; gap: 8px;">
+            <li>Формально, применимо</li>
+            <li>Статус: актуально / устарело</li>
+          </ul>
+        </div>
+      </div>
+      <div style="text-align: center; background: #111318; border: 1px solid #3b82f6; padding: 20px; border-radius: 12px;">
         <p style="font-size: 18px; color: #f8fafc; margin: 0;">
-          Контракты между модулями зафиксированы <span class="accent-green" style="font-weight: 700;">схемами JSON</span>; порядок вызовов не важен
+          Гипотеза без правила — заметка. Правило без гипотезы — парсер. Ценность — когда связаны.
         </p>
       </div>
     </div>
 
     <div class="footer-bar">
       <span>Команда HTTP 418 · кейс #02 · Мадригал</span>
-      <span>Постановка и метод</span>
+      <span>Ядро проекта</span>
     </div>
   </div>
 
@@ -332,7 +386,7 @@
         <div class="slide-tag">ПОСТАНОВКА И МЕТОД</div>
         <h2 class="slide-title">От интерпретации можно вернуться к исходным данным</h2>
       </div>
-      <div class="slide-number">06 / 14</div>
+      <div class="slide-number">07 / 14</div>
     </div>
 
     <div style="flex-grow: 1; display: flex; gap: 32px; align-items: center;">
@@ -345,24 +399,14 @@
         <div>00000050 <span style="background: rgba(16,185,129,0.2);">01 00 00 01 11 01 00 00 01 12 01 00 00 01 10 01</span></div>
       </div>
 
-      <div class="bg-card" style="flex: 0.8; padding: 32px; display: flex; flex-direction: column; gap: 16px;">
-        <h3 style="font-size: 18px; color: #fff; margin-bottom: 8px;">Метаданные пакета</h3>
-        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid #27272a;">
-          <span style="color: #64748b;">Packet Index:</span>
-          <span class="mono accent-amber">packet 3</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid #27272a;">
-          <span style="color: #64748b;">Sequence Number:</span>
-          <span class="mono accent-green">seq 1001</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid #27272a;">
-          <span style="color: #64748b;">Timestamp:</span>
-          <span class="mono" style="color: #38bdf8;">1700000000.004</span>
-        </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span style="color: #64748b;">Session Identifier:</span>
-          <span class="mono accent-red">сессия s1</span>
-        </div>
+      <div class="bg-card" style="flex: 0.8; padding: 32px; display: flex; flex-direction: column; justify-content: center; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 15px;">
+        <div style="color: #f8fafc; font-weight: 700; margin-bottom: 8px;">value = 21</div>
+        <div style="color: #94a3b8;">← сообщение #12</div>
+        <div style="color: #94a3b8;">← байты 4..5</div>
+        <div style="color: #94a3b8;">← пакет #103</div>
+        <div style="color: #94a3b8;">← сессия 192.168.1.10:54321 → 10.0.0.5:502</div>
+        <div style="color: #94a3b8;">← capture.pcapng</div>
+        <div style="margin-top: 12px; font-size: 13px; color: #38bdf8;">клик по значению ведёт к байту</div>
       </div>
     </div>
 
@@ -379,7 +423,7 @@
         <div class="slide-tag">ПОСТАНОВКА И МЕТОД</div>
         <h2 class="slide-title">Правило проверяется на всём корпусе сразу</h2>
       </div>
-      <div class="slide-number">07 / 14</div>
+      <div class="slide-number">08 / 14</div>
     </div>
 
     <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 20px;">
@@ -415,7 +459,7 @@
         <div class="slide-tag">ПОСТАНОВКА И МЕТОД</div>
         <h2 class="slide-title">Контрпример важнее метрики</h2>
       </div>
-      <div class="slide-number">08 / 14</div>
+      <div class="slide-number">09 / 14</div>
     </div>
 
     <div style="flex-grow: 1; display: flex; gap: 32px; align-items: center;">
@@ -451,7 +495,7 @@
         <div class="slide-tag">РЕЗУЛЬТАТЫ</div>
         <h2 class="slide-title">Что получилось: 60 из 140 → 140 из 140</h2>
       </div>
-      <div class="slide-number">09 / 14</div>
+      <div class="slide-number">10 / 14</div>
     </div>
 
     <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 32px;">
@@ -474,56 +518,6 @@
       <div style="text-align: center; background: #1a1c23; padding: 16px; border-radius: 8px; border: 1px solid #2a2d37;">
         <p style="font-size: 15px; color: #94a3b8; margin: 0;">
           На корпусе уточнения. Отдельно проверено на реальном датасете: <span class="mono accent-green">45 + 45, precision 1.00</span>
-        </p>
-      </div>
-    </div>
-
-    <div class="footer-bar">
-      <span>Команда HTTP 418 · кейс #02 · Мадригал</span>
-      <span>Результаты</span>
-    </div>
-  </div>
-
-  <!-- SLIDE 10: IP Reassembly -->
-  <div class="slide-container" id="slide10">
-    <div class="slide-header">
-      <div>
-        <div class="slide-tag">РЕЗУЛЬТАТЫ</div>
-        <h2 class="slide-title">Осколки IP собираются в одно сообщение</h2>
-      </div>
-      <div class="slide-number">10 / 14</div>
-    </div>
-
-    <div style="flex-grow: 1; display: flex; gap: 24px;">
-      <div class="bg-card" style="flex: 1; padding: 32px; display: flex; flex-direction: column; justify-content: space-between;">
-        <div>
-          <div class="mono" style="font-size: 20px; font-weight: 700; color: #38bdf8; margin-bottom: 12px;">IPv4 Reassembly</div>
-          <p style="font-size: 16px; color: #e2e8f0; line-height: 1.5; margin-bottom: 16px;">
-            Группирует по <span class="mono accent-amber">id</span> и <span class="mono accent-amber">protocol</span>, offset в единицах по 8 байт. Неполный фрагмент не собирается.
-          </p>
-        </div>
-        <div class="mono" style="font-size: 13px; background: #111318; padding: 12px; border-radius: 6px; color: #10b981;">
-          status: reassembled_from
-        </div>
-      </div>
-
-      <div class="bg-card" style="flex: 1; padding: 32px; display: flex; flex-direction: column; justify-content: space-between;">
-        <div>
-          <div class="mono" style="font-size: 20px; font-weight: 700; color: #f59e0b; margin-bottom: 12px;">IPv6 Reassembly</div>
-          <p style="font-size: 16px; color: #e2e8f0; line-height: 1.5; margin-bottom: 16px;">
-            Группирует по <span class="mono accent-amber">id</span>. Перекрытие категорически не допускается — датаграмма отбрасывается.
-          </p>
-        </div>
-        <div class="mono" style="font-size: 13px; background: #111318; padding: 12px; border-radius: 6px; color: #ef4444;">
-          перекрытие отклонено
-        </div>
-      </div>
-
-      <div class="bg-card" style="flex: 1; padding: 32px; display: flex; flex-direction: column; justify-content: center; text-align: center; border-color: #3b82f6;">
-        <div class="mono accent-blue" style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">12</div>
-        <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 12px;">тестов фрагментации</div>
-        <p style="font-size: 14px; color: #94a3b8;">
-          «Дырка» — это <span class="mono accent-amber">incomplete</span>, а не ноль: байты не угадываются, пока не покрыт каждый байт до конца.
         </p>
       </div>
     </div>
@@ -585,6 +579,13 @@
             <div style="font-size: 14px; color: #94a3b8;">Пакетов в 1000 сессиях</div>
           </div>
         </div>
+        <div class="bg-card" style="padding: 20px; display: flex; align-items: center; gap: 20px; border-color: #3b82f6;">
+          <i class="fa-solid fa-layer-group accent-blue" style="font-size: 28px;"></i>
+          <div>
+            <div class="mono" style="font-size: 22px; font-weight: 800; color: #fff;">+ 12</div>
+            <div style="font-size: 14px; color: #94a3b8;">тестов фрагментации (IPv4/IPv6) как расширение</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -595,6 +596,7 @@
   </div>
 
   <!-- SLIDE 12: Demo -->
+  <!-- TODO: заменить на 3-4 реальных скриншота UI после ux/full-overhaul -->
   <div class="slide-container" id="slide12">
     <div class="slide-header">
       <div>
