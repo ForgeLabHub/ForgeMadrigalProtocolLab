@@ -48,3 +48,16 @@ Daily checkpoint of the work. One entry per day: done, broken, next.
   now matches `main`.
 - Next: full GUI usability overhaul (`ux/full-overhaul`) — empty-state screen,
   Russian-only strings, rule wizard, provenance inspector.
+
+## 2026-10-14 (bilingual catalogue)
+
+- Done: both interface languages now load a compiled catalogue; the English one
+  (`madrigal_en.ts`/`.qm`) is filled one for one from the source strings and is
+  built by `scripts/update_translations.sh` alongside Russian. Captions the
+  window assembled from variables were replaced with literals so `lupdate`
+  extracts them, and the rule-status line and provenance card are rebuilt on a
+  language switch instead of keeping the language they were first rendered in.
+- Broken: none. The suite is now 852 tests (615 without the Qt UI tests), full
+  run 852 passed, `ruff check .` clean; the counters in the docs moved from
+  846/613 to 852/615.
+- Next: hold for review; the branch `ux/full-overhaul` (PR #65) is green.
