@@ -97,3 +97,12 @@ QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests/ --ignore=tests/ui --
 - `scripts/build_linux_binary.sh` — одиночный исполняемый файл (PyInstaller).
 - `scripts/build_deb.sh` — пакет `.deb`.
 - `scripts/build_submission.py` — архив сдачи из чистого дерева.
+
+## Трейлеры инструментов в истории
+
+Два коммита в истории `main` — `49f55db` и `487e3e5` — несут трейлер
+`Co-authored-by: openhands <openhands@all-hands.dev>`. Убрать его из уже
+опубликованной истории нельзя без `git filter-repo` и `force-push`; при работе
+нескольких параллельных копий репозитория это ломает их всем. По решению команды
+трейлеры оставлены как есть. В новых коммитах трейлеров нет — это проверяется
+перед push.
