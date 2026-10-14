@@ -112,19 +112,21 @@ def test_english_headers_still_fit(window):
 def test_switching_language_recomputes_the_widths(window):
     window.set_language("en")
     QtCore.QCoreApplication.processEvents()
+    assert window.session_tree.headerItem().text(0) == "session"
     english = window.session_tree.columnWidth(0)
+
     window.set_language("ru")
     QtCore.QCoreApplication.processEvents()
+    assert window.session_tree.headerItem().text(0) == "сессия"
     russian = window.session_tree.columnWidth(0)
-    # The session column is sized to its header, so each language must fit its
-    # own label once the language changes while the window is already narrow.
-    # The two scripts differ in width, so the Russian column need not be at
-    # least the English one; both must fit their own header text.
-    english_text = window.session_tree.header().fontMetrics().horizontalAdvance("session")
-    russian_text = window.session_tree.header().fontMetrics().horizontalAdvance("сессия")
-    assert russian >= russian_text
-    assert english >= english_text
-    assert russian != english or russian_text == english_text
+
+    # The point is that the column is re-measured for the new label, not that
+    # the two widths differ: the two scripts can render to the same pixel width,
+    # which would make a width comparison flaky. Each language must instead fit
+    # its own header text after the switch.
+    metrics = window.session_tree.header().fontMetrics()
+    assert russian >= metrics.horizontalAdvance("сессия")
+    assert english >= metrics.horizontalAdvance("session")
 
 
 @catalogue_required

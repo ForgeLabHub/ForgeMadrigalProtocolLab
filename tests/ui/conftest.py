@@ -86,3 +86,48 @@ def _clean_ui_settings(_isolated_ui_settings):
         store.clear()
         store.sync()
     yield
+
+
+@pytest.fixture(autouse=True)
+def _drop_translator_between_tests(_clean_ui_settings):
+    """Leave the shared application without a translator after every test.
+
+    ``LanguageManager.set_language`` installs a ``QTranslator`` on the process
+    wide ``QApplication``. A window that is closed while Russian is selected can
+    be collected together with its manager, and Qt then keeps translating from a
+    catalogue nothing references any more. The next module in the same run sees
+    Russian tab labels while asserting the English source strings.
+
+    Removing the catalogue at the end of each test makes that order independent.
+    The tracking is expressed through ``installTranslator`` itself rather than
+    through application code, so a window that deliberately switches language
+    inside its own test is unaffected.
+    """
+    if QtCore is None:
+        yield
+        return
+
+    installed: list[object] = []
+
+    original_install = QtCore.QCoreApplication.installTranslator
+    original_remove = QtCore.QCoreApplication.removeTranslator
+
+    def tracking_install(translator):
+        if translator not in installed:
+            installed.append(translator)
+        return original_install(translator)
+
+    def tracking_remove(translator):
+        if translator in installed:
+            installed.remove(translator)
+        return original_remove(translator)
+
+    QtCore.QCoreApplication.installTranslator = staticmethod(tracking_install)
+    QtCore.QCoreApplication.removeTranslator = staticmethod(tracking_remove)
+    try:
+        yield
+    finally:
+        QtCore.QCoreApplication.installTranslator = original_install
+        QtCore.QCoreApplication.removeTranslator = original_remove
+        for translator in list(installed):
+            original_remove(translator)
