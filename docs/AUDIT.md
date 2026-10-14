@@ -415,7 +415,7 @@ sync guard had to be taught to read.
 | `ruff check .` | All checks passed |
 | `ruff format --check .` | 100 files would be reformatted (still deferred) |
 | `mypy src/` | 114 findings in 13 files (still deferred) |
-| `presentation/slide.pdf`, `slide-light.pdf` | 14 pages, no blank page |
+| `presentation/slide.pdf`, `slide-light.pdf` | 15 pages, no blank page |
 
 The `mypy` findings are concentrated in three files: `src/protocol/engine.py`
 (75), `src/ui/main_window.py` (17) and `src/protocol/rule.py` (6). The engine

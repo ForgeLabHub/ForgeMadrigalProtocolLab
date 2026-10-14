@@ -133,7 +133,7 @@ Prints `280 messages, 80 counterexamples` then `280 messages, 0 counterexamples`
 - **Framing**: 10/10 streams framed cleanly by `payload`; the other two
   candidates, 0/10.
 - **Tests**: 849 total; 615 without the UI tests; 584 without the UI and web suites; CI green.
-- **Deck**: 14 slides; final slide has two QR codes, never the word «Вопросы».
+- **Deck**: 15 slides; final slide has two QR codes, never the word «Вопросы».
 
 Full answers: `docs/DEFENSE_FAQ.md`, `docs/FAQ_FOR_JUDGES.md`,
 `presentation/Q_and_A.md`. Pre-flight list: `docs/DEFENSE_CHECKLIST.md`.

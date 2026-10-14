@@ -14,8 +14,8 @@ the repository at the final revision; re-run the command if the branch has moved
       не собирается — там `pytest --ignore=tests/ui` → **615 passed**.
       Указывайте число с контекстом: 615 без UI, 849 с Qt.
 - [ ] Линт чистый: `ruff check .` → All checks passed.
-- [ ] Дека: `presentation/slide.pdf` и `presentation/slide-light.pdf` — по **14 страниц**;
-      `presentation/slide.pptx` — 14 слайдов.
+- [ ] Дека: `presentation/slide.pdf` и `presentation/slide-light.pdf` — по **15 страниц**;
+      `presentation/slide.pptx` — 15 слайдов.
       `pdfinfo presentation/slide.pdf | grep Pages` (нужен `poppler-utils`);
       без него слайды PPTX считаются стандартной библиотекой:
       `python -c "import zipfile;z=zipfile.ZipFile('presentation/slide.pptx');print(len([n for n in z.namelist() if n.startswith('ppt/slides/slide') and n.endswith('.xml')]))"`
@@ -65,5 +65,5 @@ git fetch --all --prune && git status -sb \
 ```
 
 Expected: a clean tree at `origin/main`, 849 passed on the current `main`
-(781 on the `v1.0.0` tag), lint clean, 14 pages, a published release with 12
+(781 on the `v1.0.0` tag), lint clean, 15 pages, a published release with 12
 assets.
