@@ -215,7 +215,9 @@ commands run and the `docs/PROTOCOL_API.md` link resolves.
   from 89% to 95%.
 - Fixed two further `mypy` findings that the earlier pass had not reached (the
   provenance test assertions and the optional RSS comparison in the benchmark
-  script). `mypy` over the whole tree is now clean.
+  script). `mypy` was clean over the tree at that revision. It is not a gate on
+  the current `main` and has drifted since: the `mypy` step stays commented out
+  in the workflow, alongside `ruff format --check .`.
 - Ignored and untracked `.coverage`, which the coverage run rewrote in place.
 
 ## 9. CI rescope

@@ -20,10 +20,11 @@
 
 ## Fixed
 - Stale claims in README/docs about IPv6 and fragmentation
-- Stale test counts (781/806/838 → 840)
-- .gitignore hygiene (agent paths moved to .git/info/exclude)
+- Stale test counts (781/806/838 → 846)
+- Ignore hygiene: local tool paths kept out of the tracked `.gitignore`
+  (in `.git/info/exclude` instead)
 
 ## Verified
 - tshark cross-check: 11/12 captures byte-for-byte, 1 explained (missing segment marker)
-- 840 tests passing, ruff clean, CI green
+- 846 tests passing, ruff clean, CI green
 - Real corpus: 45 requests + 45 responses, precision 1.00
