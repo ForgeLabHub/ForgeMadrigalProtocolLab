@@ -160,7 +160,10 @@ def test_cancel_restores_previous(window):
     dialog._on_cancel()
     assert dialog.result() == QtWidgets.QDialog.DialogCode.Rejected
     # The stored value is unchanged and the window keeps the old font size.
-    assert settings_mod.read_settings()["editor"]["hex_font_size"] == before["editor"]["hex_font_size"]
+    assert (
+        settings_mod.read_settings()["editor"]["hex_font_size"]
+        == before["editor"]["hex_font_size"]
+    )
     assert window.hex_view._font_size == window._settings["editor"]["hex_font_size"]
 
 
@@ -241,7 +244,51 @@ def test_settings_signal_emits_mapping(app, isolated_settings):
     assert captured and captured[0]["advanced"]["log_level"] == "INFO"
 
 
+def test_start_guide_marks_progress(window):
+    """The guide walks capture, session, rule and apply, then hides itself."""
+    guide = window.guide_panel
+    assert not guide.isHidden(), "the guide is shown on a fresh window"
+    assert guide.step_capture.property("state") == "next"
+
+    window.open_capture(
+        REPO_ROOT
+        / "tests"
+        / "corpus"
+        / "reference_export"
+        / "corpus_capture_01.normalized.json"
+    )
+    assert guide.step_capture.property("state") == "done"
+    assert guide.step_session.property("state") == "done"
+    assert guide.step_rule.property("state") == "next"
+
+    window.load_rule(REPO_ROOT / "examples" / "corpus_rule_v1.json")
+    assert guide.step_rule.property("state") == "done"
+    assert guide.step_apply.property("state") == "next"
+
+    window.apply_rule()
+    assert guide.isHidden(), "the guide steps aside once the workspace is in use"
+
+
+def test_start_guide_can_be_shown_again(window):
+    window.guide_panel.setVisible(False)
+    assert window.guide_panel.isHidden()
+    window.show_guide()
+    assert not window.guide_panel.isHidden()
+
+
+def test_capture_action_names_both_accepted_forms(window):
+    """The menu must not claim that a raw pcap is rejected, because it is read."""
+    tip = window._actions["open_capture"].toolTip()
+    assert "pcap" in tip.lower()
+    assert "not read" not in tip.lower()
+
+
 def test_logging_level_is_valid_choice(app, isolated_settings):
     dialog = SettingsDialog()
     level = dialog._widgets["advanced"]["log_level"]
-    assert [level.itemData(i) for i in range(level.count())] == ["DEBUG", "INFO", "WARNING", "ERROR"]
+    assert [level.itemData(i) for i in range(level.count())] == [
+        "DEBUG",
+        "INFO",
+        "WARNING",
+        "ERROR",
+    ]
