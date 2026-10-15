@@ -120,7 +120,7 @@ bumped from `v1.1.0`. No product code changed.
 - The presentation screenshots were regenerated from the current theme, and the
   deck PDFs and PPTX were rebuilt (15 slides).
 - The release QR and the deck's release text now point at `v1.2.0`.
-- The test count across the documentation is the measured 896 on the current
+- The test count across the documentation is the measured 898 on the current
   `main` (794 on the frozen `v1.0.0` archive).
 - The raw pcap/pcapng open path is documented in `README.md`, `docs/demo.md` and
   `docs/GUI_VERIFICATION.md`; the verification environment is recorded there too.
@@ -197,6 +197,12 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
   and one slide per page, and the slides fill 92% of the height instead of 69%.
 - The stale "organizer captures not available" limit was replaced with the
   received-and-analysed state (PR #20, PR #26).
+- Marker-based framing no longer drops the bytes that precede a start marker.
+  A run that belongs to no framed message (leading synchronisation noise, or
+  debris between two messages) is now returned as an incomplete range instead of
+  being discarded, matching the module contract that an un-framed range is
+  reported rather than silently lost. Regression tests cover both the leading
+  and the between-message case, and the whole stream is accounted for.
 
 ### Removed
 
