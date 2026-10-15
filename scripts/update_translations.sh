@@ -34,6 +34,7 @@ SOURCES=(
     src/ui/welcome_view.py
     src/ui/settings.py
     src/ui/guided.py
+    src/ui/legend.py
     src/ui/rule_builder.py
     src/ui/timeline_view.py
 )

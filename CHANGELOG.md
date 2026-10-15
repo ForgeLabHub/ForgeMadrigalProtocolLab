@@ -145,6 +145,9 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
 - The reserve screencast is embedded in the deck: slide 12 plays
   `public/screencast.mp4` in a `<video>` element (poster frame, controls, muted
   autoplay), and the printed PDF/PPTX carry the poster frame.
+- A byte-state legend strip above the hex view: a collapsible row of painted
+  swatches whose captions and swatches carry an explanatory tooltip, with a
+  Settings switch to hide the strip.
 
 ### Changed
 
@@ -163,6 +166,11 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
 - The README, the audit, the portability report and the presentation
   verification now quote 781 tests and the published `v1.0.0` archive
   (PR #26).
+- The ASCII column caption is drawn in the same fixed-pitch face and size as the
+  bytes and shifted by the document margin, so it lines up with the column it
+  names instead of drifting left; the byte-state legend is now a compact strip
+  above the hex view that folds onto further lines and collapses, instead of a
+  row beside the direction selector.
 
 ### Fixed
 
@@ -175,6 +183,10 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
   and one slide per page, and the slides fill 92% of the height instead of 69%.
 - The stale "organizer captures not available" limit was replaced with the
   received-and-analysed state (PR #20, PR #26).
+- The hex bytes were painted in the proportional body face: the application
+  style sheet sets a family on every `QWidget`, which outranks `setFont`, so the
+  hex columns did not line up and the ASCII column was not on a fixed grid. The
+  byte area and its column caption now pin the fixed-pitch family themselves.
 
 ### Removed
 

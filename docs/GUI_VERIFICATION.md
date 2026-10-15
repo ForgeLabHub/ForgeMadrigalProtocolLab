@@ -22,8 +22,8 @@ scenario is `tests/ui/test_e2e.py`.
   Every menu and item carries a keyboard mnemonic; Quick help is F1.
 - Central splitter, three columns:
   - left: the session tree, group box "Sessions";
-  - centre: a direction selector, a colour-chip annotation legend, and the hex
-    view, group box "Bytes";
+  - centre: a direction selector, a compact collapsible byte-state legend strip
+    above the hex view, and the hex view, group box "Bytes";
   - right: a tab widget with Interpretation, Compare, Report and Version diff.
 - Status bar: the byte provenance label on the left, a progress bar on the
   right (hidden while idle), and a transient message area.
@@ -34,7 +34,18 @@ scenario is `tests/ui/test_e2e.py`.
 
 The legend is not a text label. Each byte kind is a swatch painted with the same
 brush the hex view uses, so `gap` and `ambiguity` show their hatch and the names
-sit next to their colour; the legend cannot drift from the bytes it explains.
+sit next to their colour; the legend cannot drift from the bytes it explains. It
+is a strip of its own above the hex view, so it cannot overlap the bytes or take
+width from the ASCII column; its chips fold onto further lines when the window is
+narrow, and the strip collapses to its title. Each swatch and caption carries an
+explanatory tooltip, and the whole strip can be hidden from Settings.
+
+The ASCII column shows printable bytes as characters and every byte outside
+`0x20`-`0x7e` as a `.`. The dot is a conventional stand-in for a non-printable
+byte, never a protocol error; the byte's value, printable reading and status are
+always available in the hex column, the byte tooltip and the status line. The
+column caption is drawn in the same fixed-pitch face and size as the bytes, so it
+stays aligned with the columns it names.
 
 ## Session tree (step 1-2)
 
