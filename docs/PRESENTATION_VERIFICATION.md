@@ -15,10 +15,10 @@ Reproduce any line below with the command in the same row.
 
 | fact | value | command |
 | --- | --- | --- |
-| pages in the committed PDF (dark) | 14 | `pdfinfo presentation/slide.pdf` |
-| pages in the committed PDF (light) | 14 | `pdfinfo presentation/slide-light.pdf` |
-| slides in the source | 14 | `grep -c 'slide-container' presentation/*.html` |
-| slides in the PPTX | 14 | `python -c "import zipfile;z=zipfile.ZipFile('presentation/slide.pptx');print(len([n for n in z.namelist() if n.startswith('ppt/slides/slide') and n.endswith('.xml')]))"` |
+| pages in the committed PDF (dark) | 15 | `pdfinfo presentation/slide.pdf` |
+| pages in the committed PDF (light) | 15 | `pdfinfo presentation/slide-light.pdf` |
+| slides in the source | 15 | `grep -c 'slide-container' presentation/*.html` |
+| slides in the PPTX | 15 | `python -c "import zipfile;z=zipfile.ZipFile('presentation/slide.pptx');print(len([n for n in z.namelist() if n.startswith('ppt/slides/slide') and n.endswith('.xml')]))"` |
 | page size | 2560 x 1440, 16:9 | `pdfinfo presentation/slide.pdf` |
 | empty pages | 0 | render scan below |
 | DejaVu / fallback glyphs | 0 (fonts are inlined in the HTML) | render scan below |
@@ -67,10 +67,15 @@ Nine of nine present.
   sits on the title slide.
 - Requirement 4: the «Три модуля» slide shows the module breakdown and the JSON
   Schema contracts; the «Путь исследователя» slide shows the pipeline.
-- Requirement 6: the demo slide plays the committed screencast. The deck carries
-  no standalone GUI screenshots; those are added after the UX overhaul.
+- Requirement 6: the demo slide (13) embeds the committed screencast
+  (`presentation/screencast.mp4`) as a `<video>` element with the poster frame,
+  `controls`, `autoplay`, `loop`, `muted` and `playsinline`. The clip is inlined
+  as a `data:video/mp4` URI, so the HTML deck plays it with no web server; the
+  printed PDF and the PPTX carry the poster frame. The deck carries no standalone
+  GUI screenshots; the still screenshots live in `presentation/screenshots/` and
+  are used by `README.md`, not by the deck.
 - Requirement 7: `presentation/public/qr_repo.png` and `qr_release.png` are
-  referenced by the closing slide and decode to the repository and the `v1.1.0`
+  referenced by the closing slide and decode to the repository and the `v1.2.0`
   release; the per-member Telegram codes decode to `@Pasha1778` and `@petruan`.
   All four codes were decoded from the rendered PDF, in both themes.
 
@@ -122,15 +127,15 @@ same families through `src/ui/theme/fonts.py`.
 | committed file | `presentation/screencast.mp4` | `git ls-files presentation/screencast.mp4` |
 | served copy | `presentation/public/screencast.mp4` is a symlink to it | `ls -l presentation/public/screencast.mp4` |
 | codec, size | H.264, 1920x1080 | `ffprobe presentation/screencast.mp4` |
-| duration | 2:22 | `ffprobe presentation/screencast.mp4` |
-| shown on | slide 12, `<video src="public/screencast.mp4">` | `grep -c '<video' presentation/*.html` |
+| duration | 3:40 | `ffprobe presentation/screencast.mp4` |
+| shown on | embedded on slide 13 as `<video src="data:video/mp4;base64,...">` | `grep -c '<video' presentation/*.html` |
 
-The clip is embedded in the demo slide (12): the left card plays
-`presentation/public/screencast.mp4` in a `<video>` element with the poster frame
-`public/screencast-poster.png`, `controls`, `muted`, `loop` and `playsinline`.
-The printed PDF and PPTX therefore show the poster frame, and the HTML deck plays
-the recording in place. The clip stays a committed asset, played from the file
-system if the live window does not come up.
+The clip is embedded in the demo slide (13): the element carries the poster frame,
+`controls`, `autoplay`, `loop`, `muted` and `playsinline`, and the clip itself is
+inlined as a `data:video/mp4` URI, so the deck plays it without a web server and
+without the rest of the repository. The printed PDF and the PPTX show the poster
+frame. `presentation/public/screencast-poster.png` is kept in `public/` so a still
+frame can be reinstated without re-running `make_assets.py`.
 
 ## Demo driver
 

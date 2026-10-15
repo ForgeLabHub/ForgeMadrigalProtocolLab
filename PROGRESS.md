@@ -61,3 +61,23 @@ Daily checkpoint of the work. One entry per day: done, broken, next.
   run 852 passed, `ruff check .` clean; the counters in the docs moved from
   846/613 to 852/615.
 - Next: hold for review; the branch `ux/full-overhaul` (PR #65) is green.
+
+## 2026-10-15 (independent audit — framing residue)
+
+- Done: independent audit of the current `main` (v1.2.0 tree with the learning
+  mode). One real defect fixed in `src/protocol/framing.py`: `marker_based`
+  framing returned nothing for the bytes before a start marker, so a stream that
+  did not begin on a start marker (leading synchronisation noise, or debris
+  between two messages) silently lost those bytes from the message list while
+  the module docstring promises an un-framed range is reported as `incomplete`.
+  The residue is now returned as an incomplete `Message` with reason
+  `bytes_before_start_marker`, and the end marker is consumed even when
+  `include_markers` is false, so the whole stream is accounted for. Two
+  regression tests added (`test_marker_based_reports_bytes_before_the_first_start_marker`,
+  `test_marker_based_reports_debris_between_messages`).
+- Broken: none. Non-UI suite 617 passed, `ruff check .` clean; framing, protocol,
+  hypothesis, report and project suites green. A 5000-case engine fuzz and a
+  2000-case framing fuzz over random bytes raised no unexpected exception.
+- Docs: the documented test counts moved 896/615/584 -> 898/617/586 across the
+  docs and the deck Q&A, matching the measured `main`.
+- Next: hold for review.

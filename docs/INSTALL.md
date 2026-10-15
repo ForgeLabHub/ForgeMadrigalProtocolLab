@@ -3,7 +3,7 @@
 Пошаговая установка каждым из форматов поставки. Установка из исходников — в
 [README](../README.md); сборка артефактов из дерева — в [BINARY.md](BINARY.md);
 готовые файлы — в релизе
-[v1.0.0](https://github.com/Pavel1778/madrigal-protocol-lab/releases/tag/v1.0.0).
+[v1.2.0](https://github.com/Pavel1778/madrigal-protocol-lab/releases/tag/v1.2.0).
 
 Требуется Linux x86-64 (glibc не старше той, на которой собран бинарник). Для
 графического окна — X или Wayland; для запуска без экрана задайте
@@ -39,7 +39,7 @@ chmod +x protocol-lab-x86_64.AppImage
 ## Пакет `.deb`
 
 ```
-sudo dpkg -i madrigal-protocol-lab_1.0.0_amd64.deb
+sudo dpkg -i madrigal-protocol-lab_1.2.0_amd64.deb
 madrigal-lab
 ```
 
@@ -50,8 +50,8 @@ madrigal-lab
 Проверка без установки в систему:
 
 ```
-dpkg-deb -I madrigal-protocol-lab_1.0.0_amd64.deb
-dpkg-deb -x madrigal-protocol-lab_1.0.0_amd64.deb /tmp/deb-test
+dpkg-deb -I madrigal-protocol-lab_1.2.0_amd64.deb
+dpkg-deb -x madrigal-protocol-lab_1.2.0_amd64.deb /tmp/deb-test
 /tmp/deb-test/usr/bin/madrigal-lab --help
 ```
 
@@ -123,7 +123,7 @@ docker load < madrigal-protocol-lab-docker.tar.gz
 
 ```
 python -m venv venv
-venv/bin/pip install madrigal_protocol_lab-1.0.0-py3-none-any.whl
+venv/bin/pip install madrigal_protocol_lab-1.2.0-py3-none-any.whl
 venv/bin/madrigal-lab --help
 ```
 

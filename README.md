@@ -219,6 +219,12 @@ python -m src.ui.main_window \
 потока **Ctrl +** (или **Ctrl =**) и **Ctrl −** увеличивают и уменьшают байты и
 дерево сессий, **Ctrl 0** возвращает исходный размер.
 
+Файл открывается двумя разными пунктами меню. **Файл → Открыть нормализованный
+захват…** читает `*.normalized.json`, а сырой `.pcap`/`.pcapng` нормализует в
+памяти по ходу открытия. **Файл → Импорт PCAP…** читает сырой захват и
+дополнительно сохраняет его `*.normalized.json` рядом с исходным файлом, после
+чего открывает результат.
+
 ### Веб-интерфейс (необязательно)
 
 Дополнительно есть локальная веб-страница поверх тех же движков захвата и правил.
@@ -345,16 +351,16 @@ v2 на том же корпусе: 140 matched, 0 mismatched, точность 
 Основная поставка — исходное дерево с инструкцией выше, упакованное скриптом
 `python scripts/build_submission.py` в `dist/submission_*.zip`. Архив
 распаковывается и запускается тем же порядком. Готовые сборки лежат в релизе
-[v1.0.0](https://github.com/Pavel1778/madrigal-protocol-lab/releases/tag/v1.0.0);
+[v1.2.0](https://github.com/Pavel1778/madrigal-protocol-lab/releases/tag/v1.2.0);
 пошаговая установка из них — в [docs/INSTALL.md](docs/INSTALL.md).
 
 | Формат | Установка | Размер | Команда запуска |
 | --- | --- | --- | --- |
-| AppImage | не требуется | ~71 МБ | `chmod +x; ./protocol-lab-*.AppImage` |
-| `.deb` | dpkg | ~71 МБ | `sudo dpkg -i madrigal-protocol-lab_*.deb` |
-| `.run` | самозапуск | ~71 МБ | `chmod +x; ./madrigal-lab.run` |
-| Binary | portable | ~71 МБ | `chmod +x; ./madrigal-lab` |
-| Docker | docker | ~540 МБ | `docker load < *.tar.gz` |
+| AppImage | не требуется | ~97 МБ | `chmod +x; ./protocol-lab-*.AppImage` |
+| `.deb` | dpkg | ~97 МБ | `sudo dpkg -i madrigal-protocol-lab_*.deb` |
+| `.run` | самозапуск | ~97 МБ | `chmod +x; ./madrigal-lab.run` |
+| Binary | portable | ~97 МБ | `chmod +x; ./madrigal-lab` |
+| Docker | docker | ~451 МБ | `docker load < *.tar.gz` |
 | pip | pip | ~15 МБ | `pip install madrigal_protocol_lab-*.whl` |
 | Source | venv | ~7 МБ | `pip install -e .` |
 
