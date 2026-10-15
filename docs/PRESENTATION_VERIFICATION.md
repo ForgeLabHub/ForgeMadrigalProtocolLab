@@ -75,7 +75,7 @@ Nine of nine present.
   GUI screenshots; the still screenshots live in `presentation/screenshots/` and
   are used by `README.md`, not by the deck.
 - Requirement 7: `presentation/public/qr_repo.png` and `qr_release.png` are
-  referenced by the closing slide and decode to the repository and the `v1.1.0`
+  referenced by the closing slide and decode to the repository and the `v1.2.0`
   release; the per-member Telegram codes decode to `@Pasha1778` and `@petruan`.
   All four codes were decoded from the rendered PDF, in both themes.
 
