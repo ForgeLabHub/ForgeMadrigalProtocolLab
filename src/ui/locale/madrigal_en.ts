@@ -290,12 +290,12 @@
     <name>MainWindow</name>
     <message>
         <location filename="../main_window.py" line="116" />
-        <location filename="../main_window.py" line="829" />
+        <location filename="../main_window.py" line="832" />
         <source>Madrigal protocol laboratory</source>
         <translation>Madrigal protocol laboratory</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="158" />
+        <location filename="../main_window.py" line="161" />
         <source>no capture loaded
 
 Open a capture (Ctrl+O): pcap, pcapng or normalized JSON.</source>
@@ -304,391 +304,391 @@ Open a capture (Ctrl+O): pcap, pcapng or normalized JSON.</source>
 Open a capture (Ctrl+O): pcap, pcapng or normalized JSON.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="159" />
+        <location filename="../main_window.py" line="162" />
         <source>no rule applied yet</source>
         <translation>no rule applied yet</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="195" />
+        <location filename="../main_window.py" line="198" />
         <source>Load the small capture, rule and journal that ship with the tool, for a first look</source>
         <translation>Load the small capture, rule and journal that ship with the tool, for a first look</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="203" />
+        <location filename="../main_window.py" line="206" />
         <source>Open a capture: a raw .pcap/.pcapng is normalized on the fly, a normalized JSON is read as is</source>
         <translation>Open a capture: a raw .pcap/.pcapng is normalized on the fly, a normalized JSON is read as is</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="213" />
+        <location filename="../main_window.py" line="216" />
         <source>Describe the message in a form instead of writing JSON by hand</source>
         <translation>Describe the message in a form instead of writing JSON by hand</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="223" />
+        <location filename="../main_window.py" line="226" />
         <source>Read a raw .pcap/.pcapng and save its normalized JSON next to it</source>
         <translation>Read a raw .pcap/.pcapng and save its normalized JSON next to it</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="244" />
+        <location filename="../main_window.py" line="247" />
         <source>Show the rule's reach over the whole capture and its counterexamples</source>
         <translation>Show the rule's reach over the whole capture and its counterexamples</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="276" />
+        <location filename="../main_window.py" line="279" />
         <source>Enlarge the bytes and the session tree (Ctrl+Plus)</source>
         <translation>Enlarge the bytes and the session tree (Ctrl+Plus)</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="287" />
+        <location filename="../main_window.py" line="290" />
         <source>Shrink the bytes and the session tree (Ctrl+Minus)</source>
         <translation>Shrink the bytes and the session tree (Ctrl+Minus)</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="294" />
+        <location filename="../main_window.py" line="297" />
         <source>Restore the default byte and tree size</source>
         <translation>Restore the default byte and tree size</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="298" />
-        <location filename="../main_window.py" line="384" />
+        <location filename="../main_window.py" line="301" />
+        <location filename="../main_window.py" line="387" />
         <source>&amp;Timeline</source>
         <translation>&amp;Timeline</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="303" />
-        <location filename="../main_window.py" line="409" />
+        <location filename="../main_window.py" line="306" />
+        <location filename="../main_window.py" line="412" />
         <source>Show the fourth column: the message timeline against the journal</source>
         <translation>Show the fourth column: the message timeline against the journal</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="363" />
+        <location filename="../main_window.py" line="366" />
         <source>&amp;File</source>
         <translation>&amp;File</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="364" />
+        <location filename="../main_window.py" line="367" />
         <source>&amp;Rule</source>
         <translation>&amp;Rule</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="365" />
+        <location filename="../main_window.py" line="368" />
         <source>&amp;Report</source>
         <translation>&amp;Report</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="366" />
+        <location filename="../main_window.py" line="369" />
         <source>&amp;View</source>
         <translation>&amp;View</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="367" />
+        <location filename="../main_window.py" line="370" />
         <source>&amp;Help</source>
         <translation>&amp;Help</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="368" />
+        <location filename="../main_window.py" line="371" />
         <source>&amp;Language</source>
         <translation>&amp;Language</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="373" />
+        <location filename="../main_window.py" line="376" />
         <source>Open &amp;demo</source>
         <translation>Open &amp;demo</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="374" />
+        <location filename="../main_window.py" line="377" />
         <source>Open &amp;normalized capture...</source>
         <translation>Open &amp;normalized capture...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="375" />
+        <location filename="../main_window.py" line="378" />
         <source>Open &amp;rule...</source>
         <translation>Open &amp;rule...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="376" />
+        <location filename="../main_window.py" line="379" />
         <source>&amp;Build rule...</source>
         <translation>&amp;Build rule...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="377" />
+        <location filename="../main_window.py" line="380" />
         <source>&amp;Save result...</source>
         <translation>&amp;Save result...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="378" />
+        <location filename="../main_window.py" line="381" />
         <source>&amp;Import PCAP...</source>
         <translation>&amp;Import PCAP...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="379" />
+        <location filename="../main_window.py" line="382" />
         <source>&amp;Quit</source>
         <translation>&amp;Quit</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="380" />
+        <location filename="../main_window.py" line="383" />
         <source>&amp;Apply to current direction</source>
         <translation>&amp;Apply to current direction</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="381" />
+        <location filename="../main_window.py" line="384" />
         <source>Apply to &amp;whole capture</source>
         <translation>Apply to &amp;whole capture</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="382" />
+        <location filename="../main_window.py" line="385" />
         <source>&amp;Compare versions</source>
         <translation>&amp;Compare versions</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="383" />
+        <location filename="../main_window.py" line="386" />
         <source>Check on &amp;corpus...</source>
         <translation>Check on &amp;corpus...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="385" />
+        <location filename="../main_window.py" line="388" />
         <source>Show &amp;REPORT.md</source>
         <translation>Show &amp;REPORT.md</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="386" />
+        <location filename="../main_window.py" line="389" />
         <source>&amp;Export Markdown...</source>
         <translation>&amp;Export Markdown...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="387" />
+        <location filename="../main_window.py" line="390" />
         <source>Export &amp;HTML...</source>
         <translation>Export &amp;HTML...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="388" />
+        <location filename="../main_window.py" line="391" />
         <source>&amp;Dark theme</source>
         <translation>&amp;Dark theme</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="389" />
+        <location filename="../main_window.py" line="392" />
         <source>&amp;Light theme</source>
         <translation>&amp;Light theme</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="390" />
+        <location filename="../main_window.py" line="393" />
         <source>&amp;System theme</source>
         <translation>&amp;System theme</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="391" />
+        <location filename="../main_window.py" line="394" />
         <source>Zoom &amp;in</source>
         <translation>Zoom &amp;in</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="392" />
+        <location filename="../main_window.py" line="395" />
         <source>Zoom in</source>
         <translation>Zoom in</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="393" />
+        <location filename="../main_window.py" line="396" />
         <source>Zoom &amp;out</source>
         <translation>Zoom &amp;out</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="394" />
+        <location filename="../main_window.py" line="397" />
         <source>&amp;Reset zoom</source>
         <translation>&amp;Reset zoom</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="395" />
+        <location filename="../main_window.py" line="398" />
         <source>&amp;Settings...</source>
         <translation>&amp;Settings...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="396" />
+        <location filename="../main_window.py" line="399" />
         <source>Show &amp;start guide</source>
         <translation>Show &amp;start guide</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="397" />
+        <location filename="../main_window.py" line="400" />
         <source>&amp;Quick help</source>
         <translation>&amp;Quick help</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="398" />
+        <location filename="../main_window.py" line="401" />
         <source>&amp;About</source>
         <translation>&amp;About</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="411" />
+        <location filename="../main_window.py" line="414" />
         <source>System</source>
         <translation>System</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="411" />
+        <location filename="../main_window.py" line="414" />
         <source>Russian</source>
         <translation>Russian</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="412" />
+        <location filename="../main_window.py" line="415" />
         <source>English</source>
         <translation>English</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="439" />
-        <location filename="../main_window.py" line="833" />
+        <location filename="../main_window.py" line="442" />
+        <location filename="../main_window.py" line="836" />
         <source>Sessions</source>
         <translation>Sessions</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="450" />
-        <location filename="../main_window.py" line="834" />
+        <location filename="../main_window.py" line="453" />
+        <location filename="../main_window.py" line="837" />
         <source>direction</source>
         <translation>direction</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="473" />
-        <location filename="../main_window.py" line="832" />
+        <location filename="../main_window.py" line="476" />
+        <location filename="../main_window.py" line="835" />
         <source>Bytes</source>
         <translation>Bytes</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="509" />
-        <location filename="../main_window.py" line="845" />
+        <location filename="../main_window.py" line="512" />
+        <location filename="../main_window.py" line="848" />
         <source>Timeline</source>
         <translation>Timeline</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="540" />
+        <location filename="../main_window.py" line="543" />
         <source>Interpretation</source>
         <translation>Interpretation</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="541" />
+        <location filename="../main_window.py" line="544" />
         <source>Compare</source>
         <translation>Compare</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="542" />
+        <location filename="../main_window.py" line="545" />
         <source>Hypotheses</source>
         <translation>Hypotheses</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="543" />
+        <location filename="../main_window.py" line="546" />
         <source>Report</source>
         <translation>Report</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="544" />
+        <location filename="../main_window.py" line="547" />
         <source>Version diff</source>
         <translation>Version diff</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="547" />
+        <location filename="../main_window.py" line="550" />
         <source>Interpretation tab</source>
         <translation>Interpretation tab</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="548" />
+        <location filename="../main_window.py" line="551" />
         <source>Compare tab</source>
         <translation>Compare tab</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="549" />
+        <location filename="../main_window.py" line="552" />
         <source>Hypotheses tab</source>
         <translation>Hypotheses tab</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="550" />
+        <location filename="../main_window.py" line="553" />
         <source>Report tab</source>
         <translation>Report tab</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="551" />
+        <location filename="../main_window.py" line="554" />
         <source>Version diff tab</source>
         <translation>Version diff tab</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="565" />
-        <location filename="../main_window.py" line="869" />
+        <location filename="../main_window.py" line="568" />
+        <location filename="../main_window.py" line="872" />
         <source>no byte selected</source>
         <translation>no byte selected</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="710" />
+        <location filename="../main_window.py" line="713" />
         <source>zoom {0}%</source>
         <translation>zoom {0}%</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="738" />
+        <location filename="../main_window.py" line="741" />
         <source>settings applied</source>
         <translation>settings applied</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="872" />
+        <location filename="../main_window.py" line="875" />
         <source>none</source>
         <translation>none</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="872" />
+        <location filename="../main_window.py" line="875" />
         <source>{0} sessions  capture_id {1}  diagnostics {2}</source>
         <translation>{0} sessions  capture_id {1}  diagnostics {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="986" />
+        <location filename="../main_window.py" line="987" />
         <source>the built-in demo is not available</source>
         <translation>the built-in demo is not available</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="995" />
+        <location filename="../main_window.py" line="996" />
         <source>opened the built-in demo</source>
         <translation>opened the built-in demo</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1008" />
+        <location filename="../main_window.py" line="1009" />
         <source>open a capture and a rule before a journal</source>
         <translation>open a capture and a rule before a journal</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1013" />
+        <location filename="../main_window.py" line="1014" />
         <source>could not read the journal: {0}</source>
         <translation>could not read the journal: {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1018" />
+        <location filename="../main_window.py" line="1019" />
         <source>journal: {0}</source>
         <translation>journal: {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1024" />
+        <location filename="../main_window.py" line="1025" />
         <source>Open action journal</source>
         <translation>Open action journal</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1065" />
+        <location filename="../main_window.py" line="1066" />
         <source>Open capture</source>
         <translation>Open capture</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1079" />
+        <location filename="../main_window.py" line="1080" />
         <source>Cannot open capture</source>
         <translation>Cannot open capture</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1092" />
+        <location filename="../main_window.py" line="1093" />
         <source>Import PCAP</source>
         <translation>Import PCAP</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1115" />
+        <location filename="../main_window.py" line="1116" />
         <source>Cannot import capture</source>
         <translation>Cannot import capture</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1119" />
-        <location filename="../main_window.py" line="1600" />
-        <location filename="../main_window.py" line="1630" />
+        <location filename="../main_window.py" line="1120" />
+        <location filename="../main_window.py" line="1599" />
+        <location filename="../main_window.py" line="1629" />
         <source>wrote {0}</source>
         <translation>wrote {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1133" />
+        <location filename="../main_window.py" line="1134" />
         <source>loaded {0}  rule v{1}</source>
         <translation>loaded {0}  rule v{1}</translation>
     </message>
@@ -698,142 +698,142 @@ Open a capture (Ctrl+O): pcap, pcapng or normalized JSON.</translation>
         <translation>rule built; apply it to check it</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1231" />
+        <location filename="../main_window.py" line="1230" />
         <source>Open rule</source>
         <translation>Open rule</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1244" />
+        <location filename="../main_window.py" line="1243" />
         <source>no example rule found</source>
         <translation>no example rule found</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1160" />
-        <location filename="../main_window.py" line="1194" />
-        <location filename="../main_window.py" line="1298" />
-        <location filename="../main_window.py" line="1362" />
+        <location filename="../main_window.py" line="1161" />
+        <location filename="../main_window.py" line="1195" />
+        <location filename="../main_window.py" line="1297" />
+        <location filename="../main_window.py" line="1361" />
         <source>rule error: {0}</source>
         <translation>rule error: {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1288" />
-        <location filename="../main_window.py" line="1352" />
+        <location filename="../main_window.py" line="1287" />
+        <location filename="../main_window.py" line="1351" />
         <source>open a capture first</source>
         <translation>open a capture first</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1292" />
-        <location filename="../main_window.py" line="1356" />
+        <location filename="../main_window.py" line="1291" />
+        <location filename="../main_window.py" line="1355" />
         <source>open or build a rule first</source>
         <translation>open or build a rule first</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1311" />
+        <location filename="../main_window.py" line="1310" />
         <source>rule v{0}  {1}</source>
         <translation>rule v{0}  {1}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1316" />
+        <location filename="../main_window.py" line="1315" />
         <source>applied rule v{0} to {1} {2}</source>
         <translation>applied rule v{0} to {1} {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1386" />
+        <location filename="../main_window.py" line="1385" />
         <source>rule v{0} over the capture: {1}  counterexamples={2}</source>
         <translation>rule v{0} over the capture: {1}  counterexamples={2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1391" />
+        <location filename="../main_window.py" line="1390" />
         <source>verified rule over the whole capture: {0}</source>
         <translation>verified rule over the whole capture: {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1407" />
+        <location filename="../main_window.py" line="1406" />
         <source>no previous rule version to compare</source>
         <translation>no previous rule version to compare</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1411" />
+        <location filename="../main_window.py" line="1410" />
         <source>rule v{0} supersedes v{1}; the old run is marked outdated</source>
         <translation>rule v{0} supersedes v{1}; the old run is marked outdated</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1458" />
+        <location filename="../main_window.py" line="1457" />
         <source>packet {0}  seq {1}  ts {2}</source>
         <translation>packet {0}  seq {1}  ts {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1484" />
+        <location filename="../main_window.py" line="1483" />
         <source>&lt;- message #{0}</source>
         <translation>&lt;- message #{0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1486" />
+        <location filename="../main_window.py" line="1485" />
         <source>&lt;- bytes {0}..{1}</source>
         <translation>&lt;- bytes {0}..{1}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1493" />
+        <location filename="../main_window.py" line="1492" />
         <source>&lt;- packet #{0}</source>
         <translation>&lt;- packet #{0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1498" />
+        <location filename="../main_window.py" line="1497" />
         <source>&lt;- session {0} ({1})</source>
         <translation>&lt;- session {0} ({1})</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1501" />
+        <location filename="../main_window.py" line="1500" />
         <source>&lt;- {0}</source>
         <translation>&lt;- {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1530" />
+        <location filename="../main_window.py" line="1529" />
         <source>apply the rule to the whole capture first (F6)</source>
         <translation>apply the rule to the whole capture first (F6)</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1578" />
+        <location filename="../main_window.py" line="1577" />
         <source>Markdown (*.md)</source>
         <translation>Markdown (*.md)</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1586" />
+        <location filename="../main_window.py" line="1585" />
         <source>{0} is not available</source>
         <translation>{0} is not available</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1590" />
+        <location filename="../main_window.py" line="1589" />
         <source>Export report</source>
         <translation>Export report</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1610" />
+        <location filename="../main_window.py" line="1609" />
         <source>apply a rule before saving a result</source>
         <translation>apply a rule before saving a result</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1613" />
+        <location filename="../main_window.py" line="1612" />
         <source>Save result</source>
         <translation>Save result</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1625" />
+        <location filename="../main_window.py" line="1624" />
         <source>could not save result: {0}</source>
         <translation>could not save result: {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1628" />
+        <location filename="../main_window.py" line="1627" />
         <source>could not save the result</source>
         <translation>could not save the result</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1636" />
+        <location filename="../main_window.py" line="1635" />
         <source>Quick help</source>
         <translation>Quick help</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1653" />
+        <location filename="../main_window.py" line="1652" />
         <source>Order of work
 The empty state lists the same steps and marks the ones already
 done. Help - Show start guide brings it back over the workspace.
@@ -866,12 +866,12 @@ The bytes are the source of truth. A rule is an interpretation; a
 mismatch is a counterexample kept against it, not discarded.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1674" />
+        <location filename="../main_window.py" line="1672" />
         <source>About</source>
         <translation>About</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1680" />
+        <location filename="../main_window.py" line="1678" />
         <source>Madrigal protocol laboratory
 A local tool for reconstructing an undocumented binary protocol over TCP.
 The bytes are the source of truth; a rule is an interpretation checked against them.</source>

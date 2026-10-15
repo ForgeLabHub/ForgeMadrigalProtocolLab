@@ -131,6 +131,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self._corpus_dialog = None
         self._last_offset: int | None = None
         self._settings: dict = read_settings()
+        # The last rule-status line is kept as a renderer rather than as a
+        # finished string, so a language switch can rebuild it in the new
+        # language instead of leaving the previous one on screen.
         self._rule_status_render: Callable[[], str] | None = None
         self._rule_status_error = False
         self._guided_enabled: bool = bool(
@@ -512,10 +515,10 @@ class MainWindow(QtWidgets.QMainWindow):
         splitter.setStretchFactor(3, 0)
         self._splitter = splitter
 
-        # The coach sits above the three panels inside the workspace, so the
-        # start screen stays free of it and the two never show at once. It is a
-        # view only; the window wires each step to its own slot. It is on by
-        # default and switched off from here or from the settings dialog.
+        # The guided-mode coach sits above the workspace: one plain-language
+        # strip that names the current step. It is a view only; the window wires
+        # each step to its own slot. The welcome screen remains the first-run
+        # screen, so the two never compete.
         self.guided_panel = GuidedPanel()
         self.guided_panel.nextRequested.connect(self._guided_next)
         self.guided_panel.dismissRequested.connect(self._dismiss_guided)
@@ -1190,8 +1193,8 @@ class MainWindow(QtWidgets.QMainWindow):
             # Keep what the form produced so the reader can fix it by hand; the
             # error is reported beside the editor rather than thrown away.
             self.validation_view.set_rule_text(text)
-            self.validation_view.set_rule_status(
-                self.tr("rule error: {0}").format(exc), error=True
+            self._set_rule_status(
+                lambda exc=exc: self.tr("rule error: {0}").format(exc), error=True
             )
             return
         # The built rule becomes the current model, so "apply" has something to
@@ -1302,8 +1305,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.validation_view.show_application(application)
         self.compare_view.show_application(application)
         self._show_hypotheses(rule.rule, application.messages)
-        self._rule_applied = True
         self.validation_view.set_rule_overview(rule.rule, applied=True)
+        self._rule_applied = True
         stream = self._capture.stream(self._session_id, self._direction)
         self.hex_view.set_annotations(annotations_from_application(application, stream))
         counts = ", ".join(f"{k}={v}" for k, v in sorted(application.counts.items()))
@@ -1502,7 +1505,12 @@ class MainWindow(QtWidgets.QMainWindow):
         return lines
 
     def _message_at(self, offset: int | None) -> tuple[int, object] | None:
-        """The message whose range contains ``offset``, with its 1-based index."""
+        """The message whose range contains ``offset``, with its 1-based index.
+
+        ``offset`` is unset until a byte is clicked. There is no message to find
+        then, so an unset offset is treated the same as one that falls outside
+        every message rather than dereferenced.
+        """
         if offset is None or self._rule is None or self._rule.root is None:
             return None
         for index, message in enumerate(self._rule.root.messages, start=1):
@@ -1656,18 +1664,17 @@ class MainWindow(QtWidgets.QMainWindow):
         )
 
     def show_guide(self) -> None:
-        """Bring the guide back.
+        """Return to the start screen and bring the coach back.
 
-        Before a capture is open the start guide is the welcome screen; with a
-        capture open it is the coach above the workspace. Showing the welcome
-        screen does not close the open capture, so returning to the workspace is
-        one click on a session.
+        The welcome screen is the first-run guide: it names the three steps and
+        reports which are done. The coach is the running hint strip above the
+        workspace. Showing the guide turns the coach back on and lands on the
+        welcome screen; it does not close the open capture, so returning to the
+        workspace is one click on a session.
         """
-        if self._capture is None:
-            self._refresh_welcome_progress()
-            self._stack.setCurrentWidget(self.welcome_view)
-        else:
-            self.set_guided_mode(True)
+        self.set_guided_mode(True)
+        self._refresh_welcome_progress()
+        self._stack.setCurrentWidget(self.welcome_view)
 
     def show_about(self) -> None:
         """Show the about dialog."""
