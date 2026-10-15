@@ -1500,9 +1500,14 @@ class MainWindow(QtWidgets.QMainWindow):
             lines.append(self.tr("<- {0}").format(self._capture_name))
         return lines
 
-    def _message_at(self, offset: int) -> tuple[int, object] | None:
-        """The message whose range contains ``offset``, with its 1-based index."""
-        if self._rule is None or self._rule.root is None:
+    def _message_at(self, offset: int | None) -> tuple[int, object] | None:
+        """The message whose range contains ``offset``, with its 1-based index.
+
+        ``offset`` is unset until a byte is clicked. There is no message to find
+        then, so an unset offset is treated the same as one that falls outside
+        every message rather than dereferenced.
+        """
+        if offset is None or self._rule is None or self._rule.root is None:
             return None
         for index, message in enumerate(self._rule.root.messages, start=1):
             if message.offset <= offset < message.offset + message.length:
