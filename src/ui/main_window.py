@@ -991,6 +991,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.load_rule(SAMPLE_RULE)
         if SAMPLE_JOURNAL.is_file():
             self.load_journal(SAMPLE_JOURNAL)
+        # The direction run fills the Messages table and the hex annotations;
+        # the corpus run then adds the whole-capture counterexamples without
+        # touching either. Running only the corpus pass would leave the demo on
+        # the empty Messages state while the rule had in fact been applied.
         self.apply_rule()
         self.apply_to_capture()
         self._notify(self.tr("opened the built-in demo"))
