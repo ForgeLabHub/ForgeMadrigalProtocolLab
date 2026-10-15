@@ -967,13 +967,13 @@ class MainWindow(QtWidgets.QMainWindow):
         The same preference the settings dialog writes is persisted here, so the
         strip does not reappear on the next start after it was dismissed.
         """
-        self._settings.setdefault("general", {})["guided_mode"] = False
-        write_settings(self._settings)
         self.set_guided_mode(False)
 
     def set_guided_mode(self, enabled: bool) -> None:
         """Show or hide the coach, and remember the choice in the settings."""
         self._guided_enabled = bool(enabled)
+        self._settings.setdefault("general", {})["guided_mode"] = self._guided_enabled
+        write_settings(self._settings)
         self._update_guided()
         if self._guided_enabled:
             self.guided_panel.raise_()
@@ -993,6 +993,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.load_rule(SAMPLE_RULE)
         if SAMPLE_JOURNAL.is_file():
             self.load_journal(SAMPLE_JOURNAL)
+        # The direction run fills the Messages table and the hex annotations;
+        # the corpus run then adds the whole-capture counterexamples without
+        # touching either. Running only the corpus pass would leave the demo on
+        # the empty Messages state while the rule had in fact been applied.
         self.apply_rule()
         self.apply_to_capture()
         self._notify(self.tr("opened the built-in demo"))
