@@ -26,14 +26,14 @@ message is classified. Rule v2 transfers to `corpus_capture_02` with 40 matched
 and 0 counterexamples, and fails openly on `synthetic_live`. See `REPORT.md`
 sections 7-8, `tests/integration/test_reference_report.py`.
 
-## 4. Why 781 tests, and not more?
+## 4. Why 794 tests, and not more?
 
 The suite covers every module and every status the engine can emit, including
 the boundary and defect fixtures; coverage is 90 % over `src/`, and the
 remaining lines are error branches that need a real I/O failure. More tests
 would not raise the claim, which is "confirmed in scope", not "proven". See
 `docs/AUDIT.md` sections 4 and 11. The figure is the count at the archived
-`v1.0.0` submission; the working `main` has since grown to 852.
+`v1.0.0` submission; the working `main` has since grown to 883 (at `a7c119e`).
 
 ## 5. What happens on a conflicting overlap?
 
@@ -110,7 +110,7 @@ next version. A reader can always tell which rule produced which verdict. See
 
 The investigation is a portable directory: relative paths plus sha256 digests,
 exportable and importable as a zip with integrity checking. A clean unpack runs
-the whole suite (780 passed, 1 skipped from the published archive). See
+the whole suite (793 passed, 1 skipped from the published archive). See
 `docs/PORTABILITY.md`, `src/project/`.
 
 ## Where to look next

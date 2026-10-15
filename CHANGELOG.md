@@ -105,6 +105,26 @@ verification of the deck, the screencast and the demo driver.
 - `4c3b1a3` chore(repo): add git attributes, hook, message template and hygiene doc
 - `1c8621f` test(ui): add locale, snapshot and state-isolation suites
 
+## v1.2.0
+
+The final-stabilization release: the documentation, the presentation and the
+reserve screencast are brought in line with the current tree, and the version is
+bumped from `v1.1.0`. No product code changed.
+
+### Changed
+
+- The reserve screencast `presentation/screencast.mp4` was re-recorded from the
+  current GUI: 3:40 (219.8 s), 1920x1080, 15 fps, no sound. The previous clip
+  was 125 s and showed the pre-overhaul interface. The poster frame and the
+  inlined `data:video/mp4` in the deck were refreshed.
+- The presentation screenshots were regenerated from the current theme, and the
+  deck PDFs and PPTX were rebuilt (15 slides).
+- The release QR and the deck's release text now point at `v1.2.0`.
+- The test count across the documentation is the measured 883 on the current
+  `main` (794 on the frozen `v1.0.0` archive).
+- The raw pcap/pcapng open path is documented in `README.md`, `docs/demo.md` and
+  `docs/GUI_VERIFICATION.md`; the verification environment is recorded there too.
+
 ## Unreleased
 
 Everything merged into `main` after the `v1.0.0` tag, by pull request. `v1.0.0`
@@ -142,26 +162,28 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
 - Researcher annotations stored in the project (`src/project/annotations.py`),
   with `annotate` and `annotations` subcommands, and an Annotations section in
   both report renderers.
-- The reserve screencast is embedded in the deck: slide 12 plays
-  `public/screencast.mp4` in a `<video>` element (poster frame, controls, muted
-  autoplay), and the printed PDF/PPTX carry the poster frame.
+- The reserve screencast is embedded in the deck: the demo slide (13) plays
+  `public/screencast.mp4` in a `<video>` element (poster frame, controls,
+  autoplay, loop, muted, playsinline) inlined as a `data:video/mp4` URI, and the
+  printed PDF/PPTX carry the poster frame.
 
 ### Changed
 
 - The deck was rebuilt as a single self-contained HTML file, printed to PDF and
-  packaged to PPTX as one full-bleed page per slide, reduced to fourteen slides
-  with varied layouts and no overflow (PR #16, PR #21, PR #25).
+  packaged to PPTX as one full-bleed page per slide, reduced to a static
+  fifteen-slide deck with varied layouts and no overflow (PR #16, PR #21,
+  PR #25, PR #64).
 - The deck is now static: no click build-ins and no transition animations. The
-  recording slide plays the reserve clip in place of a play badge, the metric
-  note states that the 4 GiB budget is on a 16 GiB machine, and the PDF and PPTX
-  carry the poster frame.
+  demo slide plays the reserve clip in place of a play badge, the metric note
+  states that the 4 GiB budget is on a 16 GiB machine, and the PDF and PPTX carry
+  the poster frame.
 - The defense script was split into a 5-minute and a 10-minute route with
   timings derived from the spoken text (PR #24).
 - The test counts across the documentation were refreshed to the merged
-  revision, and the deck and verification documents resynced to the 14-slide
-  deck (PR #16, PR #18, PR #25, PR #26).
+  revision, and the deck and verification documents resynced to the 15-slide
+  deck (PR #16, PR #18, PR #25, PR #26, PR #70).
 - The README, the audit, the portability report and the presentation
-  verification now quote 781 tests and the published `v1.0.0` archive
+  verification now quote the v1.0.0 test counts and the published `v1.0.0` archive
   (PR #26).
 
 ### Fixed
