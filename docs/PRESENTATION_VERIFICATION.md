@@ -67,9 +67,11 @@ Nine of nine present.
   sits on the title slide.
 - Requirement 4: the «Три модуля» slide shows the module breakdown and the JSON
   Schema contracts; the «Путь исследователя» slide shows the pipeline.
-- Requirement 6: the demo slide (13) names the committed screencast
-  (`presentation/screencast.mp4`) as the reserve recording («Резерв — запись
-  прогона (3:40)»). The deck carries no inline `<video>` element and no standalone
+- Requirement 6: the demo slide (13) embeds the committed screencast
+  (`presentation/screencast.mp4`) as a `<video>` element with the poster frame,
+  `controls`, `autoplay`, `loop`, `muted` and `playsinline`. The clip is inlined
+  as a `data:video/mp4` URI, so the HTML deck plays it with no web server; the
+  printed PDF and the PPTX carry the poster frame. The deck carries no standalone
   GUI screenshots; the still screenshots live in `presentation/screenshots/` and
   are used by `README.md`, not by the deck.
 - Requirement 7: `presentation/public/qr_repo.png` and `qr_release.png` are
@@ -126,14 +128,14 @@ same families through `src/ui/theme/fonts.py`.
 | served copy | `presentation/public/screencast.mp4` is a symlink to it | `ls -l presentation/public/screencast.mp4` |
 | codec, size | H.264, 1920x1080 | `ffprobe presentation/screencast.mp4` |
 | duration | 3:40 | `ffprobe presentation/screencast.mp4` |
-| shown on | named on slide 13 as the reserve recording; no inline `<video>` element | `grep -c '<video' presentation/*.html` |
+| shown on | embedded on slide 13 as `<video src="data:video/mp4;base64,...">` | `grep -c '<video' presentation/*.html` |
 
-The clip is a standalone fallback, not an embedded element: the demo slide (13)
-names it in a caption («Резерв — запись прогона (3:40)»), and the committed
-`presentation/screencast.mp4` is played from the file system if the live window
-does not come up. The deck carries no `<video>` tag, so the printed PDF and PPTX
-show the slide copy only. `presentation/public/screencast-poster.png` is kept in
-`public/` so a still frame can be reinstated without re-running `make_assets.py`.
+The clip is embedded in the demo slide (13): the element carries the poster frame,
+`controls`, `autoplay`, `loop`, `muted` and `playsinline`, and the clip itself is
+inlined as a `data:video/mp4` URI, so the deck plays it without a web server and
+without the rest of the repository. The printed PDF and the PPTX show the poster
+frame. `presentation/public/screencast-poster.png` is kept in `public/` so a still
+frame can be reinstated without re-running `make_assets.py`.
 
 ## Demo driver
 

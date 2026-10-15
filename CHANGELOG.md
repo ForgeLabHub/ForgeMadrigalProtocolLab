@@ -142,10 +142,10 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
 - Researcher annotations stored in the project (`src/project/annotations.py`),
   with `annotate` and `annotations` subcommands, and an Annotations section in
   both report renderers.
-- The reserve screencast is named in the deck: the demo slide (13) carries the
-  caption «Резерв — запись прогона (3:40)», and the clip is played from the file
-  system. The deck carries no `<video>` element, so the printed PDF/PPTX and the
-  built SPA render identically with no video codec in the path.
+- The reserve screencast is embedded in the deck: the demo slide (13) plays
+  `public/screencast.mp4` in a `<video>` element (poster frame, controls,
+  autoplay, loop, muted, playsinline) inlined as a `data:video/mp4` URI, and the
+  printed PDF/PPTX carry the poster frame.
 
 ### Changed
 
@@ -154,9 +154,9 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
   fifteen-slide deck with varied layouts and no overflow (PR #16, PR #21,
   PR #25, PR #64).
 - The deck is now static: no click build-ins and no transition animations. The
-  demo slide names the reserve clip in place of a play badge, the metric note
-  states that the 4 GiB budget is on a 16 GiB machine, and the PDF and PPTX show
-  the slide copy only.
+  demo slide plays the reserve clip in place of a play badge, the metric note
+  states that the 4 GiB budget is on a 16 GiB machine, and the PDF and PPTX carry
+  the poster frame.
 - The defense script was split into a 5-minute and a 10-minute route with
   timings derived from the spoken text (PR #24).
 - The test counts across the documentation were refreshed to the merged

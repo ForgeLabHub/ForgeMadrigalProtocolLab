@@ -127,9 +127,10 @@ both were wrong, and the pre-overhaul clip they described showed the old
 interface. The committed clip runs 3:40 and shows the current interface. The team
 slide carries no video, only the avatar.
 
-The deck names the clip as the fallback without embedding it. After the 15-slide
-restructure the dedicated «Запись прогона» slide was folded into the demo slide
-(13), whose caption reads «Резерв — запись прогона (3:40)». The deck carries no
-`<video>` element, so it renders identically in the PDF, the PPTX and the built
-SPA, with no video codec in the path; the baked poster stays in `public/` so a
-still frame can be reinstated without re-running `make_assets.py`.
+The deck embeds the clip in the demo slide (13) as a `<video>` element. After the
+15-slide restructure the dedicated «Запись прогона» slide was folded into the demo
+slide, whose caption reads «Резерв — запись прогона (3:40)»; the clip is inlined
+as a `data:video/mp4` URI with the poster frame, `controls`, `autoplay`, `loop`,
+`muted` and `playsinline`, so the HTML deck plays it with no web server. The
+printed PDF and the PPTX show the poster frame. The baked poster stays in
+`public/` so a still frame can be reinstated without re-running `make_assets.py`.
