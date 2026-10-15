@@ -33,6 +33,7 @@ SOURCES=(
     src/ui/corpus_dialog.py
     src/ui/welcome_view.py
     src/ui/settings.py
+    src/ui/legend.py
     src/ui/rule_builder.py
     src/ui/timeline_view.py
     src/ui/tutor.py

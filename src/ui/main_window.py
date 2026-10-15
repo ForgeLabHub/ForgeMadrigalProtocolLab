@@ -29,22 +29,17 @@ from . import learning, theme
 from .compare_view import CompareView
 from .constants import (
     FONT_SIZE_BODY,
-    FONT_SIZE_CAPTION,
-    LEGEND_SWATCH_PX,
     PROGRESS_BAR_WIDTH,
 )
 from .help_dialog import HelpCard, LearningCentre
 from .hex_view import (
-    LEGEND_KINDS,
     HexView,
     annotations_from_application,
     annotations_from_stream,
-    legend_label,
-    legend_swatch,
 )
 from .hypotheses_view import HypothesesView
 from .i18n import LanguageManager
-from .layout import FlowLayout
+from .legend import AnnotationLegend
 from .model import CaptureModel, CaptureModelError, RuleModel, verify_rule_on_corpus
 from .session_tree import SessionTree
 from .settings import (
@@ -587,23 +582,16 @@ class MainWindow(QtWidgets.QMainWindow):
         controls.addWidget(self._direction_label)
         controls.addWidget(self.direction_combo)
         controls.addStretch(1)
-        self.annotation_legend = QtWidgets.QWidget()
-        legend_layout = FlowLayout(self.annotation_legend, margin=0, spacing=8)
-        self._legend_chips: list[QtWidgets.QLabel] = []
-        for kind, _name in LEGEND_KINDS:
-            label = legend_label(kind)
-            chip = QtWidgets.QLabel(label)
-            chip.setFont(theme.body_font(FONT_SIZE_CAPTION))
-            chip.setProperty("role", "secondary")
-            chip.setToolTip(label)
-            swatch = QtWidgets.QLabel()
-            swatch.setPixmap(legend_swatch(kind))
-            swatch.setFixedSize(LEGEND_SWATCH_PX, LEGEND_SWATCH_PX)
-            legend_layout.addWidget(swatch)
-            legend_layout.addWidget(chip)
-            self._legend_chips.append(chip)
-        controls.addWidget(self.annotation_legend)
         centre_layout.addLayout(controls)
+
+        # The byte-state legend is its own strip above the hex view, not a
+        # widget beside the direction selector: a strip cannot overlap the
+        # bytes or take width from the ASCII column, and it folds or collapses
+        # when the window is narrow.
+        self.annotation_legend = AnnotationLegend()
+        self._legend_chips: list[QtWidgets.QLabel] = self.annotation_legend.chips
+        centre_layout.addWidget(self.annotation_legend)
+
         self.hex_view = HexView()
         centre_layout.addWidget(self.hex_view, 1)
         self._bytes_box = self._wrap(self.tr("Bytes"), centre)
@@ -804,10 +792,15 @@ class MainWindow(QtWidgets.QMainWindow):
             view.apply_theme()
         self.welcome_view.apply_theme()
         self.tutor_panel.apply_theme()
+        self.annotation_legend.apply_theme()
         self.report_view.setFont(theme.mono_font(FONT_SIZE_BODY))
         self.diff_view.setFont(theme.mono_font(FONT_SIZE_BODY))
 
     # -- zoom --------------------------------------------------------------
+
+    def set_legend_visible(self, visible: bool) -> None:
+        """Show or hide the byte-state legend strip above the hex view."""
+        self.annotation_legend.setVisible(bool(visible))
 
     def zoom_in(self) -> None:
         """Enlarge the bytes and the tree by one step."""
@@ -922,6 +915,7 @@ class MainWindow(QtWidgets.QMainWindow):
             int(editor.get("tree_font_size", DEFAULTS["editor"]["tree_font_size"]))
         )
         self.hex_view.set_show_diagnostics(bool(advanced.get("show_diagnostics", True)))
+        self.set_legend_visible(bool(advanced.get("show_legend", True)))
         self.set_guided_mode(
             bool(general.get("guided_mode", DEFAULTS["general"]["guided_mode"]))
         )
@@ -979,10 +973,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._bytes_box.setTitle(self.tr("Bytes"))
         self._sessions_box.setTitle(self.tr("Sessions"))
         self._direction_label.setText(self.tr("direction"))
-        for chip, (kind, _name) in zip(self._legend_chips, LEGEND_KINDS, strict=False):
-            label = legend_label(kind)
-            chip.setText(label)
-            chip.setToolTip(label)
+        self.annotation_legend.retranslate_ui()
         self.validation_view.retranslate_ui()
         self.compare_view.retranslate_ui()
         self.hypotheses_view.retranslate_ui()
