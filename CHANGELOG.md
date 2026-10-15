@@ -171,6 +171,9 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
   `public/screencast.mp4` in a `<video>` element (poster frame, controls,
   autoplay, loop, muted, playsinline) inlined as a `data:video/mp4` URI, and the
   printed PDF/PPTX carry the poster frame.
+- A byte-state legend strip above the hex view (`src/ui/legend.py`): a
+  collapsible row of painted swatches whose captions and swatches carry an
+  explanatory tooltip, with a Settings switch to hide the strip.
 
 ### Changed
 
@@ -190,6 +193,11 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
 - The README, the audit, the portability report and the presentation
   verification now quote the v1.0.0 test counts and the published `v1.0.0` archive
   (PR #26).
+- The ASCII column caption is drawn in the same fixed-pitch face and size as the
+  bytes and shifted by the document margin, so it lines up with the column it
+  names instead of drifting left; the byte-state legend is now a compact strip
+  above the hex view that folds onto further lines and collapses, instead of a
+  row beside the direction selector.
 
 ### Fixed
 
@@ -208,6 +216,10 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
   being discarded, matching the module contract that an un-framed range is
   reported rather than silently lost. Regression tests cover both the leading
   and the between-message case, and the whole stream is accounted for.
+- The hex bytes were painted in the proportional body face: the application
+  style sheet sets a family on every `QWidget`, which outranks `setFont`, so the
+  hex columns did not line up and the ASCII column was not on a fixed grid. The
+  byte area and its column caption now pin the fixed-pitch family themselves.
 
 ### Removed
 
