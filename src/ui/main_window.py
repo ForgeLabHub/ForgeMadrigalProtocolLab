@@ -965,13 +965,13 @@ class MainWindow(QtWidgets.QMainWindow):
         The same preference the settings dialog writes is persisted here, so the
         strip does not reappear on the next start after it was dismissed.
         """
-        self._settings.setdefault("general", {})["guided_mode"] = False
-        write_settings(self._settings)
         self.set_guided_mode(False)
 
     def set_guided_mode(self, enabled: bool) -> None:
         """Show or hide the coach, and remember the choice in the settings."""
         self._guided_enabled = bool(enabled)
+        self._settings.setdefault("general", {})["guided_mode"] = self._guided_enabled
+        write_settings(self._settings)
         self._update_guided()
         if self._guided_enabled:
             self.guided_panel.raise_()
