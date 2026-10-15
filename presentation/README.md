@@ -21,11 +21,11 @@ repository's own code. Every number is from `docs/METRICS.md`.
 | `assets/madrigal-mark.png` | the square monogram used as a watermark |
 | `assets/brand/` | three abstract background textures from the case owner's site |
 | `public/` | assets the deck serves: fonts, logo, QR codes, member photos |
-| `public/screencast-poster.png` | the poster frame shown on slide 12 under `screencast.mp4` |
+| `public/screencast-poster.png` | the poster frame for `screencast.mp4`, kept in `public/` so a still can be reinstated (the deck itself carries no `<video>`) |
 | `defense_script.md` | the 5- and 10-minute speaker routes, one section per slide |
 | `Q_and_A.md` | the questions asked after the talk and the prepared answers |
 | `VIDEO.md` | shot list for the reserve screen recording |
-| `screencast.mp4` | the reserve recording of a full run (2:22, H.264, no sound), embedded on slide 12 |
+| `screencast.mp4` | the reserve recording of a full run (3:40, H.264, no sound), named on slide 13 |
 | `record_demo.py` | drives the real window through the demo scenario for the recording |
 | `generate_screenshots.py` | renders the eleven window captures offscreen |
 | `make_assets.py` | panel crops, QR codes and the round member photos |
@@ -71,9 +71,10 @@ python -m presentation.make_brand
 
 ## Notes
 
-- The deck is one file: fonts, logos, QR codes, screenshots, charts and the
-  reserve screencast are all inlined as `data:` URIs, so it opens, plays and
-  prints without a web server and without the rest of the repository.
+- The deck is one file: fonts, logos, QR codes and charts are all inlined as
+  `data:` URIs, so it opens and prints without a web server and without the rest
+  of the repository. The reserve screencast is not inlined: the demo slide names
+  `screencast.mp4` in a caption and the clip is played from the file system.
 - Fonts (Tektur, Montserrat, JetBrains Mono) are bundled under `public/fonts/`
   and shipped in the HTML, so a machine without the families installed still
   shows the deck's own typefaces.

@@ -108,34 +108,28 @@ state the previous one left, so the recording is one continuous take.
 
 ## Measured result
 
-`presentation/video.mp4` is the recorded take: 1680 by 1050, H.264, 3:39
-(219.4 s), about 3.5 MB. The window capture sat inside a display whose top-left
-corner was not the window origin, so the raw take carried solid black bands at
-both ends; it was trimmed to the first and last frame with content
-(`-ss 5 -to 224.4` on the raw take) and re-encoded, keeping the frame size and
-scale. The duration is asserted with blackdetect on the first and last two
-seconds.
+`screencast.mp4` is the committed reserve take: H.264, 1920 by 1080, 15 fps,
+219.8 s (3:40), about 2.0 MB, no sound. It was recorded on 2026-10-15 from the
+current GUI (`main` at `a7c119e`) with `record_demo.py` driven under a virtual X
+server (`Xvfb :99` at 1920x1080, `openbox`, `QT_QPA_PLATFORM=xcb`) and grabbed
+with `ffmpeg -f x11grab`. The raw take opened on 3.6 s of solid black and closed
+on 11.5 s of black; it was trimmed to the first and last frame with content
+(`-ss 3.6 -to 223.4`) and re-encoded to H.264 at 15 fps, so `blackdetect`
+reports no black segment in the committed file. The poster
+`presentation/public/screencast-poster.png` is a frame from the same take.
 
-The six scenes fit the first 3:45; the last thirty seconds are the close. The
-finished file is not committed, and is distinct from
-`presentation/screencast.mp4`, the committed 2:22 recording kept alongside the
-deck; the two are separate takes.
+A separate longer take, `presentation/video.mp4`, is a local recording aid; it is
+not committed. The six scenes fit the first 3:45; the last thirty seconds are the
+close.
 
-`screencast.mp4` is H.264, 1920 by 1080, 15 fps, 142.1 s (2:22), about 1.0 MB.
-The raw take opened and closed on solid black, 2.2 s at the head and 22.0 s at
-the tail. It was trimmed to the first and last frame with content
-(`-ss 2.2 -to 143.933`, stream copy), keeping the frame size and rate;
-`blackdetect` reports no black segment in the committed file.
+Note: earlier revisions of this file quoted the clip as 1:25 and then as 2:22;
+both were wrong, and the pre-overhaul clip they described showed the old
+interface. The committed clip runs 3:40 and shows the current interface. The team
+slide carries no video, only the avatar.
 
-Note: an earlier revision of this file quoted the clip as 1:25 and placed it on
-the team slide. That was wrong on both counts: the clip runs 2:22, and the team
-slide carries no video, only the avatar. The clip is a standalone fallback.
-
-The deck no longer shows the clip as a still. After the 14-slide restructure the
-dedicated «Запись прогона» slide was folded into the demo slide (12), whose
-caption names the clip as the fallback («Резерв — запись полного прогона, 2:22,
-без звука»). The baked poster `presentation/public/screencast-poster.png` stays
-in `public/` unused, so a still frame can be reinstated without re-running
-`make_assets.py`; keeping the frame an image means the deck would render
-identically in the PDF, the PPTX and the built SPA, with no video codec in the
-path.
+The deck names the clip as the fallback without embedding it. After the 15-slide
+restructure the dedicated «Запись прогона» slide was folded into the demo slide
+(13), whose caption reads «Резерв — запись прогона (3:40)». The deck carries no
+`<video>` element, so it renders identically in the PDF, the PPTX and the built
+SPA, with no video codec in the path; the baked poster stays in `public/` so a
+still frame can be reinstated without re-running `make_assets.py`.
