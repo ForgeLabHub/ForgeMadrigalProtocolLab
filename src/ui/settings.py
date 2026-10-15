@@ -27,6 +27,7 @@ DEFAULTS: dict[str, dict[str, Any]] = {
     "general": {
         "theme": "system",
         "language": "system",
+        "guided_mode": True,
     },
     "editor": {
         "hex_font_size": 13,
@@ -176,11 +177,21 @@ class SettingsDialog(QtWidgets.QDialog):
         language.addItem(self.tr("Russian"), "ru")
         language.addItem(self.tr("English"), "en")
         language.addItem(self.tr("System"), "system")
+        guided = QtWidgets.QCheckBox(self.tr("Show the guided hints"))
+        guided.setToolTip(
+            self.tr("Show the step-by-step hints above the workspace on first run")
+        )
+        guided.setChecked(bool(get(self._initial, "general", "guided_mode")))
         self._set_combo(theme, get(self._initial, "general", "theme"))
         self._set_combo(language, get(self._initial, "general", "language"))
         form.addRow(self.tr("Theme"), theme)
         form.addRow(self.tr("Language"), language)
-        self._widgets["general"] = {"theme": theme, "language": language}
+        form.addRow("", guided)
+        self._widgets["general"] = {
+            "theme": theme,
+            "language": language,
+            "guided_mode": guided,
+        }
         return page
 
     def _build_editor(self) -> QtWidgets.QWidget:
@@ -251,6 +262,7 @@ class SettingsDialog(QtWidgets.QDialog):
         """Collect the widgets into the settings mapping."""
         theme = self._widgets["general"]["theme"]
         language = self._widgets["general"]["language"]
+        guided = self._widgets["general"]["guided_mode"]
         hex_size = self._widgets["editor"]["hex_font_size"]
         tree_size = self._widgets["editor"]["tree_font_size"]
         show_offset = self._widgets["editor"]["show_offset"]
@@ -263,6 +275,7 @@ class SettingsDialog(QtWidgets.QDialog):
             "general": {
                 "theme": theme.currentData(),
                 "language": language.currentData(),
+                "guided_mode": guided.isChecked(),
             },
             "editor": {
                 "hex_font_size": hex_size.value(),

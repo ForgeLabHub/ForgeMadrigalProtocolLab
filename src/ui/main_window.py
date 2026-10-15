@@ -28,6 +28,7 @@ from .constants import (
     LEGEND_SWATCH_PX,
     PROGRESS_BAR_WIDTH,
 )
+from .guided import GuidedPanel
 from .hex_view import (
     LEGEND_KINDS,
     HexView,
@@ -122,6 +123,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._direction: str = ""
         self._corpus_report = None
         self._last_dir: Path | None = None
+        self._rule_applied = False
         self._theme_manager = None
         self._language_manager: LanguageManager | None = None
         self._capture_name: str = ""
@@ -129,11 +131,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self._corpus_dialog = None
         self._last_offset: int | None = None
         self._settings: dict = read_settings()
-        # The last rule-status line is kept as a renderer rather than as a
-        # finished string, so a language switch can rebuild it in the new
-        # language instead of leaving the previous one on screen.
         self._rule_status_render: Callable[[], str] | None = None
         self._rule_status_error = False
+        self._guided_enabled: bool = bool(
+            self._settings.get("general", {}).get("guided_mode", True)
+        )
 
         self._build_menu()
         self._build_central()
@@ -510,6 +512,15 @@ class MainWindow(QtWidgets.QMainWindow):
         splitter.setStretchFactor(3, 0)
         self._splitter = splitter
 
+        # The coach sits above the three panels inside the workspace, so the
+        # start screen stays free of it and the two never show at once. It is a
+        # view only; the window wires each step to its own slot. It is on by
+        # default and switched off from here or from the settings dialog.
+        self.guided_panel = GuidedPanel()
+        self.guided_panel.nextRequested.connect(self._guided_next)
+        self.guided_panel.dismissRequested.connect(self._dismiss_guided)
+
+        layout.addWidget(self.guided_panel)
         layout.addWidget(splitter, 1)
 
     def _wrap(self, title: str, widget: QtWidgets.QWidget) -> QtWidgets.QGroupBox:
@@ -570,6 +581,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.validation_view.ruleValidityChanged.connect(
             self.validation_view.show_rule_validity
         )
+        self.validation_view.ruleValidityChanged.connect(self._on_rule_validity)
         self.validation_view.counterexampleSelected.connect(self._reveal_counterexample)
         self.hypotheses_view.messageSelected.connect(self.reveal_offset)
 
@@ -578,6 +590,35 @@ class MainWindow(QtWidgets.QMainWindow):
         self._timeline_box.setVisible(bool(visible))
         if visible:
             self._timeline_box.raise_()
+
+    def _on_rule_validity(self, valid: bool, _message: str) -> None:
+        """An edited rule is a new, unrun rule: its old verdict is not current.
+
+        A rule that parses is adopted as the model so it can be run; a rule that
+        does not is left in the editor and reported, with the data the reader
+        typed preserved. Either way the previous verdict is cleared, so a stale
+        "applied" mark is never shown against different bytes.
+        """
+        if self._rule_applied:
+            self._rule_applied = False
+            self.validation_view.clear()
+            self.hex_view.set_annotations(None)
+            self._update_guided()
+        if not valid:
+            return
+        text = self.validation_view.rule_text().strip()
+        if not text:
+            return
+        if self._rule is not None and self._rule.text.strip() == text:
+            return
+        try:
+            model = RuleModel.from_text(text)
+        except Exception:
+            return
+        if self._rule is not None:
+            model.previous_rule = self._rule.rule
+            model.previous_report = self._rule.corpus_report
+        self._rule = model
 
     # -- theme -------------------------------------------------------------
 
@@ -615,6 +656,7 @@ class MainWindow(QtWidgets.QMainWindow):
         ):
             view.apply_theme()
         self.welcome_view.apply_theme()
+        self.guided_panel.apply_theme()
         self.report_view.setFont(theme.mono_font(FONT_SIZE_BODY))
         self.diff_view.setFont(theme.mono_font(FONT_SIZE_BODY))
 
@@ -733,6 +775,9 @@ class MainWindow(QtWidgets.QMainWindow):
             int(editor.get("tree_font_size", DEFAULTS["editor"]["tree_font_size"]))
         )
         self.hex_view.set_show_diagnostics(bool(advanced.get("show_diagnostics", True)))
+        self.set_guided_mode(
+            bool(general.get("guided_mode", DEFAULTS["general"]["guided_mode"]))
+        )
 
         level = str(advanced.get("log_level", "INFO"))
         if level in logging.getLevelNamesMapping():
@@ -799,7 +844,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.timeline_view.retranslate_ui()
         self._timeline_box.setTitle(self.tr("Timeline"))
         self.welcome_view.retranslate_ui()
+        self.guided_panel.retranslate_ui()
         self._refresh_rule_status()
+        # The empty-state hint is built text, so a language change must rebuild
+        # it; without this it stays in the language it was created in.
+        if self._capture is None:
+            self._show_empty_state()
         if self._capture is not None and self._last_offset is not None:
             self._show_provenance(self._last_offset)
         else:
@@ -838,6 +888,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self._capture_name = Path(path).name
         self._refresh_title()
         self._set_provenance_text(self._capture_summary())
+        # A new capture invalidates every verdict taken against the previous one:
+        # the rule stays loaded, but it has not been run here yet, so no stale
+        # result is left on screen.
+        self._rule_applied = False
+        self._corpus_report = None
+        if self._rule is not None:
+            self._rule.corpus_report = None
+            self._rule.root = None
+        self._clear_results()
         if model.sessions:
             self._on_direction_selected(
                 model.sessions[0].session_id,
@@ -846,6 +905,75 @@ class MainWindow(QtWidgets.QMainWindow):
         self._show_workspace()
         self._refresh_welcome_progress()
         self.validation_view.set_ready(capture=True, rule=self._rule is not None)
+        self._update_guided()
+
+    def _clear_results(self) -> None:
+        """Drop the message and counterexample views of a previous capture."""
+        self.validation_view.clear()
+        self.compare_view.clear()
+        self.hypotheses_view.clear()
+
+    # -- guided mode -------------------------------------------------------
+
+    def _update_guided(self) -> None:
+        """Show the coach at the step the workspace is actually at."""
+        if not self._guided_enabled:
+            self.guided_panel.setVisible(False)
+            return
+        self.guided_panel.set_step(self._guided_index())
+        # The workspace is self-describing once a capture, a rule and an applied
+        # rule are all present; the coach steps aside rather than repeat it.
+        self.guided_panel.setVisible(
+            not (self._capture is not None and self._rule is not None and self._rule_applied)
+        )
+
+    def _guided_index(self) -> int:
+        """The stage that matches the window state, 0-based."""
+        if self._capture is None:
+            return 0
+        if not (self._session_id and self._direction):
+            return 1
+        if self._rule is None:
+            return 2
+        if not self._rule_applied:
+            return 3
+        return 4
+
+    def _guided_next(self) -> None:
+        """Run the action the coach is currently offering."""
+        index = self._guided_index()
+        if index == 0:
+            self.open_demo()
+        elif index == 1:
+            if self._capture is not None and self._capture.sessions:
+                session = self._capture.sessions[0]
+                directions = self._capture.directions(session.session_id)
+                if directions:
+                    self.session_tree.select_direction(session.session_id, directions[0])
+        elif index == 2:
+            self.build_rule()
+        elif index == 3:
+            self.apply_rule()
+        else:
+            self.apply_to_capture()
+        self._update_guided()
+
+    def _dismiss_guided(self) -> None:
+        """Turn the hints off from the strip and remember the choice.
+
+        The same preference the settings dialog writes is persisted here, so the
+        strip does not reappear on the next start after it was dismissed.
+        """
+        self._settings.setdefault("general", {})["guided_mode"] = False
+        write_settings(self._settings)
+        self.set_guided_mode(False)
+
+    def set_guided_mode(self, enabled: bool) -> None:
+        """Show or hide the coach, and remember the choice in the settings."""
+        self._guided_enabled = bool(enabled)
+        self._update_guided()
+        if self._guided_enabled:
+            self.guided_panel.raise_()
 
     def open_demo(self) -> None:
         """Open the small capture, rule and journal that ship with the tool.
@@ -997,6 +1125,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self._rule = RuleModel.from_file(path)
         self._rule.previous_rule = previous_rule
         self._rule.previous_report = previous_report
+        # A freshly loaded rule has not been run against this capture yet, so the
+        # previous verdict is not the current one.
+        self._rule_applied = False
         self.validation_view.set_rule_text(self._rule.text)
         self._set_rule_status(
             lambda: self.tr("loaded {0}  rule v{1}").format(
@@ -1007,6 +1138,30 @@ class MainWindow(QtWidgets.QMainWindow):
         self.validation_view.set_rule_overview(self._rule.rule, applied=False)
         self._refresh_welcome_progress()
         self.validation_view.set_ready(capture=self._capture is not None, rule=True)
+        self._update_guided()
+
+    def _current_rule(self) -> RuleModel | None:
+        """The rule to run: the loaded model, or the text the editor holds.
+
+        A rule built in the form or typed in the editor is a document, not a
+        file. Adopting it here is what keeps "apply" from silently doing nothing
+        when no rule file was ever opened. The previous run is carried over so a
+        re-edit still shows the diff against it.
+        """
+        if self._rule is not None:
+            return self._rule
+        text = self.validation_view.rule_text().strip()
+        if not text:
+            return None
+        try:
+            model = RuleModel.from_text(text)
+        except Exception as exc:
+            self.validation_view.set_rule_status(
+                self.tr("rule error: {0}").format(exc), error=True
+            )
+            return None
+        self._rule = model
+        return model
 
     def build_rule(self) -> None:
         """Open the form-based rule builder, seeded with the current rule.
@@ -1028,8 +1183,29 @@ class MainWindow(QtWidgets.QMainWindow):
         dialog.setFont(theme.body_font(FONT_SIZE_BODY))
         if dialog.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
-        self.validation_view.set_rule_text(dialog.rule_text())
+        text = dialog.rule_text()
+        try:
+            model = RuleModel.from_text(text)
+        except Exception as exc:
+            # Keep what the form produced so the reader can fix it by hand; the
+            # error is reported beside the editor rather than thrown away.
+            self.validation_view.set_rule_text(text)
+            self.validation_view.set_rule_status(
+                self.tr("rule error: {0}").format(exc), error=True
+            )
+            return
+        # The built rule becomes the current model, so "apply" has something to
+        # run instead of reporting that no rule is loaded.
+        if self._rule is not None:
+            model.previous_rule = self._rule.rule
+            model.previous_report = self._rule.corpus_report
+        self._rule = model
+        self._rule_applied = False
+        self.validation_view.set_rule_text(text)
+        self.validation_view.set_rule_overview(model.rule, applied=False)
         self._set_rule_status(lambda: self.tr("rule built; apply it to check it"))
+        self._refresh_welcome_progress()
+        self._update_guided()
 
     def _current_message_bytes(self) -> bytes:
         """The bytes of the message the last-clicked byte belongs to, or a slice.
@@ -1086,6 +1262,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.validation_view.set_context(session_id, direction)
         self._refresh_welcome_progress()
         self._render_stream()
+        self._update_guided()
 
     def _on_direction_changed(self, direction: str) -> None:
         if self._capture is None or not direction or direction == self._direction:
@@ -1101,22 +1278,32 @@ class MainWindow(QtWidgets.QMainWindow):
     # -- rule --------------------------------------------------------------
 
     def apply_rule(self) -> None:
-        """Adopt the edited rule and apply it to the current direction."""
-        if self._capture is None or self._rule is None:
-            self._notify(self.tr("open a capture and a rule first"))
+        """Adopt the edited rule and apply it to the current direction.
+
+        The rule that runs is the loaded model or the text the editor holds; a
+        built or typed rule becomes the model here, so the action always has
+        something to run rather than reporting that no rule is loaded.
+        """
+        if self._capture is None:
+            self._notify(self.tr("open a capture first"))
+            return
+        rule = self._current_rule()
+        if rule is None:
+            self._notify(self.tr("open or build a rule first"))
             return
         try:
-            self._rule.reload(self.validation_view.rule_text())
+            rule.reload(self.validation_view.rule_text())
         except Exception as exc:
             self._set_rule_status(
                 lambda exc=exc: self.tr("rule error: {0}").format(exc), error=True
             )
             return
-        application = self._rule.apply(self._capture, self._session_id, self._direction)
+        application = rule.apply(self._capture, self._session_id, self._direction)
         self.validation_view.show_application(application)
         self.compare_view.show_application(application)
-        self._show_hypotheses(self._rule.rule, application.messages)
-        self.validation_view.set_rule_overview(self._rule.rule, applied=True)
+        self._show_hypotheses(rule.rule, application.messages)
+        self._rule_applied = True
+        self.validation_view.set_rule_overview(rule.rule, applied=True)
         stream = self._capture.stream(self._session_id, self._direction)
         self.hex_view.set_annotations(annotations_from_application(application, stream))
         counts = ", ".join(f"{k}={v}" for k, v in sorted(application.counts.items()))
@@ -1130,6 +1317,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 application.rule.rule_version, self._session_id, self._direction
             )
         )
+        self._update_guided()
 
     def _show_hypotheses(self, rule, messages) -> None:
         """Fill the hypotheses tab with the alternative readings for the run."""
@@ -1160,11 +1348,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def apply_to_capture(self) -> None:
         """Verify the current rule over every direction of the capture."""
-        if self._capture is None or self._rule is None:
-            self._notify(self.tr("open a capture and a rule first"))
+        if self._capture is None:
+            self._notify(self.tr("open a capture first"))
+            return
+        rule = self._current_rule()
+        if rule is None:
+            self._notify(self.tr("open or build a rule first"))
             return
         try:
-            self._rule.reload(self.validation_view.rule_text())
+            rule.reload(self.validation_view.rule_text())
         except Exception as exc:
             self._set_rule_status(
                 lambda exc=exc: self.tr("rule error: {0}").format(exc), error=True
@@ -1172,31 +1364,33 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         self._begin_run()
         self._set_progress(20)
-        report = verify_rule_on_corpus(self._rule.rule, self._capture)
+        report = verify_rule_on_corpus(rule.rule, self._capture)
         self._set_progress(100)
         self._end_run()
         if (
-            self._rule.previous_report is not None
-            and self._rule.previous_report.rule_id == report.rule_id
+            rule.previous_report is not None
+            and rule.previous_report.rule_id == report.rule_id
         ):
-            self._show_report_diff(self._rule.previous_report, report)
-        self._rule.corpus_report = report
+            self._show_report_diff(rule.previous_report, report)
+        rule.corpus_report = report
         self._corpus_report = report
+        self._rule_applied = True
         self.validation_view.show_corpus_report(report)
-        self.validation_view.set_rule_overview(self._rule.rule, applied=True)
-        directions = (self._rule.rule.direction,) if self._rule.rule.direction else ()
-        self._show_hypotheses(self._rule.rule, self._corpus_messages(directions))
+        self.validation_view.set_rule_overview(rule.rule, applied=True)
+        directions = (rule.rule.direction,) if rule.rule.direction else ()
+        self._show_hypotheses(rule.rule, self._corpus_messages(directions))
         counts = ", ".join(f"{k}={v}" for k, v in sorted(report.counts().items()))
         self._set_rule_status(
             lambda counts=counts, report=report: self.tr(
                 "rule v{0} over the capture: {1}  counterexamples={2}"
             ).format(
-                self._rule.rule.rule_version, counts, len(report.contradictions)
+                rule.rule.rule_version, counts, len(report.contradictions)
             )
         )
         self._notify(
             self.tr("verified rule over the whole capture: {0}").format(counts)
         )
+        self._update_guided()
 
     def _show_report_diff(self, report_a, report_b) -> None:
         from ..hypothesis.diff import diff_reports, format_report_diff
@@ -1460,15 +1654,18 @@ class MainWindow(QtWidgets.QMainWindow):
         )
 
     def show_guide(self) -> None:
-        """Return to the empty-state screen.
+        """Bring the guide back.
 
-        The welcome screen is the start guide now: it names the three steps and
-        reports which are done, and it is where a reader lands before a capture is
-        open. Showing it does not close the open capture, so returning to the
-        workspace is one click on a session.
+        Before a capture is open the start guide is the welcome screen; with a
+        capture open it is the coach above the workspace. Showing the welcome
+        screen does not close the open capture, so returning to the workspace is
+        one click on a session.
         """
-        self._refresh_welcome_progress()
-        self._stack.setCurrentWidget(self.welcome_view)
+        if self._capture is None:
+            self._refresh_welcome_progress()
+            self._stack.setCurrentWidget(self.welcome_view)
+        else:
+            self.set_guided_mode(True)
 
     def show_about(self) -> None:
         """Show the about dialog."""
