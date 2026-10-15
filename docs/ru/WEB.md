@@ -41,7 +41,7 @@ python -m src.web.app --capture out/cap01.json --rule examples/corpus_rule_v1.js
 
 ## Снимок
 
-![Hex-просмотр с применённым правилом](web-screenshot.png)
+![Hex-просмотр с применённым правилом](../web-screenshot.png)
 
 Список сессий связывает каждое направление с hex-просмотром; применение правила
 превращает цвета байтов в вердикты, а клик по байту показывает его исходный пакет.
@@ -54,7 +54,7 @@ python -m src.web.app --capture out/cap01.json --rule examples/corpus_rule_v1.js
 провенанс. Все три направления разрешаются, правило сообщает `matched`, а карточка
 провенанса показывает пакет 3, seq 1001, ts 1700000000.004 для байта 0. Полный
 набор проходит на 781 тесте. Запись того прогона — в
-[screenshots/verify/web.png](screenshots/verify/web.png).
+[screenshots/verify/web.png](../screenshots/verify/web.png).
 
 Сам веб-модуль во время слияния не менялся; конфликтовал только `README.md`,
 потому что `main` переписал его в формат сдачи.
