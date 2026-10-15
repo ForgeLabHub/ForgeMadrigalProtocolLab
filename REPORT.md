@@ -271,8 +271,9 @@ Open:
   set would not be found by this analysis.
 - The corpus was generated, and its generator is not derived from a real device,
   so the corpus protocol may not match any deployed one.
-- The window opens a capture file, not a project directory: the portable project
-  is exercised from the command line, not from a project menu.
+- The window opens a capture file, and the Project menu creates, opens, saves,
+  exports and imports a portable project directory; the command-line
+  `src.project.cli` drives the same format.
 
 ## 13. Verification
 
