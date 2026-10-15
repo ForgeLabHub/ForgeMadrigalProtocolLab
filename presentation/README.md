@@ -11,7 +11,7 @@ repository's own code. Every number is from `docs/METRICS.md`.
 | --- | --- |
 | `Презентация Madrigal Protocol Lab.html` | the deck source, 15 slides, dark theme, all images inlined |
 | `Презентация Madrigal Protocol Lab (светлая).html` | the same deck in the light theme |
-| `slide.pdf` | the printed export, 15 pages, 2560×1440 |
+| `slides.pdf` | the printed export, 15 pages, 2560×1440 |
 | `slide-light.pdf` | the same deck exported for a washed-out projector |
 | `slide.pptx` | the deck as a PPTX, one full-bleed image per slide, zip timestamps pinned to 1980-01-01 |
 | `slide-light.pptx` | the light variant as a PPTX |
@@ -46,13 +46,13 @@ lifted, so the layout and the copy are identical between the two.
 
 ```bash
 # print each theme to PDF (Chromium must be on PATH)
-chromium --headless=new --no-pdf-header-footer --print-to-pdf=slide.pdf \
+chromium --headless=new --no-pdf-header-footer --print-to-pdf=slides.pdf \
   "Презентация Madrigal Protocol Lab.html"
 chromium --headless=new --no-pdf-header-footer --print-to-pdf=slide-light.pdf \
   "Презентация Madrigal Protocol Lab (светлая).html"
 
 # package the PDFs into PPTX (from the repository root)
-python -m presentation.make_deck_pptx presentation/slide.pdf presentation/slide.pptx
+python -m presentation.make_deck_pptx presentation/slides.pdf presentation/slide.pptx
 python -m presentation.make_deck_pptx presentation/slide-light.pdf presentation/slide-light.pptx
 ```
 

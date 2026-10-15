@@ -33,7 +33,7 @@ done
 
 Крупные собранные бинарники не попадают в историю: `presentation/video.mp4`
 игнорируется и пересобирается из `presentation/VIDEO.md`. Закоммиченные артефакты
-(`slide.pdf`, `slide.pptx`, `screencast.mp4`) — намеренные результаты.
+(`slides.pdf`, `slide.pptx`, `screencast.mp4`) — намеренные результаты.
 
 ## .gitattributes
 

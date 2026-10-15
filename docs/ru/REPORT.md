@@ -336,8 +336,8 @@ TCP с намеренно другой раскладкой (little-endian дл�
 | `docs/RULE_V1_V2.md` | запись версий для двух корпусных правил |
 | `docs/GUI_VERIFICATION.md` | что окно было проведено показать, и найденные дефекты |
 | `docs/PRESENTATION_VERIFICATION.md` | каждое утверждение деки отображено на его доказательство |
-| `presentation/slide.pdf` | дека, четырнадцать слайдов, с реальными снимками |
-| `presentation/slide-light.pdf` | та же дека в светлой теме, четырнадцать слайдов |
+| `presentation/slides.pdf` | дека, пятнадцать слайдов, с реальными снимками |
+| `presentation/slide-light.pdf` | та же дека в светлой теме, пятнадцать слайдов |
 | `presentation/slide.pptx` | та же дека как переносимый PPTX, одна отрисованная страница на слайд |
 | `presentation/defense_script.md` | маршруты спикера на 5 и 10 минут к защите |
 | `presentation/screenshots/` | одиннадцать захватов окна |

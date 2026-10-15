@@ -6,7 +6,7 @@
 требований организаторов. Рассматриваемые артефакты: исходник деки
 `presentation/Презентация Madrigal Protocol Lab.html`, её светный двойник
 `presentation/Презентация Madrigal Protocol Lab (светлая).html`, закоммиченные
-`presentation/slide.pdf` и `presentation/slide-light.pdf`, сборки PPTX
+`presentation/slides.pdf` и `presentation/slide-light.pdf`, сборки PPTX
 `presentation/slide.pptx` и `presentation/slide-light.pptx` и
 `presentation/defense_script.md`. Ничего не пересобиралось из шаблона; PDF печатаются
 из HTML, а PPTX генерируется нашим собственным кодом.
@@ -17,11 +17,11 @@
 
 | факт | значение | команда |
 | --- | --- | --- |
-| страниц в закоммиченном PDF (тёмная) | 14 | `pdfinfo presentation/slide.pdf` |
-| страниц в закоммиченном PDF (светлая) | 14 | `pdfinfo presentation/slide-light.pdf` |
-| слайдов в исходнике | 14 | `grep -c 'slide-container' presentation/*.html` |
-| слайдов в PPTX | 14 | `python -c "import zipfile;z=zipfile.ZipFile('presentation/slide.pptx');print(len([n for n in z.namelist() if n.startswith('ppt/slides/slide') and n.endswith('.xml')]))"` |
-| размер страницы | 2560 x 1440, 16:9 | `pdfinfo presentation/slide.pdf` |
+| страниц в закоммиченном PDF (тёмная) | 15 | `pdfinfo presentation/slides.pdf` |
+| страниц в закоммиченном PDF (светлая) | 15 | `pdfinfo presentation/slide-light.pdf` |
+| слайдов в исходнике | 15 | `grep -c 'class="slide-container"' presentation/*.html` |
+| слайдов в PPTX | 15 | `python -c "import zipfile;z=zipfile.ZipFile('presentation/slide.pptx');print(len([n for n in z.namelist() if n.startswith('ppt/slides/slide') and n.endswith('.xml')]))"` |
+| размер страницы | 2560 x 1440, 16:9 | `pdfinfo presentation/slides.pdf` |
 | пустых страниц | 0 | скан отрисовки ниже |
 | глифы DejaVu / запасные | 0 (шрифты встроены в HTML) | скан отрисовки ниже |
 
