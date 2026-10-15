@@ -266,6 +266,30 @@ def test_welcome_screen_marks_progress(window):
     assert welcome.step_rule.property("state") == "done"
 
 
+def test_guided_mode_marks_progress(window):
+    """The coach follows the real state and steps aside once work is done."""
+    panel = window.guided_panel
+    assert not panel.isHidden(), "the coach is shown on a fresh window"
+    assert panel.step_index == 0
+
+    window.open_capture(
+        REPO_ROOT
+        / "tests"
+        / "corpus"
+        / "reference_export"
+        / "corpus_capture_01.normalized.json"
+    )
+    # The capture selects its first direction, so the reader is at the rule step.
+    assert panel.step_index == 2
+
+    window.load_rule(REPO_ROOT / "examples" / "corpus_rule_v1.json")
+    assert panel.step_index == 3
+
+    window.apply_rule()
+    assert panel.step_index == 4
+    assert panel.isHidden(), "the coach steps aside once the workspace is in use"
+
+
 def test_welcome_screen_can_be_shown_again(window):
     window.open_demo()
     assert window._stack.currentWidget() is window.workspace
@@ -288,6 +312,50 @@ def test_apply_is_gated_until_a_capture_and_a_rule_are_open(window):
     window.open_demo()
     assert view.apply_button.isEnabled()
     assert view.apply_button.toolTip() == ""
+
+
+def test_guided_mode_can_be_shown_again(window):
+    window.set_guided_mode(False)
+    assert window.guided_panel.isHidden()
+    window.show_guide()
+    assert not window.guided_panel.isHidden()
+
+
+def test_guided_mode_stays_a_thin_strip(window):
+    """The coach must not eat the workspace it introduces."""
+    panel = window.guided_panel
+    # The coach sits in the workspace, which appears once a capture is open;
+    # measuring it on the welcome screen would measure a hidden page.
+    window.open_capture(
+        REPO_ROOT
+        / "tests"
+        / "corpus"
+        / "reference_export"
+        / "corpus_capture_01.normalized.json"
+    )
+    panel.setVisible(True)
+    window.resize(1024, 768)
+    window.show()
+    for _ in range(3):
+        QtWidgets.QApplication.processEvents()
+    assert panel.height() < window.height() // 4
+
+
+def test_guided_mode_round_trips_through_the_dialog(app, isolated_settings):
+    """Turning the hints off in the dialog persists and reaches a new window."""
+    dialog = SettingsDialog()
+    dialog._widgets["general"]["guided_mode"].setChecked(False)
+    values = dialog.values()
+    assert values["general"]["guided_mode"] is False
+
+    first = MainWindow()
+    first.apply_settings(values)
+    first.close()
+
+    second = MainWindow()
+    assert second._guided_enabled is False
+    assert second.guided_panel.isHidden()
+    second.close()
 
 
 def test_capture_action_names_both_accepted_forms(window):

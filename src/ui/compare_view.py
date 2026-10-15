@@ -184,6 +184,17 @@ class CompareView(QtWidgets.QWidget):
         self.right_combo.blockSignals(False)
         self._refresh()
 
+    def clear(self) -> None:
+        """Empty the two selectors and the diff after the capture is replaced."""
+        self._application = None
+        self.left_combo.blockSignals(True)
+        self.right_combo.blockSignals(True)
+        self.left_combo.clear()
+        self.right_combo.clear()
+        self.left_combo.blockSignals(False)
+        self.right_combo.blockSignals(False)
+        self._refresh()
+
     def _refresh(self) -> None:
         self.table.setRowCount(0)
         if self._application is None:
