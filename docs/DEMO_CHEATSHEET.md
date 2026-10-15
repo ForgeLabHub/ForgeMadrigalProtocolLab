@@ -132,7 +132,7 @@ Prints `280 messages, 80 counterexamples` then `280 messages, 0 counterexamples`
 - **Real dataset**: 45 requests + 45 responses, all `matched`, 100 % byte coverage.
 - **Framing**: 10/10 streams framed cleanly by `payload`; the other two
   candidates, 0/10.
-- **Tests**: 898 total; 617 without the UI tests; 586 without the UI and web suites; CI green.
+- **Tests**: 914 total; 620 without the UI tests; 589 without the UI and web suites; CI green.
 - **Deck**: 15 slides; final slide has two QR codes, never the word «Вопросы».
 
 Full answers: `docs/DEFENSE_FAQ.md`, `docs/FAQ_FOR_JUDGES.md`,

@@ -132,6 +132,11 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
 
 ### Added
 
+- A `Project` menu that manages a portable project directory: create, open,
+  write the manifest, add a capture, store a named rule version, and export or
+  import the project as a zip. `rule_text`/`save_rule` let the window write the
+  same JSON document the CLI reads, and the new strings are translated in both
+  catalogues.
 - Interface test coverage and a CI matrix for it: locale, snapshot,
   state-isolation and layout suites, and the `ui` job (PR #18).
 - A perceptual snapshot comparison for the interface, replacing the exact-pixel

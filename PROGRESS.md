@@ -81,3 +81,19 @@ Daily checkpoint of the work. One entry per day: done, broken, next.
 - Docs: the documented test counts moved 896/615/584 -> 898/617/586 across the
   docs and the deck Q&A, matching the measured `main`.
 - Next: hold for review.
+
+## 2026-10-15 (project management and rule versions)
+
+- Done: the GUI project workflow. A `Project` menu creates and opens a portable
+  project directory, writes its manifest, copies a capture in and registers it,
+  stores a named rule version, and exports or imports the project as a zip.
+  `src/protocol/rule.py` gained `rule_text`/`save_rule` so a rule written from the
+  window is the same JSON the CLI reads. The window title tracks the open project
+  and capture, closing with unsaved project changes asks first, and the new
+  strings are translated in both catalogues.
+- Broken: none. Non-UI suite 620 passed, `ruff check .` clean; every `tests/ui`
+  module passes on its own. New tests: `tests/ui/test_project_management.py` and
+  three serialization cases in `tests/protocol/test_rule.py`.
+- Docs: the documented test counts moved 898/617/586 -> 914/620/589 across the
+  living docs and the deck Q&A, matching the measured `main`.
+- Next: hold for review.
