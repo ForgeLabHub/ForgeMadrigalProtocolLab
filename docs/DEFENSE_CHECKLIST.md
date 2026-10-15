@@ -67,4 +67,3 @@ git fetch --all --prune && git status -sb \
 Expected: a clean tree at `origin/main`, 852 passed on the current `main`
 (781 on the `v1.0.0` tag), lint clean, 15 pages, a published release with 12
 assets.
-assets.
