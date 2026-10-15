@@ -43,6 +43,12 @@ DEFAULTS: dict[str, dict[str, Any]] = {
         "log_level": "INFO",
         "show_diagnostics": True,
     },
+    "learning": {
+        # Completed lesson keys, comma-separated. A string so the settings
+        # reader and writer, which handle scalars, need no special case.
+        "completed": "",
+        "welcome_seen": False,
+    },
 }
 
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")

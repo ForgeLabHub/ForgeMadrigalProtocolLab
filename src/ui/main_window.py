@@ -20,7 +20,8 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 from ..protocol.result import build_result, write_result
 from ..protocol.rule import load_rule_text
-from . import theme
+from . import help as reference
+from . import learning, theme
 from .compare_view import CompareView
 from .constants import (
     FONT_SIZE_BODY,
@@ -28,7 +29,7 @@ from .constants import (
     LEGEND_SWATCH_PX,
     PROGRESS_BAR_WIDTH,
 )
-from .guided import GuidedPanel
+from .help_dialog import HelpCard, LearningCentre
 from .hex_view import (
     LEGEND_KINDS,
     HexView,
@@ -51,6 +52,7 @@ from .settings import (
     write_settings,
 )
 from .timeline_view import TimelineView
+from .tutor import TutorPanel
 from .validation_view import ValidationView
 from .welcome_view import WelcomeView
 
@@ -84,6 +86,19 @@ ZOOM_MAX_FONT = 28
 TREE_MIN_FONT = 7
 TREE_MAX_FONT = 26
 HEX_TREE_OFFSET = 2
+
+# The widget a lesson step points at, mapped to the reference entry its help
+# button opens. The keys are the names the steps use, so the course and the
+# reference stay linked in one place.
+_HELP_TARGETS: dict[str, str] = {
+    "sessions_box": "sessions_box",
+    "hex_view": "hex_view",
+    "right_tabs": "right_tabs",
+    "status_bar": "status_bar",
+    "direction_combo": "direction",
+    "validation_view": "validation_view",
+    "session_tree": "session",
+}
 
 logger = logging.getLogger(__name__)
 
@@ -139,6 +154,26 @@ class MainWindow(QtWidgets.QMainWindow):
         self._guided_enabled: bool = bool(
             self._settings.get("general", {}).get("guided_mode", True)
         )
+        # Learning state. The course position is tracked by lesson key and step
+        # index; the completion markers record which lessons were finished, so
+        # the course can be continued or a single lesson replayed. The tutor is
+        # only shown while it is active and the expert mode is off.
+        self._learning_active: bool = False
+        self._learning_lesson: str = learning.LESSONS[0].key
+        self._learning_step: int = 0
+        self._completed_lessons: set[str] = {
+            key
+            for key in str(
+                self._settings.get("learning", {}).get("completed", "")
+            ).split(",")
+            if key
+        }
+        self._help_card: HelpCard | None = None
+        self._learning_centre: LearningCentre | None = None
+        self._pointer_clear = QtCore.QTimer(self)
+        self._pointer_clear.setSingleShot(True)
+        self._pointer_clear.setInterval(2600)
+        self._pointer_clear.timeout.connect(self._clear_pointer)
 
         self._build_menu()
         self._build_central()
@@ -334,8 +369,24 @@ class MainWindow(QtWidgets.QMainWindow):
 
         help_menu = bar.addMenu("")
         self._menus["help"] = help_menu
+        self._actions["start_learning"] = self._action(
+            help_menu, "Start the &interactive course", self.start_learning
+        )
+        self._actions["learning_centre"] = self._action(
+            help_menu, "Learning and &help...", self.open_learning_centre
+        )
+        self._actions["toggle_learning_mode"] = QtGui.QAction(
+            self.tr("&Learning mode"), self
+        )
+        self._actions["toggle_learning_mode"].setCheckable(True)
+        self._actions["toggle_learning_mode"].setToolTip(
+            self.tr("Show the guided hints and the tutor; off is the expert mode")
+        )
+        self._actions["toggle_learning_mode"].toggled.connect(self.set_guided_mode)
+        help_menu.addAction(self._actions["toggle_learning_mode"])
+        help_menu.addSeparator()
         self._actions["show_guide"] = self._action(
-            help_menu, "Show &start guide", self.show_guide
+            help_menu, "Show the &start screen", self.show_guide
         )
         self._actions["quick_help"] = self._action(
             help_menu, "&Quick help", self.show_help, "F1"
@@ -396,7 +447,10 @@ class MainWindow(QtWidgets.QMainWindow):
             "zoom_out": self.tr("Zoom &out"),
             "zoom_reset": self.tr("&Reset zoom"),
             "settings": self.tr("&Settings..."),
-            "show_guide": self.tr("Show &start guide"),
+            "start_learning": self.tr("Start the &interactive course"),
+            "learning_centre": self.tr("Learning and &help..."),
+            "toggle_learning_mode": self.tr("&Learning mode"),
+            "show_guide": self.tr("Show the &start screen"),
             "quick_help": self.tr("&Quick help"),
             "about": self.tr("&About"),
         }
@@ -420,8 +474,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # the workspace. Only one is ever visible. A fresh window shows the welcome
         # screen alone; the workspace appears once a capture is open.
         self.welcome_view = WelcomeView()
+        self.welcome_view.learningRequested.connect(self._start_course_from_welcome)
         self.welcome_view.demoRequested.connect(self.open_demo)
-        self.welcome_view.fileRequested.connect(self.open_capture_dialog)
+        self.welcome_view.capabilitiesRequested.connect(self.open_learning_centre)
 
         self.workspace = QtWidgets.QWidget()
         self._build_workspace(self.workspace)
@@ -515,15 +570,20 @@ class MainWindow(QtWidgets.QMainWindow):
         splitter.setStretchFactor(3, 0)
         self._splitter = splitter
 
-        # The guided-mode coach sits above the workspace: one plain-language
-        # strip that names the current step. It is a view only; the window wires
-        # each step to its own slot. The welcome screen remains the first-run
-        # screen, so the two never compete.
-        self.guided_panel = GuidedPanel()
-        self.guided_panel.nextRequested.connect(self._guided_next)
-        self.guided_panel.dismissRequested.connect(self._dismiss_guided)
+        # The tutor sits above the workspace: one lesson step at a time, with a
+        # pointer at the element it describes. It is a view only; the window
+        # wires each button to its own slot. The welcome screen remains the
+        # first-run screen, so the two never compete.
+        self.tutor_panel = TutorPanel()
+        self.tutor_panel.backRequested.connect(self._learning_back)
+        self.tutor_panel.nextRequested.connect(self._learning_next)
+        self.tutor_panel.skipRequested.connect(self._learning_skip)
+        self.tutor_panel.finishRequested.connect(self._learning_finish)
+        self.tutor_panel.hideRequested.connect(self._learning_hide)
+        self.tutor_panel.helpRequested.connect(self._learning_help)
+        self.tutor_panel.setVisible(False)
 
-        layout.addWidget(self.guided_panel)
+        layout.addWidget(self.tutor_panel)
         layout.addWidget(splitter, 1)
 
     def _wrap(self, title: str, widget: QtWidgets.QWidget) -> QtWidgets.QGroupBox:
@@ -659,7 +719,7 @@ class MainWindow(QtWidgets.QMainWindow):
         ):
             view.apply_theme()
         self.welcome_view.apply_theme()
-        self.guided_panel.apply_theme()
+        self.tutor_panel.apply_theme()
         self.report_view.setFont(theme.mono_font(FONT_SIZE_BODY))
         self.diff_view.setFont(theme.mono_font(FONT_SIZE_BODY))
 
@@ -847,7 +907,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.timeline_view.retranslate_ui()
         self._timeline_box.setTitle(self.tr("Timeline"))
         self.welcome_view.retranslate_ui()
-        self.guided_panel.retranslate_ui()
+        self.tutor_panel.retranslate_ui()
         self._refresh_rule_status()
         # The empty-state hint is built text, so a language change must rebuild
         # it; without this it stays in the language it was created in.
@@ -916,67 +976,287 @@ class MainWindow(QtWidgets.QMainWindow):
         self.compare_view.clear()
         self.hypotheses_view.clear()
 
-    # -- guided mode -------------------------------------------------------
+    # -- learning mode -----------------------------------------------------
 
-    def _update_guided(self) -> None:
-        """Show the coach at the step the workspace is actually at."""
-        if not self._guided_enabled:
-            self.guided_panel.setVisible(False)
-            return
-        self.guided_panel.set_step(self._guided_index())
-        # The workspace is self-describing once a capture, a rule and an applied
-        # rule are all present; the coach steps aside rather than repeat it.
-        self.guided_panel.setVisible(
-            not (self._capture is not None and self._rule is not None and self._rule_applied)
+    def _learning_state(self, name: str) -> bool:
+        """Whether the named completion condition currently holds.
+
+        The course advances on these, not on button presses: a step whose
+        condition is already true is not repeated, and a step whose condition is
+        false cannot be passed with Next. The conditions read the window's own
+        state, so no second model of the application is kept for the course.
+        """
+        if name == "capture_open":
+            return self._capture is not None
+        if name == "direction_chosen":
+            return bool(self._session_id and self._direction)
+        if name == "byte_selected":
+            return self._last_offset is not None
+        if name == "compare_open":
+            return self.right_tabs.currentWidget() is self.compare_view
+        if name == "rule_open":
+            return self._rule is not None
+        if name == "rule_applied":
+            return bool(self._rule_applied)
+        if name == "corpus_applied":
+            return self._corpus_report is not None
+        return False
+
+    def _current_lesson(self) -> learning.Lesson:
+        """The lesson the tutor is on."""
+        return learning.LESSON_BY_KEY.get(
+            self._learning_lesson, learning.LESSONS[0]
         )
 
-    def _guided_index(self) -> int:
-        """The stage that matches the window state, 0-based."""
-        if self._capture is None:
-            return 0
-        if not (self._session_id and self._direction):
-            return 1
-        if self._rule is None:
-            return 2
-        if not self._rule_applied:
-            return 3
-        return 4
+    def _update_learning(self) -> None:
+        """Show the tutor at the current lesson step, or hide it.
 
-    def _guided_next(self) -> None:
-        """Run the action the coach is currently offering."""
-        index = self._guided_index()
-        if index == 0:
-            self.open_demo()
-        elif index == 1:
-            if self._capture is not None and self._capture.sessions:
-                session = self._capture.sessions[0]
-                directions = self._capture.directions(session.session_id)
-                if directions:
-                    self.session_tree.select_direction(session.session_id, directions[0])
-        elif index == 2:
-            self.build_rule()
-        elif index == 3:
-            self.apply_rule()
-        else:
-            self.apply_to_capture()
-        self._update_guided()
-
-    def _dismiss_guided(self) -> None:
-        """Turn the hints off from the strip and remember the choice.
-
-        The same preference the settings dialog writes is persisted here, so the
-        strip does not reappear on the next start after it was dismissed.
+        The tutor is visible only while it is active and the expert mode is on
+        for hints; in the expert mode nothing is shown. Within a lesson, if the
+        reader has already reached a later step's condition, the tutor moves to
+        it rather than making them repeat what is done.
         """
-        self.set_guided_mode(False)
+        if not (self._guided_enabled and self._learning_active):
+            self.tutor_panel.setVisible(False)
+            return
+        lesson = self._current_lesson()
+        step = lesson.steps[self._learning_step]
+        while (
+            step.requires is not None
+            and self._learning_state(step.requires)
+            and self._learning_step + 1 < len(lesson.steps)
+        ):
+            self._learning_step += 1
+            step = lesson.steps[self._learning_step]
+        done = step.requires is None or self._learning_state(step.requires)
+        self.tutor_panel.show_step(lesson, self._learning_step, done)
+        self.tutor_panel.setVisible(True)
+        self._point_at(step)
+
+    def start_learning(self, lesson_key: str | None = None) -> None:
+        """Start or resume the course, optionally at a chosen lesson."""
+        self._learning_active = True
+        if isinstance(lesson_key, str) and lesson_key in learning.LESSON_BY_KEY:
+            self._learning_lesson = lesson_key
+            self._learning_step = 0
+        self._update_learning()
+        self.tutor_panel.raise_()
+
+    def _start_course_from_welcome(self) -> None:
+        """The first-run path: load the example, then start the course.
+
+        The course teaches on real data, so the example is opened first; the
+        reader is not asked to find a file before the first lesson.
+        """
+        if self._capture is None:
+            self.open_demo()
+        self.start_learning(learning.LESSONS[0].key)
+
+    def _learning_next(self) -> None:
+        """Advance one step, running the step's action when it offers one."""
+        lesson = self._current_lesson()
+        step = lesson.steps[self._learning_step]
+        if step.requires is not None and not self._learning_state(step.requires):
+            # The reader has not done what the step asks: offer the action and
+            # say so rather than moving on silently.
+            if not self._learning_offer(step):
+                self._notify(self.tr("finish this step first, or use Skip"))
+            self._update_learning()
+            return
+        if self._learning_step + 1 < len(lesson.steps):
+            self._learning_step += 1
+            self._update_learning()
+            return
+        # The lesson is finished: record it and move to the next one, or leave
+        # the course when this was the last lesson.
+        self._complete_current_lesson()
+        index = learning.lesson_index(self._learning_lesson)
+        if index + 1 < len(learning.LESSONS):
+            self._learning_lesson = learning.LESSONS[index + 1].key
+            self._learning_step = 0
+            self._update_learning()
+        else:
+            self._learning_finish()
+
+    def _learning_offer(self, step: learning.Step) -> bool:
+        """Run the action a step offers, if it has one; return whether it did."""
+        show = step.show_me
+        if show == "open_demo":
+            self.open_demo()
+        elif show == "select_direction":
+            self._select_first_direction()
+        elif show == "build_rule":
+            self.build_rule()
+        elif show == "apply_rule":
+            self.apply_rule()
+        elif show == "apply_to_capture":
+            self.apply_to_capture()
+        elif show == "show_compare":
+            self.right_tabs.setCurrentWidget(self.compare_view)
+        else:
+            return False
+        return True
+
+    def _select_first_direction(self) -> None:
+        """Pick the first session and its first direction, as the course asks."""
+        if self._capture is None or not self._capture.sessions:
+            return
+        session = self._capture.sessions[0]
+        directions = self._capture.directions(session.session_id)
+        if directions:
+            self.session_tree.select_direction(session.session_id, directions[0])
+
+    def _learning_back(self) -> None:
+        """Return to the previous step, or the previous lesson at the first."""
+        if self._learning_step > 0:
+            self._learning_step -= 1
+            self._update_learning()
+            return
+        index = learning.lesson_index(self._learning_lesson)
+        if index > 0:
+            previous = learning.LESSONS[index - 1]
+            self._learning_lesson = previous.key
+            self._learning_step = len(previous.steps) - 1
+            self._update_learning()
+
+    def _learning_skip(self) -> None:
+        """Skip the rest of the current lesson and go to the next one."""
+        self._complete_current_lesson()
+        index = learning.lesson_index(self._learning_lesson)
+        if index + 1 < len(learning.LESSONS):
+            self._learning_lesson = learning.LESSONS[index + 1].key
+            self._learning_step = 0
+            self._update_learning()
+        else:
+            self._learning_finish()
+
+    def _learning_finish(self) -> None:
+        """Finish the course and leave the tutor."""
+        self._complete_current_lesson()
+        self._learning_active = False
+        self.tutor_panel.setVisible(False)
+        self._clear_pointer()
+        self._notify(self.tr("course finished"))
+
+    def _learning_hide(self) -> None:
+        """Hide the tutor without losing the position in the course."""
+        self._learning_active = False
+        self.tutor_panel.setVisible(False)
+        self._clear_pointer()
+
+    def _complete_current_lesson(self) -> None:
+        """Record the current lesson as done and persist the progress."""
+        self._completed_lessons.add(self._learning_lesson)
+        self._settings.setdefault("learning", {})["completed"] = ",".join(
+            sorted(self._completed_lessons)
+        )
+        write_settings(self._settings)
+
+    def reset_learning(self) -> None:
+        """Forget the course progress; the reader's work is untouched."""
+        self._completed_lessons = set()
+        self._learning_lesson = learning.LESSONS[0].key
+        self._learning_step = 0
+        self._settings.setdefault("learning", {})["completed"] = ""
+        write_settings(self._settings)
+        self._update_learning()
+
+    def _learning_help(self, target: str) -> None:
+        """Open the reference card for the element a step points at."""
+        key = _HELP_TARGETS.get(target)
+        if key:
+            self.show_help_for(key)
+
+    # -- contextual help ---------------------------------------------------
+
+    def show_help_for(self, key: str) -> None:
+        """Show the reference card for *key*, reusing the open card."""
+        entry = reference.lookup(key)
+        if entry is None:
+            return
+        if self._help_card is None:
+            self._help_card = HelpCard(entry, self)
+        else:
+            self._help_card.set_entry(entry)
+        self._help_card.show()
+        self._help_card.raise_()
+
+    def open_learning_centre(self) -> None:
+        """Open the learning centre, reusing the open one."""
+        if self._learning_centre is None:
+            self._learning_centre = LearningCentre(
+                completed=self._completed_lessons,
+                current_lesson=self._learning_lesson,
+                parent=self,
+            )
+            self._learning_centre.lessonChosen.connect(self.start_learning)
+            self._learning_centre.resetRequested.connect(self.reset_learning)
+            self._learning_centre.helpRequested.connect(self.show_help_for)
+        else:
+            self._learning_centre._completed = set(self._completed_lessons)
+            self._learning_centre._current = self._learning_lesson
+            self._learning_centre.retranslate_ui()
+        self._learning_centre.show()
+        self._learning_centre.raise_()
+
+    # -- the pointer -------------------------------------------------------
+
+    def _point_at(self, step: learning.Step) -> None:
+        """Outline the element a step describes, when it names one."""
+        self._clear_pointer()
+        widget = self._pointer_targets().get(step.target or "")
+        if widget is None:
+            return
+        widget.setProperty("learningPointer", True)
+        self._repolish(widget)
+        self._pointer_clear.start()
+
+    def _clear_pointer(self) -> None:
+        """Remove the outline from every element it could have been set on."""
+        for widget in self._pointer_targets().values():
+            if widget.property("learningPointer"):
+                widget.setProperty("learningPointer", False)
+                self._repolish(widget)
+
+    def _pointer_targets(self) -> dict[str, QtWidgets.QWidget]:
+        """The elements a lesson step can point at, by the name a step uses."""
+        return {
+            "sessions_box": self._sessions_box,
+            "hex_view": self.hex_view,
+            "right_tabs": self.right_tabs,
+            "status_bar": self.statusBar(),
+            "direction_combo": self.direction_combo,
+            "validation_view": self.validation_view,
+            "session_tree": self.session_tree,
+        }
+
+    @staticmethod
+    def _repolish(widget: QtWidgets.QWidget) -> None:
+        """Re-apply the style sheet so a dynamic property takes effect."""
+        style = widget.style()
+        style.unpolish(widget)
+        style.polish(widget)
+
+    # -- hints (the former guided mode) ------------------------------------
+
+    def _update_guided(self) -> None:
+        """Keep the hint preference and the tutor in step."""
+        self._update_learning()
 
     def set_guided_mode(self, enabled: bool) -> None:
-        """Show or hide the coach, and remember the choice in the settings."""
+        """Show or hide the hints, and remember the choice in the settings."""
         self._guided_enabled = bool(enabled)
         self._settings.setdefault("general", {})["guided_mode"] = self._guided_enabled
         write_settings(self._settings)
-        self._update_guided()
-        if self._guided_enabled:
-            self.guided_panel.raise_()
+        action = self._actions.get("toggle_learning_mode")
+        if action is not None and action.isChecked() != self._guided_enabled:
+            # Keep the menu check in step without re-entering through toggled.
+            action.blockSignals(True)
+            action.setChecked(self._guided_enabled)
+            action.blockSignals(False)
+        self._update_learning()
+        if self._guided_enabled and self._learning_active:
+            self.tutor_panel.raise_()
 
     def open_demo(self) -> None:
         """Open the small capture, rule and journal that ship with the tool.
@@ -1448,6 +1728,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def _on_byte_clicked(self, offset: int) -> None:
         self._last_offset = offset
         self._show_provenance(offset)
+        # A lesson step that waits for a byte selection completes here.
+        if self._learning_active:
+            self._update_learning()
 
     def _on_byte_hovered(self, offset: int) -> None:
         self._last_offset = offset
