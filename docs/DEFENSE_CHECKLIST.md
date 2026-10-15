@@ -21,10 +21,10 @@ the repository at the final revision; re-run the command if the branch has moved
       без него слайды PPTX считаются стандартной библиотекой:
       `python -c "import zipfile;z=zipfile.ZipFile('presentation/slide.pptx');print(len([n for n in z.namelist() if n.startswith('ppt/slides/slide') and n.endswith('.xml')]))"`
 - [ ] QR открываются: `zbarimg -q presentation/public/qr_repo.png` и
-      `qr_release.png` декодируются в репозиторий и в релиз `v1.0.0`.
-- [ ] Релиз `v1.0.0` опубликован (не draft): 12 ассетов, включая
+      `qr_release.png` декодируются в репозиторий и в релиз `v1.2.0`.
+- [ ] Релиз `v1.2.0` опубликован (не draft): 14 ассетов, включая
       `submission_*.zip`, `slide.pdf` и `.deb`.
-      `gh release view v1.0.0 --json isDraft,assets`
+      `gh release view v1.2.0 --json isDraft,assets`
 - [ ] Ссылки в форме сдачи открываются в инкогнито (без входа в аккаунт).
 - [ ] Числа сверены с `docs/METRICS.md`, `docs/REAL_CORPUS_ANALYSIS.md`,
       `docs/AUDIT.md` — ни одного придуманного числа.
@@ -62,9 +62,9 @@ git fetch --all --prune && git status -sb \
   && pytest tests/ -q \
   && ruff check . \
   && pdfinfo presentation/slide.pdf | grep Pages \
-  && gh release view v1.0.0 --json isDraft,assets
+  && gh release view v1.2.0 --json isDraft,assets
 ```
 
 Expected: a clean tree at `origin/main`, 883 passed on the current `main`
-(794 on the `v1.0.0` tag), lint clean, 15 pages, a published release with 12
-assets.
+(794 on the `v1.0.0` tag), lint clean, 15 pages, a published `v1.2.0` release
+with 14 assets.
