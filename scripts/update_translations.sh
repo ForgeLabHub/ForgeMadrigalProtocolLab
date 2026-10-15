@@ -38,7 +38,7 @@ SOURCES=(
 TS="src/ui/locale/madrigal_ru.ts"
 QM="src/ui/locale/madrigal_ru.qm"
 
-"$LUPDATE" "${SOURCES[@]}" -ts "$TS"
+"$LUPDATE" -no-obsolete "${SOURCES[@]}" -ts "$TS"
 "$LRELEASE" "$TS" -qm "$QM"
 
 echo "updated: $TS"
