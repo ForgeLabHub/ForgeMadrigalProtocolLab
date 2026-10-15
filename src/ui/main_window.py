@@ -1501,11 +1501,13 @@ class MainWindow(QtWidgets.QMainWindow):
             lines.append(self.tr("<- {0}").format(self._capture_name))
         return lines
 
-    def _message_at(self, offset: int) -> tuple[int, object] | None:
+    def _message_at(self, offset: int | None) -> tuple[int, object] | None:
         """The message whose range contains ``offset``, with its 1-based index."""
-        if self._rule is None or self._rule.root is None:
+        if offset is None or self._rule is None or self._rule.root is None:
             return None
         for index, message in enumerate(self._rule.root.messages, start=1):
+            if message.offset is None:
+                continue
             if message.offset <= offset < message.offset + message.length:
                 return index, message
         return None
