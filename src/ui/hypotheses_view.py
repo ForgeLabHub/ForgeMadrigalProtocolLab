@@ -23,9 +23,6 @@ MID_SCORE = 0.5
 
 _COLUMNS = ("field", "reading", "support", "contradict", "score")
 
-# Translation context for strings built outside an instance method.
-_TRANSLATE_CONTEXT = "HypothesesView"
-
 # The readings added for value shape; shown with the same colour code as the
 # rest but named here so the panel can label them.
 _SHAPE_READINGS = (
@@ -74,9 +71,7 @@ class HypothesesView(QtWidgets.QWidget):
         layout.addWidget(self.header)
 
         self.table = QtWidgets.QTableWidget(0, len(_COLUMNS))
-        self.table.setHorizontalHeaderLabels(
-            [QtCore.QCoreApplication.translate(_TRANSLATE_CONTEXT, name) for name in _COLUMNS]
-        )
+        self.table.setHorizontalHeaderLabels(self._column_headers())
         self.table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setFont(theme.body_font(FONT_SIZE_BODY))
@@ -127,11 +122,23 @@ class HypothesesView(QtWidgets.QWidget):
         self._fields = []
         self.header.setText(self.tr("no rule applied"))
 
+    def _column_headers(self) -> list[str]:
+        """The translated column captions.
+
+        Written as literal ``tr`` calls rather than a loop over the column
+        names: ``lupdate`` only extracts a string it can see at the call site.
+        """
+        return [
+            self.tr("field"),
+            self.tr("reading"),
+            self.tr("support"),
+            self.tr("contradict"),
+            self.tr("score"),
+        ]
+
     def retranslate_ui(self) -> None:
         """Re-apply the column headers and rebuild the body in the active language."""
-        self.table.setHorizontalHeaderLabels(
-            [QtCore.QCoreApplication.translate(_TRANSLATE_CONTEXT, name) for name in _COLUMNS]
-        )
+        self.table.setHorizontalHeaderLabels(self._column_headers())
         if self._fields:
             self.show_fields(self._fields)
         elif not self.table.rowCount():

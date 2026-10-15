@@ -25,6 +25,7 @@ already honours.
 
 from __future__ import annotations
 
+import contextlib
 import os
 
 # The window is opened without a display. Set at import time so any module that
@@ -130,4 +131,7 @@ def _drop_translator_between_tests(_clean_ui_settings):
         QtCore.QCoreApplication.installTranslator = original_install
         QtCore.QCoreApplication.removeTranslator = original_remove
         for translator in list(installed):
-            original_remove(translator)
+            # The translator's C++ side may already be gone if its parent was
+            # collected; nothing is installed then, so removal can be skipped.
+            with contextlib.suppress(RuntimeError):
+                original_remove(translator)

@@ -12,12 +12,13 @@ Open the dialog with **View → Settings...** or the **Ctrl+,** shortcut.
 | Setting | Values | Default |
 | --- | --- | --- |
 | Theme | Dark, Light, System | System |
-| Language | Русский, English, System | System |
+| Language | Russian, English, System (shown in the interface language) | System |
 
 The theme and the interface language apply as soon as they are changed, through
 the same `ThemeManager` and `LanguageManager` the menus use. `System` follows the
 desktop colour scheme and locale; see `docs/STYLE.md` for the palettes and the
-catalogue in `src/ui/locale/`.
+catalogues in `src/ui/locale/`. Both languages ship a compiled catalogue, so the
+picker and every other caption follow the active language rather than mixing two.
 
 ## Editor
 

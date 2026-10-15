@@ -8,11 +8,11 @@ the repository at the final revision; re-run the command if the branch has moved
 
 - [ ] `main = origin/main`, дерево чистое.
       `git fetch --all --prune && git status -sb && git log --oneline -1 origin/main`
-- [ ] Тесты зелёные: `pytest tests/ -q` → **849 passed** на текущем `main`
+- [ ] Тесты зелёные: `pytest tests/ -q` → **852 passed** на текущем `main`
       (на теге `v1.0.0`, который лежит в сдаваемом архиве, — **781 passed**; ≈ 8 min).
       UI-тесты требуют Qt-runtime; в контейнере без `libEGL.so.1` полный набор
       не собирается — там `pytest --ignore=tests/ui` → **615 passed**.
-      Указывайте число с контекстом: 615 без UI, 849 с Qt.
+      Указывайте число с контекстом: 615 без UI, 852 с Qt.
 - [ ] Линт чистый: `ruff check .` → All checks passed.
 - [ ] Дека: `presentation/slide.pdf` и `presentation/slide-light.pdf` — по **15 страниц**;
       `presentation/slide.pptx` — 15 слайдов.
@@ -64,6 +64,6 @@ git fetch --all --prune && git status -sb \
   && gh release view v1.0.0 --json isDraft,assets
 ```
 
-Expected: a clean tree at `origin/main`, 849 passed on the current `main`
+Expected: a clean tree at `origin/main`, 852 passed on the current `main`
 (781 on the `v1.0.0` tag), lint clean, 15 pages, a published release with 12
 assets.

@@ -330,6 +330,19 @@ class RuleModel:
         rule = _rule_from_text(text)
         return cls(rule, text, path=path)
 
+    @classmethod
+    def from_text(cls, text: str) -> RuleModel:
+        """Adopt rule text edited in place, without a file behind it.
+
+        The rule builder and the editor produce a document, not a path. This is
+        the contract that lets a rule typed or built in the window become the
+        current model, so the run has a rule to apply rather than silently doing
+        nothing. A parse error propagates so the caller can keep the text and
+        report it next to the field.
+        """
+        rule = _rule_from_text(text)
+        return cls(rule, text)
+
     def reload(self, text: str) -> None:
         """Adopt edited text as a new rule version; the old run goes outdated.
 

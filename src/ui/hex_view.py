@@ -228,11 +228,15 @@ class HexView(QtWidgets.QPlainTextEdit):
         )
 
     def _column_header(self) -> str:
-        prefix = "offset    " if self._show_offset else ""
+        # The offset word and the "ascii" caption are the only translatable
+        # parts; the hex digits are data, never translated. Each is padded to
+        # its column width so the header stays aligned with the byte rows.
+        offset_word = self.tr("offset").ljust(_PREFIX) if self._show_offset else ""
+        ascii_word = self.tr("ascii")
         return (
-            prefix
+            offset_word
             + "".join(f"{i:02x} " for i in range(_BYTES_PER_LINE))
-            + self.tr("ascii")
+            + ascii_word
         )
 
     def set_font_size(self, size: int) -> None:
