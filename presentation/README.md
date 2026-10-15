@@ -23,6 +23,7 @@ repository's own code. Every number is from `docs/METRICS.md`.
 | `public/` | assets the deck serves: fonts, logo, QR codes, member photos |
 | `public/screencast-poster.png` | the poster frame shown on slide 13 under `screencast.mp4` |
 | `defense_script.md` | the 5- and 10-minute speaker routes, one section per slide |
+| `defense_guide.md` | the author's technical guide: plain-language explanation, module map, demo walkthrough, glossary, judge questions and self-check |
 | `Q_and_A.md` | the questions asked after the talk and the prepared answers |
 | `VIDEO.md` | shot list for the reserve screen recording |
 | `screencast.mp4` | the reserve recording of a full run (3:40, H.264, no sound), embedded on slide 13 |
