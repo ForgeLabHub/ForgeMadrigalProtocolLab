@@ -2643,13 +2643,13 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../main_window.py" line="132" />
-        <location filename="../main_window.py" line="893" />
+        <location filename="../main_window.py" line="141" />
+        <location filename="../main_window.py" line="969" />
         <source>Madrigal protocol laboratory</source>
         <translation>Лаборатория протоколов Мадригал</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="197" />
+        <location filename="../main_window.py" line="211" />
         <source>no capture loaded
 
 Open a capture (Ctrl+O): pcap, pcapng or normalized JSON.</source>
@@ -2658,381 +2658,601 @@ Open a capture (Ctrl+O): pcap, pcapng or normalized JSON.</source>
 Откройте захват (Ctrl+O): pcap, pcapng или нормализованный JSON.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="198" />
+        <location filename="../main_window.py" line="212" />
         <source>no rule applied yet</source>
         <translation>правило ещё не применено</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="234" />
+        <location filename="../main_window.py" line="248" />
         <source>Load the small capture, rule and journal that ship with the tool, for a first look</source>
         <translation>Загрузить небольшой захват, правило и журнал из поставки для первого знакомства</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="242" />
+        <location filename="../main_window.py" line="256" />
         <source>Open a capture: a raw .pcap/.pcapng is normalized on the fly, a normalized JSON is read as is</source>
         <translation>Открыть захват: сырой .pcap/.pcapng нормализуется на месте, нормализованный JSON читается как есть</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="252" />
+        <location filename="../main_window.py" line="266" />
         <source>Describe the message in a form instead of writing JSON by hand</source>
         <translation>Описать сообщение в форме вместо ручного написания JSON</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="262" />
+        <location filename="../main_window.py" line="276" />
         <source>Read a raw .pcap/.pcapng and save its normalized JSON next to it</source>
         <translation>Прочитать сырой .pcap/.pcapng и сохранить нормализованный JSON рядом</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="283" />
+        <location filename="../main_window.py" line="288" />
+        <source>Create a portable project directory that holds captures, rules and results</source>
+        <translation>Создать переносимый каталог проекта с захватами, правилами и результатами</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="295" />
+        <source>Open an existing portable project directory</source>
+        <translation>Открыть существующий переносимый каталог проекта</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="302" />
+        <source>Write the project manifest, refreshing its timestamp</source>
+        <translation>Записать манифест проекта, обновив отметку времени</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="310" />
+        <source>Copy a capture into the open project and register it</source>
+        <translation>Скопировать захват в открытый проект и зарегистрировать его</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="317" />
+        <source>Name the current rule version and store it in the project</source>
+        <translation>Назвать текущую версию правила и сохранить её в проекте</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="325" />
+        <source>Write the whole project to a zip archive</source>
+        <translation>Записать весь проект в zip-архив</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="332" />
+        <source>Unpack a project archive into a new directory and open it</source>
+        <translation>Распаковать архив проекта в новый каталог и открыть его</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="351" />
         <source>Show the rule's reach over the whole capture and its counterexamples</source>
         <translation>Показать охват правила по всему захвату и его контрпримеры</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="315" />
+        <location filename="../main_window.py" line="383" />
         <source>Enlarge the bytes and the session tree (Ctrl+Plus)</source>
         <translation>Увеличить байты и дерево сессий (Ctrl+Plus)</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="326" />
+        <location filename="../main_window.py" line="394" />
         <source>Shrink the bytes and the session tree (Ctrl+Minus)</source>
         <translation>Уменьшить байты и дерево сессий (Ctrl+Minus)</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="333" />
+        <location filename="../main_window.py" line="401" />
         <source>Restore the default byte and tree size</source>
         <translation>Вернуть исходный размер байтов и дерева</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="337" />
-        <location filename="../main_window.py" line="439" />
+        <location filename="../main_window.py" line="405" />
+        <location filename="../main_window.py" line="515" />
         <source>&amp;Timeline</source>
         <translation>&amp;Хронология</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="342" />
-        <location filename="../main_window.py" line="467" />
+        <location filename="../main_window.py" line="410" />
+        <location filename="../main_window.py" line="543" />
         <source>Show the fourth column: the message timeline against the journal</source>
         <translation>Показать четвёртую колонку: хронологию сообщений вместе с журналом</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="380" />
-        <location filename="../main_window.py" line="453" />
+        <location filename="../main_window.py" line="448" />
+        <location filename="../main_window.py" line="529" />
         <source>&amp;Learning mode</source>
         <translation>&amp;Режим обучения</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="385" />
+        <location filename="../main_window.py" line="453" />
         <source>Show the guided hints and the tutor; off is the expert mode</source>
         <translation>Показывать подсказки и наставника; выключено — экспертный режим</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="418" />
+        <location filename="../main_window.py" line="486" />
         <source>&amp;File</source>
         <translation>&amp;Файл</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="419" />
+        <location filename="../main_window.py" line="487" />
+        <source>&amp;Project</source>
+        <translation>&amp;Проект</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="488" />
         <source>&amp;Rule</source>
         <translation>&amp;Правило</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="420" />
+        <location filename="../main_window.py" line="489" />
         <source>&amp;Report</source>
         <translation>&amp;Отчёт</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="421" />
+        <location filename="../main_window.py" line="490" />
         <source>&amp;View</source>
         <translation>&amp;Вид</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="422" />
+        <location filename="../main_window.py" line="491" />
         <source>&amp;Help</source>
         <translation>&amp;Справка</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="423" />
+        <location filename="../main_window.py" line="492" />
         <source>&amp;Language</source>
         <translation>&amp;Язык</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="428" />
+        <location filename="../main_window.py" line="497" />
         <source>Open &amp;demo</source>
         <translation>Открыть &amp;пример</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="429" />
+        <location filename="../main_window.py" line="498" />
         <source>Open &amp;normalized capture...</source>
         <translation>Открыть &amp;нормализованный захват...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="430" />
+        <location filename="../main_window.py" line="499" />
         <source>Open &amp;rule...</source>
         <translation>Открыть &amp;правило...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="431" />
+        <location filename="../main_window.py" line="500" />
         <source>&amp;Build rule...</source>
         <translation>&amp;Собрать правило...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="432" />
+        <location filename="../main_window.py" line="501" />
         <source>&amp;Save result...</source>
         <translation>&amp;Сохранить результат...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="433" />
+        <location filename="../main_window.py" line="502" />
         <source>&amp;Import PCAP...</source>
         <translation>&amp;Импорт PCAP...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="434" />
+        <location filename="../main_window.py" line="503" />
         <source>&amp;Quit</source>
         <translation>Вы&amp;ход</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="435" />
+        <location filename="../main_window.py" line="504" />
+        <source>&amp;New project...</source>
+        <translation>&amp;Новый проект...</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="505" />
+        <source>&amp;Open project...</source>
+        <translation>&amp;Открыть проект...</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="506" />
+        <source>&amp;Save project</source>
+        <translation>&amp;Сохранить проект</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="507" />
+        <source>&amp;Add capture...</source>
+        <translation>&amp;Добавить захват...</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="508" />
+        <source>Save rule &amp;version...</source>
+        <translation>Сохранить &amp;версию правила...</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="509" />
+        <source>&amp;Export project...</source>
+        <translation>&amp;Экспорт проекта...</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="510" />
+        <source>&amp;Import project...</source>
+        <translation>&amp;Импорт проекта...</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="511" />
         <source>&amp;Apply to current direction</source>
         <translation>&amp;Применить к текущему направлению</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="436" />
+        <location filename="../main_window.py" line="512" />
         <source>Apply to &amp;whole capture</source>
         <translation>Применить ко &amp;всему захвату</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="437" />
+        <location filename="../main_window.py" line="513" />
         <source>&amp;Compare versions</source>
         <translation>&amp;Сравнить версии</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="438" />
+        <location filename="../main_window.py" line="514" />
         <source>Check on &amp;corpus...</source>
         <translation>Проверить на &amp;корпусе...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="440" />
+        <location filename="../main_window.py" line="516" />
         <source>Show &amp;REPORT.md</source>
         <translation>Показать &amp;REPORT.md</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="441" />
+        <location filename="../main_window.py" line="517" />
         <source>&amp;Export Markdown...</source>
         <translation>&amp;Экспорт Markdown...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="442" />
+        <location filename="../main_window.py" line="518" />
         <source>Export &amp;HTML...</source>
         <translation>Экспорт &amp;HTML...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="443" />
+        <location filename="../main_window.py" line="519" />
         <source>&amp;Dark theme</source>
         <translation>&amp;Тёмная тема</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="444" />
+        <location filename="../main_window.py" line="520" />
         <source>&amp;Light theme</source>
         <translation>&amp;Светлая тема</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="445" />
+        <location filename="../main_window.py" line="521" />
         <source>&amp;System theme</source>
         <translation>&amp;Системная тема</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="446" />
+        <location filename="../main_window.py" line="522" />
         <source>Zoom &amp;in</source>
         <translation>&amp;Увеличить</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="447" />
+        <location filename="../main_window.py" line="523" />
         <source>Zoom in</source>
         <translation>Увеличить</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="448" />
+        <location filename="../main_window.py" line="524" />
         <source>Zoom &amp;out</source>
         <translation>&amp;Уменьшить</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="449" />
+        <location filename="../main_window.py" line="525" />
         <source>&amp;Reset zoom</source>
         <translation>&amp;Сбросить масштаб</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="450" />
+        <location filename="../main_window.py" line="526" />
         <source>&amp;Settings...</source>
         <translation>&amp;Настройки...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="455" />
+        <location filename="../main_window.py" line="531" />
         <source>&amp;Quick help</source>
         <translation>&amp;Краткая справка</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="456" />
+        <location filename="../main_window.py" line="532" />
         <source>&amp;About</source>
         <translation>&amp;О программе</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="469" />
+        <location filename="../main_window.py" line="545" />
         <source>System</source>
         <translation>Системный</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="469" />
+        <location filename="../main_window.py" line="545" />
         <source>Russian</source>
         <translation>Русский</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="470" />
+        <location filename="../main_window.py" line="546" />
         <source>English</source>
         <translation>Английский</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="498" />
-        <location filename="../main_window.py" line="897" />
+        <location filename="../main_window.py" line="574" />
+        <location filename="../main_window.py" line="973" />
         <source>Sessions</source>
         <translation>Сессии</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="509" />
-        <location filename="../main_window.py" line="898" />
+        <location filename="../main_window.py" line="585" />
+        <location filename="../main_window.py" line="974" />
         <source>direction</source>
         <translation>направление</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="532" />
-        <location filename="../main_window.py" line="896" />
+        <location filename="../main_window.py" line="608" />
+        <location filename="../main_window.py" line="972" />
         <source>Bytes</source>
         <translation>Байты</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="568" />
-        <location filename="../main_window.py" line="909" />
+        <location filename="../main_window.py" line="644" />
+        <location filename="../main_window.py" line="985" />
         <source>Timeline</source>
         <translation>Хронология</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="604" />
+        <location filename="../main_window.py" line="680" />
         <source>Interpretation</source>
         <translation>Анализ</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="605" />
+        <location filename="../main_window.py" line="681" />
         <source>Compare</source>
         <translation>Сравн.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="611" />
+        <location filename="../main_window.py" line="687" />
         <source>Interpretation tab</source>
         <translation>Интерпретация</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="612" />
+        <location filename="../main_window.py" line="688" />
         <source>Compare tab</source>
         <translation>Сравнение</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="613" />
+        <location filename="../main_window.py" line="689" />
         <source>Hypotheses tab</source>
         <translation>Гипотезы</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="614" />
+        <location filename="../main_window.py" line="690" />
         <source>Report tab</source>
         <translation>Отчёт</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="615" />
+        <location filename="../main_window.py" line="691" />
         <source>Version diff tab</source>
         <translation>Различие версий</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1064" />
+        <location filename="../main_window.py" line="1142" />
         <source>finish this step first, or use Skip</source>
         <translation>сначала выполните этот шаг или нажмите «Пропустить»</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1140" />
+        <location filename="../main_window.py" line="1218" />
         <source>course finished</source>
         <translation>курс завершён</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1270" />
+        <location filename="../main_window.py" line="1348" />
         <source>the built-in demo is not available</source>
         <translation>встроенный пример недоступен</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1283" />
+        <location filename="../main_window.py" line="1361" />
         <source>opened the built-in demo</source>
         <translation>встроенный пример открыт</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1296" />
+        <location filename="../main_window.py" line="1374" />
         <source>open a capture and a rule before a journal</source>
         <translation>сначала откройте захват и правило, затем журнал</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1301" />
+        <location filename="../main_window.py" line="1379" />
         <source>could not read the journal: {0}</source>
         <translation>не удалось прочитать журнал: {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1306" />
+        <location filename="../main_window.py" line="1384" />
         <source>journal: {0}</source>
         <translation>журнал: {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1312" />
+        <location filename="../main_window.py" line="1390" />
         <source>Open action journal</source>
         <translation>Открыть журнал действий</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1576" />
+        <location filename="../main_window.py" line="1516" />
+        <location filename="../main_window.py" line="1691" />
+        <source>Choose a folder for the project</source>
+        <translation>Выберите каталог для проекта</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1521" />
+        <source>New project</source>
+        <translation>Новый проект</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1522" />
+        <source>Project name:</source>
+        <translation>Имя проекта:</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1527" />
+        <source>a project name is required</source>
+        <translation>требуется имя проекта</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1533" />
+        <source>could not create the project</source>
+        <translation>не удалось создать проект</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1537" />
+        <source>created project {0}</source>
+        <translation>создан проект {0}</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1544" />
+        <source>Open project</source>
+        <translation>Открыть проект</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1553" />
+        <source>could not open the project</source>
+        <translation>не удалось открыть проект</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1557" />
+        <source>opened project {0}</source>
+        <translation>открыт проект {0}</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1562" />
+        <location filename="../main_window.py" line="1660" />
+        <source>no project is open</source>
+        <translation>проект не открыт</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1567" />
+        <source>could not save the project</source>
+        <translation>не удалось сохранить проект</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1570" />
+        <source>saved project {0}</source>
+        <translation>сохранён проект {0}</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1575" />
+        <source>open or create a project first</source>
+        <translation>сначала откройте или создайте проект</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1579" />
+        <source>Add capture</source>
+        <translation>Добавить захват</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1590" />
+        <source>could not add the capture</source>
+        <translation>не удалось добавить захват</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1592" />
+        <source>added {0} to the project</source>
+        <translation>добавлено {0} в проект</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1609" />
+        <location filename="../main_window.py" line="1621" />
+        <source>Save rule version</source>
+        <translation>Сохранить версию правила</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1609" />
+        <source>Version name:</source>
+        <translation>Имя версии:</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1615" />
+        <source>a version name is required</source>
+        <translation>требуется имя версии</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1638" />
+        <location filename="../main_window.py" line="1649" />
+        <source>could not save the rule version</source>
+        <translation>не удалось сохранить версию правила</translation>
+    </message>
+    <message>
         <location filename="../main_window.py" line="1640" />
+        <source>saved {0}</source>
+        <translation>сохранено {0}</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1664" />
+        <source>Export project</source>
+        <translation>Экспорт проекта</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1674" />
+        <source>could not export the project</source>
+        <translation>не удалось экспортировать проект</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1684" />
+        <source>Import project</source>
+        <translation>Импорт проекта</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1699" />
+        <source>could not import the project</source>
+        <translation>не удалось импортировать проект</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1703" />
+        <source>imported project {0}</source>
+        <translation>импортирован проект {0}</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1724" />
+        <source>Unsaved project changes</source>
+        <translation>Несохранённые изменения проекта</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1728" />
+        <source>The open project has changes that were not saved. Save them before continuing?</source>
+        <translation>В открытом проекте есть несохранённые изменения. Сохранить их перед продолжением?</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1901" />
+        <location filename="../main_window.py" line="1965" />
         <source>open a capture first</source>
         <translation>сначала откройте захват</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1580" />
-        <location filename="../main_window.py" line="1644" />
+        <location filename="../main_window.py" line="1605" />
+        <location filename="../main_window.py" line="1905" />
+        <location filename="../main_window.py" line="1969" />
         <source>open or build a rule first</source>
         <translation>сначала откройте или постройте правило</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1775" />
+        <location filename="../main_window.py" line="2100" />
         <source>&lt;- message #{0}</source>
         <translation>&lt;- сообщение #{0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1777" />
+        <location filename="../main_window.py" line="2102" />
         <source>&lt;- bytes {0}..{1}</source>
         <translation>&lt;- байты {0}..{1}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1784" />
+        <location filename="../main_window.py" line="2109" />
         <source>&lt;- packet #{0}</source>
         <translation>&lt;- пакет #{0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1789" />
+        <location filename="../main_window.py" line="2114" />
         <source>&lt;- session {0} ({1})</source>
         <translation>&lt;- сессия {0} ({1})</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1792" />
+        <location filename="../main_window.py" line="2117" />
         <source>&lt;- {0}</source>
         <translation>&lt;- {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1828" />
+        <location filename="../main_window.py" line="2153" />
         <source>apply the rule to the whole capture first (F6)</source>
         <translation>сначала примените правило ко всему захвату (F6)</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1951" />
+        <location filename="../main_window.py" line="2276" />
         <source>Order of work
 The empty state lists the same steps and marks the ones already
 done. Help - Show start guide brings it back over the workspace.
@@ -3065,198 +3285,200 @@ F5 применить к направлению    F6 применить к за
 контрпример к нему, который сохраняется, а не отбрасывается.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="606" />
+        <location filename="../main_window.py" line="682" />
         <source>Hypotheses</source>
         <translation>Гип.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="451" />
+        <location filename="../main_window.py" line="527" />
         <source>Start the &amp;interactive course</source>
         <translation>Начать &amp;интерактивный курс</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="452" />
+        <location filename="../main_window.py" line="528" />
         <source>Learning and &amp;help...</source>
         <translation>Обучение и &amp;справка...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="454" />
+        <location filename="../main_window.py" line="530" />
         <source>Show the &amp;start screen</source>
         <translation>Показать &amp;начальный экран</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="607" />
+        <location filename="../main_window.py" line="683" />
         <source>Report</source>
         <translation>Отчёт</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="608" />
+        <location filename="../main_window.py" line="684" />
         <source>Version diff</source>
         <translation>Диф.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="629" />
-        <location filename="../main_window.py" line="933" />
+        <location filename="../main_window.py" line="705" />
+        <location filename="../main_window.py" line="1011" />
         <source>no byte selected</source>
         <translation>байт не выбран</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="774" />
+        <location filename="../main_window.py" line="850" />
         <source>zoom {0}%</source>
         <translation>масштаб {0}%</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="802" />
+        <location filename="../main_window.py" line="878" />
         <source>settings applied</source>
         <translation>настройки применены</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="936" />
+        <location filename="../main_window.py" line="1014" />
         <source>none</source>
         <translation>нет</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="936" />
+        <location filename="../main_window.py" line="1014" />
         <source>{0} sessions  capture_id {1}  diagnostics {2}</source>
         <translation>{0} сессий  capture_id {1}  диагностика {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1421" />
+        <location filename="../main_window.py" line="1499" />
         <source>loaded {0}  rule v{1}</source>
         <translation>загружено {0}  правило v{1}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1494" />
+        <location filename="../main_window.py" line="1819" />
         <source>rule built; apply it to check it</source>
         <translation>правило собрано; примените его для проверки</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1519" />
+        <location filename="../main_window.py" line="1844" />
         <source>Open rule</source>
         <translation>Открыть правило</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1532" />
+        <location filename="../main_window.py" line="1857" />
         <source>no example rule found</source>
         <translation>пример правила не найден</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1448" />
-        <location filename="../main_window.py" line="1482" />
-        <location filename="../main_window.py" line="1586" />
-        <location filename="../main_window.py" line="1650" />
+        <location filename="../main_window.py" line="1773" />
+        <location filename="../main_window.py" line="1807" />
+        <location filename="../main_window.py" line="1911" />
+        <location filename="../main_window.py" line="1975" />
         <source>rule error: {0}</source>
         <translation>ошибка правила: {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1599" />
+        <location filename="../main_window.py" line="1924" />
         <source>rule v{0}  {1}</source>
         <translation>правило v{0}  {1}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1604" />
+        <location filename="../main_window.py" line="1929" />
         <source>applied rule v{0} to {1} {2}</source>
         <translation>правило v{0} применено к {1} {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1674" />
+        <location filename="../main_window.py" line="1999" />
         <source>rule v{0} over the capture: {1}  counterexamples={2}</source>
         <translation>правило v{0} по всему захвату: {1}  контрпримеров={2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1679" />
+        <location filename="../main_window.py" line="2004" />
         <source>verified rule over the whole capture: {0}</source>
         <translation>правило проверено по всему захвату: {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1695" />
+        <location filename="../main_window.py" line="2020" />
         <source>no previous rule version to compare</source>
         <translation>нет предыдущей версии правила для сравнения</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1699" />
+        <location filename="../main_window.py" line="2024" />
         <source>rule v{0} supersedes v{1}; the old run is marked outdated</source>
         <translation>правило v{0} заменяет v{1}; старый прогон помечен как устаревший</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1749" />
+        <location filename="../main_window.py" line="2074" />
         <source>packet {0}  seq {1}  ts {2}</source>
         <translation>пакет {0}  seq {1}  ts {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1876" />
+        <location filename="../main_window.py" line="2201" />
         <source>Markdown (*.md)</source>
         <translation>Markdown (*.md)</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1884" />
+        <location filename="../main_window.py" line="2209" />
         <source>{0} is not available</source>
         <translation>{0} недоступен</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1888" />
+        <location filename="../main_window.py" line="2213" />
         <source>Export report</source>
         <translation>Экспорт отчёта</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1407" />
-        <location filename="../main_window.py" line="1898" />
-        <location filename="../main_window.py" line="1928" />
+        <location filename="../main_window.py" line="1485" />
+        <location filename="../main_window.py" line="1655" />
+        <location filename="../main_window.py" line="1676" />
+        <location filename="../main_window.py" line="2223" />
+        <location filename="../main_window.py" line="2253" />
         <source>wrote {0}</source>
         <translation>записано {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1353" />
+        <location filename="../main_window.py" line="1431" />
         <source>Open capture</source>
         <translation>Открыть захват</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1367" />
+        <location filename="../main_window.py" line="1445" />
         <source>Cannot open capture</source>
         <translation>Не удалось открыть захват</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1380" />
+        <location filename="../main_window.py" line="1458" />
         <source>Import PCAP</source>
         <translation>Импорт PCAP</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1403" />
+        <location filename="../main_window.py" line="1481" />
         <source>Cannot import capture</source>
         <translation>Не удалось импортировать захват</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1908" />
+        <location filename="../main_window.py" line="2233" />
         <source>apply a rule before saving a result</source>
         <translation>примените правило перед сохранением результата</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1911" />
+        <location filename="../main_window.py" line="2236" />
         <source>Save result</source>
         <translation>Сохранить результат</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1923" />
+        <location filename="../main_window.py" line="2248" />
         <source>could not save result: {0}</source>
         <translation>не удалось сохранить результат: {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1926" />
+        <location filename="../main_window.py" line="2251" />
         <source>could not save the result</source>
         <translation>не удалось сохранить результат</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1934" />
+        <location filename="../main_window.py" line="2259" />
         <source>Quick help</source>
         <translation>Краткая справка</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1971" />
+        <location filename="../main_window.py" line="2296" />
         <source>About</source>
         <translation>О программе</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1977" />
+        <location filename="../main_window.py" line="2302" />
         <source>Madrigal protocol laboratory
 A local tool for reconstructing an undocumented binary protocol over TCP.
 The bytes are the source of truth; a rule is an interpretation checked against them.</source>

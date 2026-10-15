@@ -11,15 +11,19 @@ separate concern.
 
 from __future__ import annotations
 
+import json
 import logging
 import sys
+import tempfile
 from collections.abc import Callable
 from pathlib import Path
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
+from ..project.manifest import ManifestError
+from ..project.project import Project, ProjectError
 from ..protocol.result import build_result, write_result
-from ..protocol.rule import load_rule_text
+from ..protocol.rule import load_rule_text, rule_text
 from . import help as reference
 from . import learning, theme
 from .compare_view import CompareView
@@ -104,6 +108,12 @@ _HELP_TARGETS: dict[str, str] = {
 logger = logging.getLogger(__name__)
 
 
+def _slug(text: str) -> str:
+    """Reduce a project or rule name to a safe file-name stem."""
+    cleaned = [c if c.isalnum() or c in "-_" else "-" for c in text.strip()]
+    return "".join(cleaned).strip("-_") or "project"
+
+
 def app_icon() -> QtGui.QIcon:
     """Return the application icon, or an empty icon when the asset is absent."""
     return QtGui.QIcon(str(APP_ICON)) if APP_ICON.is_file() else QtGui.QIcon()
@@ -140,6 +150,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self._corpus_report = None
         self._last_dir: Path | None = None
         self._rule_applied = False
+        # The portable project behind the window, if one was created or opened.
+        # Its path identifies it in the title; the manifest is the on-disk state
+        # the project API writes, so the window keeps no second copy of it.
+        self._project: Project | None = None
+        self._project_path: Path | None = None
         self._theme_manager = None
         self._language_manager: LanguageManager | None = None
         self._capture_name: str = ""
@@ -263,6 +278,60 @@ class MainWindow(QtWidgets.QMainWindow):
         )
         file_menu.addSeparator()
         self._actions["quit"] = self._action(file_menu, "&Quit", self.close, "Ctrl+Q")
+
+        project_menu = bar.addMenu("")
+        self._menus["project"] = project_menu
+        self._actions["project_new"] = self._action(
+            project_menu,
+            "&New project...",
+            self.new_project_dialog,
+            None,
+            tip=self.tr("Create a portable project directory that holds captures, rules and results"),
+        )
+        self._actions["project_open"] = self._action(
+            project_menu,
+            "&Open project...",
+            self.open_project_dialog,
+            None,
+            tip=self.tr("Open an existing portable project directory"),
+        )
+        self._actions["project_save"] = self._action(
+            project_menu,
+            "&Save project",
+            self.save_project,
+            None,
+            tip=self.tr("Write the project manifest, refreshing its timestamp"),
+        )
+        project_menu.addSeparator()
+        self._actions["project_add_capture"] = self._action(
+            project_menu,
+            "&Add capture...",
+            self.add_capture_to_project_dialog,
+            None,
+            tip=self.tr("Copy a capture into the open project and register it"),
+        )
+        self._actions["project_save_rule_version"] = self._action(
+            project_menu,
+            "Save rule &version...",
+            self.save_rule_version_dialog,
+            None,
+            tip=self.tr("Name the current rule version and store it in the project"),
+        )
+        project_menu.addSeparator()
+        self._actions["project_export"] = self._action(
+            project_menu,
+            "&Export project...",
+            self.export_project_dialog,
+            None,
+            tip=self.tr("Write the whole project to a zip archive"),
+        )
+        self._actions["project_import"] = self._action(
+            project_menu,
+            "&Import project...",
+            self.import_project_dialog,
+            None,
+            tip=self.tr("Unpack a project archive into a new directory and open it"),
+        )
 
         rule_menu = bar.addMenu("")
         self._menus["rule"] = rule_menu
@@ -416,6 +485,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """Translate every menu, action and language item in place."""
         labels = {
             "file": self.tr("&File"),
+            "project": self.tr("&Project"),
             "rule": self.tr("&Rule"),
             "report": self.tr("&Report"),
             "view": self.tr("&View"),
@@ -432,6 +502,13 @@ class MainWindow(QtWidgets.QMainWindow):
             "save_result": self.tr("&Save result..."),
             "import_pcap": self.tr("&Import PCAP..."),
             "quit": self.tr("&Quit"),
+            "project_new": self.tr("&New project..."),
+            "project_open": self.tr("&Open project..."),
+            "project_save": self.tr("&Save project"),
+            "project_add_capture": self.tr("&Add capture..."),
+            "project_save_rule_version": self.tr("Save rule &version..."),
+            "project_export": self.tr("&Export project..."),
+            "project_import": self.tr("&Import project..."),
             "apply_direction": self.tr("&Apply to current direction"),
             "apply_capture": self.tr("Apply to &whole capture"),
             "compare_versions": self.tr("&Compare versions"),
@@ -926,11 +1003,13 @@ class MainWindow(QtWidgets.QMainWindow):
             self._set_provenance_text(self._capture_summary())
 
     def _refresh_title(self) -> None:
-        """Set the window title, including the open capture's name."""
+        """Set the window title, including the open project and capture names."""
+        parts = [self._base_title]
+        if self._project_path is not None:
+            parts.append(self._project_path.name)
         if self._capture_name:
-            self.setWindowTitle(f"{self._base_title} - {self._capture_name}")
-        else:
-            self.setWindowTitle(self._base_title)
+            parts.append(self._capture_name)
+        self.setWindowTitle(" - ".join(parts))
 
     def _capture_summary(self) -> str:
         """The status-line summary of the open capture, in the active language."""
@@ -1440,6 +1519,253 @@ class MainWindow(QtWidgets.QMainWindow):
         self._refresh_welcome_progress()
         self.validation_view.set_ready(capture=self._capture is not None, rule=True)
         self._update_guided()
+
+    # -- portable project --------------------------------------------------
+
+    def new_project_dialog(self) -> None:
+        """Ask for a directory and name, then create a project there."""
+        if not self._confirm_discard_unsaved():
+            return
+        parent = QtWidgets.QFileDialog.getExistingDirectory(
+            self, self.tr("Choose a folder for the project"), self._output_dir(REPO_ROOT)
+        )
+        if not parent:
+            return
+        name, accepted = QtWidgets.QInputDialog.getText(
+            self, self.tr("New project"), self.tr("Project name:")
+        )
+        if not accepted:
+            return
+        name = name.strip()
+        if not name:
+            self._notify(self.tr("a project name is required"))
+            return
+        target = Path(parent) / _slug(name)
+        try:
+            project = Project.create(target, name)
+        except (ProjectError, ManifestError) as exc:
+            self._report_error(self.tr("could not create the project"), exc)
+            return
+        self._remember_dir(target)
+        self._adopt_project(project)
+        self._notify(self.tr("created project {0}").format(target.name))
+
+    def open_project_dialog(self) -> None:
+        """Ask for a project directory and open it without losing the current one."""
+        if not self._confirm_discard_unsaved():
+            return
+        path = QtWidgets.QFileDialog.getExistingDirectory(
+            self, self.tr("Open project"), self._output_dir(REPO_ROOT)
+        )
+        if not path:
+            return
+        try:
+            project = Project.open(path)
+        except (ProjectError, ManifestError) as exc:
+            # A failed open leaves the window on the project it already had, so a
+            # mistyped folder never costs the researcher the open investigation.
+            self._report_error(self.tr("could not open the project"), exc)
+            return
+        self._remember_dir(path)
+        self._adopt_project(project)
+        self._notify(self.tr("opened project {0}").format(project.name))
+
+    def save_project(self) -> None:
+        """Write the open project's manifest back to disk."""
+        if self._project is None:
+            self._notify(self.tr("no project is open"))
+            return
+        try:
+            self._project.save()
+        except OSError as exc:
+            self._report_error(self.tr("could not save the project"), exc)
+            return
+        self._refresh_title()
+        self._notify(self.tr("saved project {0}").format(self._project.name))
+
+    def add_capture_to_project_dialog(self) -> None:
+        """Copy a capture file into the open project and register it."""
+        if self._project is None:
+            self._notify(self.tr("open or create a project first"))
+            return
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self,
+            self.tr("Add capture"),
+            self._start_dir(REPO_ROOT),
+            "Captures (*.pcap *.pcapng *.json)",
+        )
+        if not path:
+            return
+        self._remember_dir(path)
+        try:
+            relative = self._project.add_capture(Path(path))
+            self._project.save()
+        except (ProjectError, OSError) as exc:
+            self._report_error(self.tr("could not add the capture"), exc)
+            return
+        self._notify(self.tr("added {0} to the project").format(relative))
+
+    def save_rule_version_dialog(self) -> None:
+        """Name the current rule version and store it.
+
+        With a project open the version is copied into ``rules/`` and recorded
+        in the manifest by the project API, which never overwrites an existing
+        version. Without one the researcher picks a file to write. The name is
+        carried in the rule document itself, so it survives in the report and
+        the version list.
+        """
+        rule = self._current_rule()
+        if rule is None:
+            self._notify(self.tr("open or build a rule first"))
+            return
+        default = rule.rule.name or rule.rule.rule_id
+        name, accepted = QtWidgets.QInputDialog.getText(
+            self, self.tr("Save rule version"), self.tr("Version name:"), text=default
+        )
+        if not accepted:
+            return
+        name = name.strip()
+        if not name:
+            self._notify(self.tr("a version name is required"))
+            return
+        named = rule.rule if name == rule.rule.name else rule.rule.bump_version(name=name)
+        if self._project is None:
+            path, _ = QtWidgets.QFileDialog.getSaveFileName(
+                self,
+                self.tr("Save rule version"),
+                self._output_dir(REPO_ROOT) + f"/{_slug(name)}.json",
+                "JSON (*.json)",
+            )
+            if not path:
+                return
+            self._remember_dir(path)
+            self._write_rule_file(named, Path(path))
+            return
+        temporary = Path(tempfile.mkdtemp()) / f"{_slug(name)}.json"
+        try:
+            self._write_rule_file(named, temporary)
+            relative = self._project.add_rule(
+                temporary, named.rule_id, named.rule_version
+            )
+            self._project.save()
+        except (ProjectError, OSError) as exc:
+            self._report_error(self.tr("could not save the rule version"), exc)
+            return
+        self._notify(self.tr("saved {0}").format(relative))
+
+    def _write_rule_file(self, rule, path: Path) -> None:
+        """Write ``rule`` to ``path`` and adopt it as the current rule."""
+        from ..protocol.rule import save_rule
+
+        try:
+            save_rule(rule, path)
+        except OSError as exc:
+            self._report_error(self.tr("could not save the rule version"), exc)
+            return
+        if self._rule is not None:
+            self._rule.rule = rule
+            self._rule.text = rule_text(rule)
+            self.validation_view.set_rule_text(self._rule.text)
+        self._notify(self.tr("wrote {0}").format(path))
+
+    def export_project_dialog(self) -> None:
+        """Write the open project to a zip archive."""
+        if self._project is None:
+            self._notify(self.tr("no project is open"))
+            return
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            self.tr("Export project"),
+            self._output_dir(REPO_ROOT) + f"/{self._project.name}.zip",
+            "Zip (*.zip)",
+        )
+        if not path:
+            return
+        self._remember_dir(path)
+        try:
+            self._project.export(Path(path))
+        except OSError as exc:
+            self._report_error(self.tr("could not export the project"), exc)
+            return
+        self._notify(self.tr("wrote {0}").format(path))
+
+    def import_project_dialog(self) -> None:
+        """Unpack a project archive into a new directory and open it."""
+        if not self._confirm_discard_unsaved():
+            return
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self,
+            self.tr("Import project"),
+            self._output_dir(REPO_ROOT),
+            "Zip (*.zip)",
+        )
+        if not path:
+            return
+        parent = QtWidgets.QFileDialog.getExistingDirectory(
+            self, self.tr("Choose a folder for the project"), str(Path(path).parent)
+        )
+        if not parent:
+            return
+        target = Path(parent) / _slug(Path(path).stem)
+        try:
+            project = Project.import_(Path(path), target)
+        except (ProjectError, ManifestError) as exc:
+            self._report_error(self.tr("could not import the project"), exc)
+            return
+        self._remember_dir(target)
+        self._adopt_project(project)
+        self._notify(self.tr("imported project {0}").format(project.name))
+
+    def _adopt_project(self, project: Project) -> None:
+        """Make ``project`` the open project and reflect it in the title."""
+        self._project = project
+        self._project_path = project.root
+        self._refresh_title()
+
+    def _confirm_discard_unsaved(self) -> bool:
+        """Ask before leaving a project whose manifest has uncommitted edits.
+
+        Returns ``True`` when the caller may proceed. A window with no open
+        project, or one whose in-memory manifest matches the file on disk,
+        proceeds without a dialog, so the common path is not interrupted.
+        """
+        if self._project is None:
+            return True
+        if not self._project_is_dirty():
+            return True
+        answer = QtWidgets.QMessageBox.question(
+            self,
+            self.tr("Unsaved project changes"),
+            self.tr(
+                "The open project has changes that were not saved. "
+                "Save them before continuing?"
+            ),
+            QtWidgets.QMessageBox.StandardButton.Save
+            | QtWidgets.QMessageBox.StandardButton.Discard
+            | QtWidgets.QMessageBox.StandardButton.Cancel,
+            QtWidgets.QMessageBox.StandardButton.Save,
+        )
+        if answer == QtWidgets.QMessageBox.StandardButton.Cancel:
+            return False
+        if answer == QtWidgets.QMessageBox.StandardButton.Save:
+            self.save_project()
+        return True
+
+    def _project_is_dirty(self) -> bool:
+        """Whether the open project's manifest differs from the file on disk."""
+        if self._project is None:
+            return False
+        path = self._project.path("manifest.json")
+        try:
+            on_disk = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return True
+        return on_disk != self._project.manifest.to_dict()
+
+    def _report_error(self, headline: str, exc: Exception) -> None:
+        """Show a failed operation with its reason, and mirror it in the status."""
+        self._notify(f"{headline}: {exc}")
+        QtWidgets.QMessageBox.warning(self, headline, str(exc))
 
     def _current_rule(self) -> RuleModel | None:
         """The rule to run: the loaded model, or the text the editor holds.
@@ -2015,6 +2341,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _notify(self, text: str) -> None:
         self.statusBar().showMessage(text, 6000)
+
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
+        """Give the researcher a chance to save the project before quitting.
+
+        The project is the only thing the window writes to disk, so the prompt
+        is tied to it; declining keeps the window open and the work intact.
+        """
+        if self._confirm_discard_unsaved():
+            event.accept()
+        else:
+            event.ignore()
 
 
 def _markdown_to_html(text: str) -> str:
