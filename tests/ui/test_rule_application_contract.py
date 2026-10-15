@@ -143,3 +143,49 @@ def test_language_change_rebuilds_the_empty_state(window):
 
     assert english != russian, "the hint is rebuilt in the new language"
     window.set_language("system")
+
+
+def test_message_lookup_tolerates_an_unset_offset(window):
+    """No byte clicked yet: the lookup returns nothing instead of raising.
+
+    ``_last_offset`` is None until a byte is clicked, and the build-rule action
+    reads the message under the cursor before that. A rule is applied here so the
+    lookup reaches the scan rather than the no-rule guard.
+    """
+    _open_sample(window)
+    window.apply_rule()
+    assert window._last_offset is None
+
+    assert window._message_at(window._last_offset) is None
+    assert window._message_at(None) is None
+
+
+def test_build_rule_before_any_click_does_not_raise(window, monkeypatch):
+    """Building a rule before a byte is clicked does not raise.
+
+    The builder is stubbed so the dialog cannot block the run. The failure this
+    guards against happens while the message bytes are collected, before the
+    dialog is constructed.
+    """
+    import src.ui.rule_builder as rule_builder
+
+    seen: dict[str, object] = {}
+
+    class _Stub:
+        def __init__(self, *args, **kwargs):
+            seen["message"] = kwargs.get("message")
+
+        def setFont(self, _font):  # pragma: no cover - construction only
+            pass
+
+        def exec(self):
+            return QtWidgets.QDialog.DialogCode.Rejected
+
+    monkeypatch.setattr(rule_builder, "RuleBuilderDialog", _Stub)
+
+    _open_sample(window)
+    window.apply_rule()
+    assert window._last_offset is None
+
+    window.build_rule()
+    assert isinstance(seen.get("message"), bytes)
