@@ -15,6 +15,12 @@ repository's own code. Every number is from `docs/METRICS.md`.
 | `slide-light.pdf` | the same deck exported for a washed-out projector |
 | `slide.pptx` | the deck as a PPTX, one full-bleed image per slide, zip timestamps pinned to 1980-01-01 |
 | `slide-light.pptx` | the light variant as a PPTX |
+| `Презентация Madrigal Protocol Lab (13 слайдов).html` | the 13-slide cut, dark theme (`make_alt_deck.py`) |
+| `Презентация Madrigal Protocol Lab (13 слайдов, светлая).html` | the same cut in the light theme |
+| `slides-13.pdf` | the printed export of the 13-slide cut, 13 pages |
+| `slide-light-13.pdf` | the light 13-slide export |
+| `slide-13.pptx` | the 13-slide cut as a PPTX |
+| `slide-light-13.pptx` | the light 13-slide cut as a PPTX |
 | `screenshots/` | 11 real GUI captures at 1920×1080 (`generate_screenshots.py`) |
 | `assets/` | 8 branded SVG visualisations, dark and light, plus PNG copies |
 | `assets/madrigal-logo.png` | the case owner's «Мадригал» wordmark, shown on the cover and closing slides |
@@ -33,6 +39,7 @@ repository's own code. Every number is from `docs/METRICS.md`.
 | `make_brand.py` | builds the «Мадригал» wordmark and monogram |
 | `generate_qr.py` | writes the repository and release QR codes |
 | `make_deck_pptx.py` | packages a rendered deck PDF into a PPTX, one full-bleed page per slide |
+| `make_alt_deck.py` | derives the 13-slide cut from the 15-slide master; the master is left untouched |
 
 ## Building the deck
 
@@ -55,6 +62,26 @@ chromium --headless=new --no-pdf-header-footer --print-to-pdf=slide-light.pdf \
 # package the PDFs into PPTX (from the repository root)
 python -m presentation.make_deck_pptx presentation/slides.pdf presentation/slide.pptx
 python -m presentation.make_deck_pptx presentation/slide-light.pdf presentation/slide-light.pptx
+```
+
+### The 13-slide cut
+
+If the defence brief fixes the deck at 13 slides, `make_alt_deck.py` derives
+that cut from the 15-slide master without touching it. Two slides are folded:
+the problem statement and «Дано и требуется» become one «Пакет, сообщение и
+задача» slide, and «Гипотеза ≠ Правило» and «От интерпретации можно вернуться к
+данным» become one core slide. The remaining slides keep their content and are
+renumbered.
+
+```bash
+# regenerate the HTML, then print and package as above
+python -m presentation.make_alt_deck
+chromium --headless=new --no-pdf-header-footer --print-to-pdf=slides-13.pdf \
+  "Презентация Madrigal Protocol Lab (13 слайдов).html"
+chromium --headless=new --no-pdf-header-footer --print-to-pdf=slide-light-13.pdf \
+  "Презентация Madrigal Protocol Lab (13 слайдов, светлая).html"
+python -m presentation.make_deck_pptx presentation/slides-13.pdf presentation/slide-13.pptx
+python -m presentation.make_deck_pptx presentation/slide-light-13.pdf presentation/slide-light-13.pptx
 ```
 
 ## Regenerate the assets
