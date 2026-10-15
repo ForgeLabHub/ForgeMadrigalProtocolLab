@@ -8,12 +8,12 @@ the repository at the final revision; re-run the command if the branch has moved
 
 - [ ] `main = origin/main`, дерево чистое.
       `git fetch --all --prune && git status -sb && git log --oneline -1 origin/main`
-- [ ] Тесты зелёные: `pytest tests/ -q` → **896 passed** на текущем `main`
+- [ ] Тесты зелёные: `pytest tests/ -q` → **898 passed** на текущем `main`
       (`c1b5853`; Python 3.13, PySide6 6.8.1, `QT_QPA_PLATFORM=offscreen`;
       на теге `v1.0.0`, который лежит в сдаваемом архиве, — **794 passed**; ≈ 8 min).
       UI-тесты требуют Qt-runtime; в контейнере без `libEGL.so.1` полный набор
-      не собирается — там `pytest --ignore=tests/ui` → **615 passed**.
-      Указывайте число с контекстом: 615 без UI, 896 с Qt.
+      не собирается — там `pytest --ignore=tests/ui` → **617 passed**.
+      Указывайте число с контекстом: 617 без UI, 898 с Qt.
 - [ ] Линт чистый: `ruff check .` → All checks passed.
 - [ ] Дека: `presentation/slide.pdf` и `presentation/slide-light.pdf` — по **15 страниц**;
       `presentation/slide.pptx` — 15 слайдов.
@@ -65,6 +65,6 @@ git fetch --all --prune && git status -sb \
   && gh release view v1.2.0 --json isDraft,assets
 ```
 
-Expected: a clean tree at `origin/main`, 896 passed on the current `main`
+Expected: a clean tree at `origin/main`, 898 passed on the current `main`
 (794 on the `v1.0.0` tag), lint clean, 15 pages, a published `v1.2.0` release
 with 14 assets.
