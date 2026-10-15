@@ -31,7 +31,7 @@ SOURCES=(
     src/ui/hypotheses_view.py
     src/ui/validation_view.py
     src/ui/settings.py
-    src/ui/guide_panel.py
+    src/ui/guided.py
     src/ui/rule_builder.py
     src/ui/timeline_view.py
 )

@@ -244,11 +244,11 @@ def test_settings_signal_emits_mapping(app, isolated_settings):
     assert captured and captured[0]["advanced"]["log_level"] == "INFO"
 
 
-def test_start_guide_marks_progress(window):
-    """The guide walks capture, session, rule and apply, then hides itself."""
-    guide = window.guide_panel
-    assert not guide.isHidden(), "the guide is shown on a fresh window"
-    assert guide.step_capture.property("state") == "next"
+def test_guided_mode_marks_progress(window):
+    """The coach follows the real state and steps aside once work is done."""
+    panel = window.guided_panel
+    assert not panel.isHidden(), "the coach is shown on a fresh window"
+    assert panel.step_index == 0
 
     window.open_capture(
         REPO_ROOT
@@ -257,43 +257,50 @@ def test_start_guide_marks_progress(window):
         / "reference_export"
         / "corpus_capture_01.normalized.json"
     )
-    assert guide.step_capture.property("state") == "done"
-    assert guide.step_session.property("state") == "done"
-    assert guide.step_rule.property("state") == "next"
+    # The capture selects its first direction, so the reader is at the rule step.
+    assert panel.step_index == 2
 
     window.load_rule(REPO_ROOT / "examples" / "corpus_rule_v1.json")
-    assert guide.step_rule.property("state") == "done"
-    assert guide.step_apply.property("state") == "next"
+    assert panel.step_index == 3
 
     window.apply_rule()
-    assert guide.isHidden(), "the guide steps aside once the workspace is in use"
+    assert panel.step_index == 4
+    assert panel.isHidden(), "the coach steps aside once the workspace is in use"
 
 
-def test_start_guide_can_be_shown_again(window):
-    window.guide_panel.setVisible(False)
-    assert window.guide_panel.isHidden()
+def test_guided_mode_can_be_shown_again(window):
+    window.set_guided_mode(False)
+    assert window.guided_panel.isHidden()
     window.show_guide()
-    assert not window.guide_panel.isHidden()
+    assert not window.guided_panel.isHidden()
 
 
-def test_start_guide_stays_a_thin_strip(window):
-    """The guide must not eat the workspace it introduces."""
-    guide = window.guide_panel
-    guide.setVisible(True)
+def test_guided_mode_stays_a_thin_strip(window):
+    """The coach must not eat the workspace it introduces."""
+    panel = window.guided_panel
+    panel.setVisible(True)
     window.resize(1024, 768)
     window.show()
     for _ in range(3):
         QtWidgets.QApplication.processEvents()
-    assert guide.height() < window.height() // 4
+    assert panel.height() < window.height() // 4
 
 
-def test_start_guide_keeps_the_step_hints_as_tooltips(window):
-    """The hint text is preserved, but rendered as a tooltip, not a paragraph."""
-    guide = window.guide_panel
-    step = guide.step_capture
-    assert "Ctrl+O" in step.hint.text()
-    assert step.toolTip() == step.hint.text()
-    assert step.hint.isHidden()
+def test_guided_mode_round_trips_through_the_dialog(app, isolated_settings):
+    """Turning the hints off in the dialog persists and reaches a new window."""
+    dialog = SettingsDialog()
+    dialog._widgets["general"]["guided_mode"].setChecked(False)
+    values = dialog.values()
+    assert values["general"]["guided_mode"] is False
+
+    first = MainWindow()
+    first.apply_settings(values)
+    first.close()
+
+    second = MainWindow()
+    assert second._guided_enabled is False
+    assert second.guided_panel.isHidden()
+    second.close()
 
 
 def test_capture_action_names_both_accepted_forms(window):

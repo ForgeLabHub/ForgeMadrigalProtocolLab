@@ -353,6 +353,22 @@ class ValidationView(QtWidgets.QWidget):
                 self.tr("rule v{0}  {1}").format(application.rule.rule_version, summary)
             )
 
+    def clear(self) -> None:
+        """Drop the previous run's messages and counterexamples.
+
+        A new capture invalidates the verdicts taken against the old one, so the
+        tables are emptied rather than left showing a result that no longer
+        belongs to the bytes on screen.
+        """
+        self._application = None
+        self._message_count = 0
+        self.messages_table.clearSpans()
+        self.messages_table.setRowCount(0)
+        self._show_messages_empty_state()
+        self.counter_list.clear()
+        self._tabs.setTabText(1, self.tr("Messages (0)"))
+        self._tabs.setTabText(2, self.tr("Counterexamples (0)"))
+
     def _fill_row(self, row: int, message) -> None:
         cells = [
             f"{message.offset}",
