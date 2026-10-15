@@ -105,6 +105,26 @@ verification of the deck, the screencast and the demo driver.
 - `4c3b1a3` chore(repo): add git attributes, hook, message template and hygiene doc
 - `1c8621f` test(ui): add locale, snapshot and state-isolation suites
 
+## v1.2.0
+
+The final-stabilization release: the documentation, the presentation and the
+reserve screencast are brought in line with the current tree, and the version is
+bumped from `v1.1.0`. No product code changed.
+
+### Changed
+
+- The reserve screencast `presentation/screencast.mp4` was re-recorded from the
+  current GUI: 3:40 (219.8 s), 1920x1080, 15 fps, no sound. The previous clip
+  was 125 s and showed the pre-overhaul interface. The poster frame and the
+  inlined `data:video/mp4` in the deck were refreshed.
+- The presentation screenshots were regenerated from the current theme, and the
+  deck PDFs and PPTX were rebuilt (15 slides).
+- The release QR and the deck's release text now point at `v1.2.0`.
+- The test count across the documentation is the measured 883 on the current
+  `main` (794 on the frozen `v1.0.0` archive).
+- The raw pcap/pcapng open path is documented in `README.md`, `docs/demo.md` and
+  `docs/GUI_VERIFICATION.md`; the verification environment is recorded there too.
+
 ## Unreleased
 
 Everything merged into `main` after the `v1.0.0` tag, by pull request. `v1.0.0`
