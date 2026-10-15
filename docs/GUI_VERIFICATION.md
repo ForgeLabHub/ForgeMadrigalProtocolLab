@@ -13,13 +13,25 @@ QT_QPA_PLATFORM=offscreen python -m src.ui.main_window \
 Every statement below was observed on this run; the automated form of the same
 scenario is `tests/ui/test_e2e.py`.
 
+Verification environment (recorded 2026-10-15, on `main` at `a7c119e`): Linux
+x86-64, Python 3.13, PySide6 6.8.1, no physical display attached. The primary
+pass is `QT_QPA_PLATFORM=offscreen`; a second pass (see "Second pass on a real X
+display" below) ran on a virtual X server (`Xvfb :99`, `openbox`, `QT_QPA_PLATFORM=xcb`)
+driven with `xdotool`. No pass was run on a physical display, and no human
+clicked through the window; every step below is automated.
+
 ## What opens
 
 - Title: `Madrigal protocol laboratory - corpus_capture_01.normalized.json`.
-- Menu bar: File (Open normalized capture, Open rule, Save result, Quit), Rule
+- Menu bar: File (Open demo, Open normalized capture, Open rule, Build rule,
+  Save result, Import PCAP, Quit), Rule
   (Apply to current direction, Apply to whole capture, Compare versions), Report
-  (Show REPORT.md, Export Markdown, Export HTML), Help (Quick help, About).
-  Every menu and item carries a keyboard mnemonic; Quick help is F1.
+  (Show REPORT.md, Export Markdown, Export HTML), Help (Show start guide, Quick
+  help, About).
+  Every menu and item carries a keyboard mnemonic; Quick help is F1. The File
+  menu keeps the two capture paths distinct: Open normalized capture reads a
+  `*.normalized.json` (or a raw `.pcap`/`.pcapng`, normalized in memory on open),
+  while Import PCAP reads a raw capture and writes its `*.normalized.json` first.
 - Central splitter, three columns:
   - left: the session tree, group box "Sessions";
   - centre: a direction selector, a colour-chip annotation legend, and the hex

@@ -46,14 +46,16 @@ QT_QPA_PLATFORM=offscreen pytest tests/ -q
 
 ## Step 1 - open the capture (1 min)
 
-Do: File, Open capture, choose `corpus_capture_01.normalized.json`.
+Do: File, Open capture, choose `corpus_capture_01.normalized.json`. The same
+dialog also accepts a raw `.pcap`/`.pcapng`, which the window normalizes in
+memory on open; File, Import PCAP… reads a raw capture and additionally writes
+its `*.normalized.json` next to the source before opening it.
 
 See: three sessions in the tree, each with its two directions and byte counts.
 The status bar shows the capture id and the diagnostics.
 
-Say: the tool reads a normalized capture, not a pcap. The capture module owns
-that step; here the bytes are already reassembled and each range remembers its
-packet.
+Say: the tool opens a normalized capture directly, and normalizes a raw
+pcap/pcapng on the fly. Either way each range remembers the packet it came from.
 
 ## Step 2 - provenance of a byte (1 min)
 

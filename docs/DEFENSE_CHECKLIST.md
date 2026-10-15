@@ -9,7 +9,8 @@ the repository at the final revision; re-run the command if the branch has moved
 - [ ] `main = origin/main`, дерево чистое.
       `git fetch --all --prune && git status -sb && git log --oneline -1 origin/main`
 - [ ] Тесты зелёные: `pytest tests/ -q` → **883 passed** на текущем `main`
-      (на теге `v1.0.0`, который лежит в сдаваемом архиве, — **794 passed**; ≈ 8 min).
+      (`a7c119e`; Python 3.13, PySide6 6.8.1, `QT_QPA_PLATFORM=offscreen`;
+      на теге `v1.0.0`, который лежит в сдаваемом архиве, — **794 passed**; ≈ 8 min).
       UI-тесты требуют Qt-runtime; в контейнере без `libEGL.so.1` полный набор
       не собирается — там `pytest --ignore=tests/ui` → **615 passed**.
       Указывайте число с контекстом: 615 без UI, 883 с Qt.
@@ -34,7 +35,7 @@ the repository at the final revision; re-run the command if the branch has moved
       (бюджет ≈ 3:57).
 - [ ] `presentation/defense_script.md`, 10-минутный маршрут прогнан с таймером
       (бюджет ≈ 5:44).
-- [ ] Резервное видео `presentation/screencast.mp4` (2:22, H.264) проигрывается
+- [ ] Резервное видео `presentation/screencast.mp4` (3:40, H.264) проигрывается
       без звука и без сети.
 - [ ] `docs/demo.md` и `docs/demo_cli.md` пройдены вслух, окно поднимается на
       эталонном экспорте.

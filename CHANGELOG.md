@@ -142,26 +142,28 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
 - Researcher annotations stored in the project (`src/project/annotations.py`),
   with `annotate` and `annotations` subcommands, and an Annotations section in
   both report renderers.
-- The reserve screencast is embedded in the deck: slide 12 plays
-  `public/screencast.mp4` in a `<video>` element (poster frame, controls, muted
-  autoplay), and the printed PDF/PPTX carry the poster frame.
+- The reserve screencast is embedded in the deck: the demo slide (13) plays
+  `public/screencast.mp4` in a `<video>` element (poster frame, controls,
+  autoplay, loop, muted, playsinline) inlined as a `data:video/mp4` URI, and the
+  printed PDF/PPTX carry the poster frame.
 
 ### Changed
 
 - The deck was rebuilt as a single self-contained HTML file, printed to PDF and
-  packaged to PPTX as one full-bleed page per slide, reduced to fourteen slides
-  with varied layouts and no overflow (PR #16, PR #21, PR #25).
+  packaged to PPTX as one full-bleed page per slide, reduced to a static
+  fifteen-slide deck with varied layouts and no overflow (PR #16, PR #21,
+  PR #25, PR #64).
 - The deck is now static: no click build-ins and no transition animations. The
-  recording slide plays the reserve clip in place of a play badge, the metric
-  note states that the 4 GiB budget is on a 16 GiB machine, and the PDF and PPTX
-  carry the poster frame.
+  demo slide plays the reserve clip in place of a play badge, the metric note
+  states that the 4 GiB budget is on a 16 GiB machine, and the PDF and PPTX carry
+  the poster frame.
 - The defense script was split into a 5-minute and a 10-minute route with
   timings derived from the spoken text (PR #24).
 - The test counts across the documentation were refreshed to the merged
-  revision, and the deck and verification documents resynced to the 14-slide
-  deck (PR #16, PR #18, PR #25, PR #26).
+  revision, and the deck and verification documents resynced to the 15-slide
+  deck (PR #16, PR #18, PR #25, PR #26, PR #70).
 - The README, the audit, the portability report and the presentation
-  verification now quote 781 tests and the published `v1.0.0` archive
+  verification now quote the v1.0.0 test counts and the published `v1.0.0` archive
   (PR #26).
 
 ### Fixed
