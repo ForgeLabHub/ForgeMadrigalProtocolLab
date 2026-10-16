@@ -118,3 +118,18 @@ Daily checkpoint of the work. One entry per day: done, broken, next.
   (the mirror prose still tracks an earlier revision; the English is the source
   of truth).
 - Next: hold for review.
+
+## 2026-10-16 (final integration)
+
+- Done: the last two feature PRs are integrated into `main`. The course
+  spotlight and its guard tests arrive from `ux/learning-spotlight-and-guards`,
+  and the defence material arrives from `presentation/defense-fixes` (the
+  author's guide, the 13-slide cut, the short demo clip and the screenshot
+  index). The screenshot-refresh branch is superseded: it re-lands the capture
+  set an earlier commit reverted and conflicts on the renamed deck assets, so
+  its unique text is already covered by the two merged branches.
+- Broken: none. The suite on the integrated `main` is 957 tests (620 without
+  the interface suite, 589 without the interface and web suites), all passing;
+  `ruff check .` clean and `git diff --check` clean.
+- Docs: the living docs and the deck Q&A quote the measured 957 total.
+- Next: hold for review.
