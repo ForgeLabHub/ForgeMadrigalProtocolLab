@@ -15,15 +15,15 @@ the repository at the final revision; re-run the command if the branch has moved
       не собирается — там `pytest --ignore=tests/ui` → **620 passed**.
       Указывайте число с контекстом: 620 без UI, 957 с Qt.
 - [ ] Линт чистый: `ruff check .` → All checks passed.
-- [ ] Дека: `presentation/slide.pdf` и `presentation/slide-light.pdf` — по **15 страниц**;
+- [ ] Дека: `presentation/slides.pdf` и `presentation/slide-light.pdf` — по **15 страниц**;
       `presentation/slide.pptx` — 15 слайдов.
-      `pdfinfo presentation/slide.pdf | grep Pages` (нужен `poppler-utils`);
+      `pdfinfo presentation/slides.pdf | grep Pages` (нужен `poppler-utils`);
       без него слайды PPTX считаются стандартной библиотекой:
       `python -c "import zipfile;z=zipfile.ZipFile('presentation/slide.pptx');print(len([n for n in z.namelist() if n.startswith('ppt/slides/slide') and n.endswith('.xml')]))"`
 - [ ] QR открываются: `zbarimg -q presentation/public/qr_repo.png` и
       `qr_release.png` декодируются в репозиторий и в релиз `v1.2.0`.
 - [ ] Релиз `v1.2.0` опубликован (не draft): 14 ассетов, включая
-      `submission_*.zip`, `slide.pdf` и `.deb`.
+      `submission_*.zip`, `slides.pdf` и `.deb`.
       `gh release view v1.2.0 --json isDraft,assets`
 - [ ] Ссылки в форме сдачи открываются в инкогнито (без входа в аккаунт).
 - [ ] Числа сверены с `docs/METRICS.md`, `docs/REAL_CORPUS_ANALYSIS.md`,
@@ -61,7 +61,7 @@ the repository at the final revision; re-run the command if the branch has moved
 git fetch --all --prune && git status -sb \
   && pytest tests/ -q \
   && ruff check . \
-  && pdfinfo presentation/slide.pdf | grep Pages \
+  && pdfinfo presentation/slides.pdf | grep Pages \
   && gh release view v1.2.0 --json isDraft,assets
 ```
 

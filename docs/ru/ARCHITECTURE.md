@@ -1,6 +1,6 @@
 # Архитектура
 
-Английский оригинал: [ARCHITECTURE.md](../ARCHITECTURE.md).
+Английский оригинал: [ARCHITECTURE.md](../../ARCHITECTURE.md).
 
 ## Подход
 

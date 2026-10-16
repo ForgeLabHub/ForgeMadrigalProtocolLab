@@ -165,7 +165,7 @@ at their pinned versions: the specification fixes the versions, and moving
 - `git log --all -p | grep -iE 'ghp_|github_pat_'` returns no token. The only
   lines that match are the audit text itself, which quotes the search string.
 - `git ls-files | grep -i cache` finds no tracked cache directory.
-- The largest tracked files are the presentation media — `slide.pdf`,
+- The largest tracked files are the presentation media — `slides.pdf`,
   `slide-light.pdf`, `slide.pptx`, `slide-light.pptx` and
   `presentation/screencast.mp4`. Nothing tracked exceeds 5 MiB. `.git` is 31 MiB.
 
@@ -415,7 +415,7 @@ sync guard had to be taught to read.
 | `ruff check .` | All checks passed |
 | `ruff format --check .` | 100 files would be reformatted (still deferred) |
 | `mypy src/` | 114 findings in 13 files (still deferred) |
-| `presentation/slide.pdf`, `slide-light.pdf` | 15 pages, no blank page |
+| `presentation/slides.pdf`, `slide-light.pdf` | 15 pages, no blank page |
 
 The `mypy` findings are concentrated in three files: `src/protocol/engine.py`
 (75), `src/ui/main_window.py` (17) and `src/protocol/rule.py` (6). The engine

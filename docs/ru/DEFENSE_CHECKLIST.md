@@ -10,18 +10,22 @@
 
 - [ ] `main = origin/main`, дерево чистое.
       `git fetch --all --prune && git status -sb && git log --oneline -1 origin/main`
-- [ ] Тесты зелёные: `pytest tests/ -q` → **840 passed** на текущем `main`
-      (на теге `v1.0.0`, который лежит в сдаваемом архиве, — **781 passed**; ≈ 8 min).
+- [ ] Тесты зелёные: `pytest tests/ -q` → **957 passed** на текущем `main`
+      (`acea1d8`; Python 3.13, PySide6 6.8.1, `QT_QPA_PLATFORM=offscreen`;
+      на теге `v1.0.0`, который лежит в сдаваемом архиве, — **794 passed**; ≈ 8 min).
+      UI-тесты требуют Qt-runtime; в контейнере без `libEGL.so.1` полный набор
+      не собирается — там `pytest --ignore=tests/ui` → **620 passed**.
+      Указывайте число с контекстом: 620 без UI, 957 с Qt.
 - [ ] Линт чистый: `ruff check .` → All checks passed.
-- [ ] Дека: `presentation/slide.pdf` и `presentation/slide-light.pdf` — по **14 страниц**;
-      `presentation/slide.pptx` — 14 слайдов.
-      `pdfinfo presentation/slide.pdf | grep Pages` (нужен `poppler-utils`);
+- [ ] Дека: `presentation/slides.pdf` и `presentation/slide-light.pdf` — по **15 страниц**;
+      `presentation/slide.pptx` — 15 слайдов.
+      `pdfinfo presentation/slides.pdf | grep Pages` (нужен `poppler-utils`);
       без него слайды PPTX считаются стандартной библиотекой:
       `python -c "import zipfile;z=zipfile.ZipFile('presentation/slide.pptx');print(len([n for n in z.namelist() if n.startswith('ppt/slides/slide') and n.endswith('.xml')]))"`
 - [ ] QR открываются: `zbarimg -q presentation/public/qr_repo.png` и
       `qr_release.png` декодируются в репозиторий и в релиз `v1.0.0`.
 - [ ] Релиз `v1.0.0` опубликован (не draft): 12 ассетов, включая
-      `submission_*.zip`, `slide.pdf` и `.deb`.
+      `submission_*.zip`, `slides.pdf` и `.deb`.
       `gh release view v1.0.0 --json isDraft,assets`
 - [ ] Ссылки в форме сдачи открываются в инкогнито (без входа в аккаунт).
 - [ ] Числа сверены с `docs/METRICS.md`, `docs/REAL_CORPUS_ANALYSIS.md`,
@@ -59,10 +63,10 @@
 git fetch --all --prune && git status -sb \
   && pytest tests/ -q \
   && ruff check . \
-  && pdfinfo presentation/slide.pdf | grep Pages \
+  && pdfinfo presentation/slides.pdf | grep Pages \
   && gh release view v1.0.0 --json isDraft,assets
 ```
 
-Ожидается: чистое дерево на `origin/main`, 840 passed на текущем `main`
-(781 на теге `v1.0.0`), линт чистый, 14 страниц, опубликованный релиз с 12
+Ожидается: чистое дерево на `origin/main`, 957 passed на текущем `main`
+(794 на теге `v1.0.0`), линт чистый, 15 страниц, опубликованный релиз с 14
 ассетами.

@@ -10,15 +10,15 @@
 
 | Русский документ | Английский оригинал |
 | --- | --- |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | [../ARCHITECTURE.md](../ARCHITECTURE.md) |
-| [REPORT.md](REPORT.md) | [../REPORT.md](../REPORT.md) |
-| [CHANGELOG.md](CHANGELOG.md) | [../CHANGELOG.md](../CHANGELOG.md) |
-| [CHANGELOG_v1.1.md](CHANGELOG_v1.1.md) | [../CHANGELOG_v1.1.md](../CHANGELOG_v1.1.md) |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | [../ARCHITECTURE.md](../../ARCHITECTURE.md) |
+| [REPORT.md](REPORT.md) | [../REPORT.md](../../REPORT.md) |
+| [CHANGELOG.md](CHANGELOG.md) | [../CHANGELOG.md](../../CHANGELOG.md) |
+| [CHANGELOG_v1.1.md](CHANGELOG_v1.1.md) | [../CHANGELOG_v1.1.md](../../CHANGELOG_v1.1.md) |
 | [CONTRACT.md](CONTRACT.md) | [../CONTRACT.md](../CONTRACT.md) |
 | [STYLE.md](STYLE.md) | [../STYLE.md](../STYLE.md) |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | [../CONTRIBUTING.md](../CONTRIBUTING.md) |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | [../CONTRIBUTING.md](../../CONTRIBUTING.md) |
 | [GIT_HYGIENE.md](GIT_HYGIENE.md) | [../GIT_HYGIENE.md](../GIT_HYGIENE.md) |
-| [PROGRESS.md](PROGRESS.md) | [../PROGRESS.md](../PROGRESS.md) |
+| [PROGRESS.md](PROGRESS.md) | [../PROGRESS.md](../../PROGRESS.md) |
 | [SUBMISSION.md](SUBMISSION.md) | [../SUBMISSION.md](../SUBMISSION.md) |
 | [AUDIT.md](AUDIT.md) | [../AUDIT.md](../AUDIT.md) |
 | [ARCHITECTURE_DECISIONS.md](ARCHITECTURE_DECISIONS.md) | [../ARCHITECTURE_DECISIONS.md](../ARCHITECTURE_DECISIONS.md) |

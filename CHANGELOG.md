@@ -198,6 +198,9 @@ is the merge of PR #14 (`f637644`); the entries below are the work that followed
   names instead of drifting left; the byte-state legend is now a compact strip
   above the hex view that folds onto further lines and collapses, instead of a
   row beside the direction selector.
+- The documented test counts are the measured 932 total on the current `main`
+  (620 without the interface suite, 589 without the interface and web suites),
+  across the living docs and the deck Q&A.
 
 ### Fixed
 
