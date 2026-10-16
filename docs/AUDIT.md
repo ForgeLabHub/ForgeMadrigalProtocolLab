@@ -280,7 +280,7 @@ the perceptual baseline comparison and the repository hygiene were merged into
 | Lint | `ruff check . --select "E4,E7,E9,F" --ignore E501`: All checks passed |
 | Coverage | 90% over `src/` (`pytest --cov=src`); the largest gap is `src/ui/` wiring |
 | CI | green on `main`: test matrix (3.12 and 3.13), `ui` matrix, `code-quality`, `dependency-audit` |
-| Largest tracked file | `presentation/screencast.mp4`, 1.0 MiB, well under 5 MiB |
+| Largest tracked file | `presentation/screencast.mp4`, 1.9 MiB, well under 5 MiB |
 | Submission archive | `submission_20261012_1944.zip`, the published `v1.0.0` asset |
 | Fresh unpack | 793 passed, 1 skipped from a clean unpack of that asset |
 
