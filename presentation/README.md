@@ -21,7 +21,9 @@ repository's own code. Every number is from `docs/METRICS.md`.
 | `slide-light-13.pdf` | the light 13-slide export |
 | `slide-13.pptx` | the 13-slide cut as a PPTX |
 | `slide-light-13.pptx` | the light 13-slide cut as a PPTX |
-| `screenshots/` | 11 real GUI captures at 1920×1080 (`generate_screenshots.py`) |
+| `screenshots/` | 11 real GUI captures at 1920×1080 (`generate_screenshots.py`), indexed below |
+| `demo/screencast-short.mp4` | the core cycle in 54 s, cut from `screencast.mp4` (apply rule → counterexample → alternatives → corpus) |
+| `demo/screencast-short.gif` | the same 54 s at 960×540, 6 fps, 96 colours (≈0.9 MB) for Markdown and GitHub |
 | `assets/` | 8 branded SVG visualisations, dark and light, plus PNG copies |
 | `assets/madrigal-logo.png` | the case owner's «Мадригал» wordmark, shown on the cover and closing slides |
 | `assets/madrigal-mark.png` | the square monogram used as a watermark |
@@ -96,6 +98,46 @@ python -m presentation.make_assets
 # the «Мадригал» wordmark and monogram
 python -m presentation.make_brand
 ```
+
+## Demo materials
+
+The reserve recording `screencast.mp4` is 3:40 and covers the whole run. For a
+shorter take, `demo/screencast-short.mp4` (54 s) and its GIF cut the core cycle
+out of it: apply rule v1, open a counterexample, show the alternative readings,
+verify v1 over the corpus, then apply v2 and recheck with no counterexamples.
+
+```bash
+# rebuild the short clip and its GIF from the reserve recording
+ffmpeg -y -ss 72.5 -t 54 -i screencast.mp4 -c:v libx264 -preset slow -crf 24 \
+  -pix_fmt yuv420p -an demo/screencast-short.mp4
+ffmpeg -y -i demo/screencast-short.mp4 \
+  -vf "fps=6,scale=960:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=96[p];[b][p]paletteuse=dither=bayer:bayer_scale=3" \
+  -loop 0 demo/screencast-short.gif
+```
+
+The recording itself comes from `record_demo.py`, which drives the real window
+through the scenario under a display. The GIF is a compact fallback; the MP4 is
+the primary material.
+
+## Screenshot index
+
+The eleven captures under `screenshots/` are rendered offscreen by
+`generate_screenshots.py` against the captures in `tests/corpus/reference_export/`
+and the rules in `examples/`. Each one shows a real state of the window.
+
+| File | What it shows |
+| --- | --- |
+| `01_main.png` | the main window with the reference capture and rule v1 loaded, session `s1`, direction `A_to_B` |
+| `02_sessions.png` | the session tree with its diagnostics on the defective capture |
+| `03_hex_matched.png` | the hex view with matched bytes highlighted under rule v1 |
+| `04_hex_gap.png` | the hex view over a reassembly gap on the defective capture |
+| `05_validation.png` | the validation panel with a counterexample opened at its bytes |
+| `06_compare.png` | two messages compared byte by byte |
+| `07_rule_editor.png` | the rule editor with rule v2 loaded |
+| `08_diff.png` | the v1 to v2 version diff over the whole capture |
+| `09_provenance.png` | the provenance bar for a single byte: packet index, sequence, time |
+| `10_hypotheses.png` | the hypotheses tab with the alternative readings and their scores |
+| `11_version_diff.png` | the text view of the v1 to v2 diff |
 
 ## Notes
 
