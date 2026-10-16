@@ -10,12 +10,12 @@
 
 - [ ] `main = origin/main`, дерево чистое.
       `git fetch --all --prune && git status -sb && git log --oneline -1 origin/main`
-- [ ] Тесты зелёные: `pytest tests/ -q` → **932 passed** на текущем `main`
+- [ ] Тесты зелёные: `pytest tests/ -q` → **957 passed** на текущем `main`
       (`acea1d8`; Python 3.13, PySide6 6.8.1, `QT_QPA_PLATFORM=offscreen`;
       на теге `v1.0.0`, который лежит в сдаваемом архиве, — **794 passed**; ≈ 8 min).
       UI-тесты требуют Qt-runtime; в контейнере без `libEGL.so.1` полный набор
       не собирается — там `pytest --ignore=tests/ui` → **620 passed**.
-      Указывайте число с контекстом: 620 без UI, 932 с Qt.
+      Указывайте число с контекстом: 620 без UI, 957 с Qt.
 - [ ] Линт чистый: `ruff check .` → All checks passed.
 - [ ] Дека: `presentation/slides.pdf` и `presentation/slide-light.pdf` — по **15 страниц**;
       `presentation/slide.pptx` — 15 слайдов.
@@ -67,6 +67,6 @@ git fetch --all --prune && git status -sb \
   && gh release view v1.0.0 --json isDraft,assets
 ```
 
-Ожидается: чистое дерево на `origin/main`, 932 passed на текущем `main`
+Ожидается: чистое дерево на `origin/main`, 957 passed на текущем `main`
 (794 на теге `v1.0.0`), линт чистый, 15 страниц, опубликованный релиз с 14
 ассетами.

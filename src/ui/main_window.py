@@ -50,6 +50,7 @@ from .settings import (
     read_settings,
     write_settings,
 )
+from .spotlight import LearningSpotlight
 from .timeline_view import TimelineView
 from .tutor import TutorPanel
 from .validation_view import ValidationView
@@ -650,6 +651,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
         layout.addWidget(self.tutor_panel)
         layout.addWidget(splitter, 1)
+
+        # The spotlight dims the workspace columns around the element a lesson
+        # step names, so the target stands out on a busy window. It is bounded
+        # by the splitter, so it never covers the tutor strip; the overlay is
+        # transparent to the mouse, so the lit element stays clickable.
+        self._spotlight = LearningSpotlight(container, bounds=splitter)
 
     def _wrap(self, title: str, widget: QtWidgets.QWidget) -> QtWidgets.QGroupBox:
         box = QtWidgets.QGroupBox(title)
@@ -1272,17 +1279,24 @@ class MainWindow(QtWidgets.QMainWindow):
     # -- the pointer -------------------------------------------------------
 
     def _point_at(self, step: learning.Step) -> None:
-        """Outline the element a step describes, when it names one."""
+        """Outline and light the element a step describes, when it names one.
+
+        The element is outlined with the accent property and, on the workspace
+        columns, spotlit: the rest is dimmed so the target stands out. A step
+        with no target clears both.
+        """
         self._clear_pointer()
         widget = self._pointer_targets().get(step.target or "")
         if widget is None:
             return
         widget.setProperty("learningPointer", True)
         self._repolish(widget)
+        self._spotlight.set_target(widget)
         self._pointer_clear.start()
 
     def _clear_pointer(self) -> None:
         """Remove the outline from every element it could have been set on."""
+        self._spotlight.clear()
         for widget in self._pointer_targets().values():
             if widget.property("learningPointer"):
                 widget.setProperty("learningPointer", False)

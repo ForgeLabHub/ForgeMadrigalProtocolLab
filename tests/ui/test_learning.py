@@ -251,3 +251,57 @@ def test_tutor_help_button_opens_the_step_target(window):
     window.start_learning("interface")
     window._learning_help("hex_view")
     assert window._help_card is not None
+
+
+# -- the spotlight -------------------------------------------------------
+
+
+def test_spotlight_lights_the_target_and_clears(window):
+    """A step that names an element dims the rest and lights that element."""
+    window.setFixedSize(1280, 800)
+    window.show()
+    window.open_demo()
+    window.start_learning("interface")
+    app = QtWidgets.QApplication.instance()
+    app.processEvents()
+    spotlight = window._spotlight
+    assert spotlight.isVisible(), "a targeted step shows the spotlight"
+    assert spotlight._target is not None
+    opening = spotlight._opening()
+    assert opening is not None, "the target has a lit opening"
+    # The opening is around the target, not the whole workspace.
+    assert opening.width() < spotlight.width()
+    window._clear_pointer()
+    assert not spotlight.isVisible(), "clearing the pointer removes the spotlight"
+
+
+def test_spotlight_never_covers_the_tutor_strip(window):
+    """The dim is bounded by the workspace so the course buttons stay readable."""
+    window.setFixedSize(1280, 800)
+    window.show()
+    window.open_demo()
+    window.start_learning("interface")
+    app = QtWidgets.QApplication.instance()
+    app.processEvents()
+    spotlight = window._spotlight
+    tutor_rect = window.tutor_panel.geometry()
+    assert not spotlight.geometry().intersects(tutor_rect), (
+        "the spotlight must not dim the tutor strip"
+    )
+
+
+def test_spotlight_follows_a_resize(window):
+    """The overlay and its opening track the workspace after a resize."""
+    window.setFixedSize(1280, 800)
+    window.show()
+    window.open_demo()
+    window.start_learning("interface")
+    app = QtWidgets.QApplication.instance()
+    app.processEvents()
+    spotlight = window._spotlight
+    before = spotlight.geometry()
+    window.setFixedSize(1000, 700)
+    app.processEvents()
+    after = spotlight.geometry()
+    assert after.width() < before.width(), "the overlay shrank with the window"
+    assert spotlight._opening() is not None, "the opening is still aligned"
