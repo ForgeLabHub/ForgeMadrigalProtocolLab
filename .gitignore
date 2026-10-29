@@ -50,3 +50,6 @@ sample_protocol.tar*
 /*.tar.gz
 /*.tgz
 /*_files/
+
+# Состояние forge.sh/forge.bat: PID-файлы и логи запусков
+.run/
