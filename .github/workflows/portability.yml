@@ -69,8 +69,27 @@ jobs:
       - uses: actions/checkout@v4
       - name: Structural checks
         run: ./scripts/docs-check.sh
-      - name: Both language sets exist
+      - name: Both language sets exist and overlap
+        # Наборы не совпадают один-в-один и не должны: русский набор исторически
+        # содержит CHANGELOG/CONTRIBUTING/PROGRESS, английский — BEYOND_SCOPE и
+        # PROJECT_MAP. Проверяем то, что важно: оба набора живые и в основном
+        # описывают одни и те же темы, а не разошлись в разные документы.
         run: |
-          test -f docs/PROJECT_MAP.md
-          test -f docs/ru/PROJECT_MAP.md
-          echo "оба набора документации на месте"
+          python - <<'PY'
+          import pathlib, sys
+          en = {p.name for p in pathlib.Path("docs").glob("*.md")}
+          ru = {p.name for p in pathlib.Path("docs/ru").glob("*.md")}
+          print(f"en={len(en)} ru={len(ru)} общих={len(en & ru)}")
+          problems = []
+          if len(en) < 30 or len(ru) < 30:
+              problems.append("набор слишком мал — часть документации потеряна")
+          if not en & ru or len(en & ru) / max(len(en), len(ru)) < 0.75:
+              problems.append("наборы разошлись: общих документов меньше 75%")
+          for required in ("docs/index.md", "docs/ru/README.md", "docs/PROJECT_MAP.md"):
+              if not pathlib.Path(required).exists():
+                  problems.append(f"нет {required}")
+          if problems:
+              print("\n".join(problems), file=sys.stderr)
+              sys.exit(1)
+          print("оба набора на месте")
+          PY
