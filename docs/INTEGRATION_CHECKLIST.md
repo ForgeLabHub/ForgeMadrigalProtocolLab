@@ -7,9 +7,9 @@ only after running the command or looking at the output, not from memory.
 ## Before the merge
 
 - [ ] the capture stage CI is green for the current head.
-      `gh run list --repo Pavel1778/madrigal-protocol-lab --branch capture --limit 3`
+      `gh run list --repo ForgeLabHub/ForgeMadrigalProtocolLab --branch capture --limit 3`
 - [ ] the protocol stage CI is green for the current head.
-      `gh run list --repo Pavel1778/madrigal-protocol-lab --branch protocol --limit 3`
+      `gh run list --repo ForgeLabHub/ForgeMadrigalProtocolLab --branch protocol --limit 3`
 - [ ] The protocol stage has merged the current `main` locally and the suite is
       green there, so the merge is a fast-forward of history, not a surprise.
       `git checkout protocol && git merge main && pytest tests/ -q`
@@ -38,7 +38,7 @@ only after running the command or looking at the output, not from memory.
 
 - [ ] Full suite on `main`: `pytest tests/ -q` is green.
 - [ ] CI on `main` is green.
-      `gh run list --repo Pavel1778/madrigal-protocol-lab --branch main --limit 3`
+      `gh run list --repo ForgeLabHub/ForgeMadrigalProtocolLab --branch main --limit 3`
 - [ ] The pipeline runs end to end on the corpus:
       `python -m src.project.cli pipeline --pcap tests/corpus/corpus_capture_01.pcapng --project project.madrigal --report reports/REPORT.md`
 - [ ] The GUI opens `reference_export/corpus_capture_01.normalized.json` (or the

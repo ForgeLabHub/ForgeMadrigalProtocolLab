@@ -3,7 +3,7 @@
 Пошаговая установка каждым из форматов поставки. Установка из исходников — в
 [README](../README.md); сборка артефактов из дерева — в [BINARY.md](BINARY.md);
 готовые файлы — в релизе
-[v1.2.0](https://github.com/Pavel1778/madrigal-protocol-lab/releases/tag/v1.2.0).
+[v1.2.0](https://github.com/ForgeLabHub/ForgeMadrigalProtocolLab/releases/tag/v1.2.0).
 
 Требуется Linux x86-64 (glibc не старше той, на которой собран бинарник). Для
 графического окна — X или Wayland; для запуска без экрана задайте

@@ -9,9 +9,9 @@
 ## До слияния
 
 - [ ] CI стадии захвата зелёный для текущей вершины.
-      `gh run list --repo Pavel1778/madrigal-protocol-lab --branch capture --limit 3`
+      `gh run list --repo ForgeLabHub/ForgeMadrigalProtocolLab --branch capture --limit 3`
 - [ ] CI стадии протокола зелёный для текущей вершины.
-      `gh run list --repo Pavel1778/madrigal-protocol-lab --branch protocol --limit 3`
+      `gh run list --repo ForgeLabHub/ForgeMadrigalProtocolLab --branch protocol --limit 3`
 - [ ] Стадия протокола слила текущую `main` локально, и набор зелёный там, поэтому
       слияние — перемотка истории, а не сюрприз.
       `git checkout protocol && git merge main && pytest tests/ -q`
@@ -41,7 +41,7 @@
 
 - [ ] Полный набор на `main`: `pytest tests/ -q` зелёный.
 - [ ] CI на `main` зелёный.
-      `gh run list --repo Pavel1778/madrigal-protocol-lab --branch main --limit 3`
+      `gh run list --repo ForgeLabHub/ForgeMadrigalProtocolLab --branch main --limit 3`
 - [ ] Конвейер проходит от начала до конца на корпусе:
       `python -m src.project.cli pipeline --pcap tests/corpus/corpus_capture_01.pcapng --project project.madrigal --report reports/REPORT.md`
 - [ ] GUI открывает `reference_export/corpus_capture_01.normalized.json` (или

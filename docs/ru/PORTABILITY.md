@@ -124,7 +124,7 @@ deadsnakes, когда запрошенный интерпретатор не д
 x86-64 воспроизводит проверку:
 
 ```
-git clone https://github.com/Pavel1778/madrigal-protocol-lab.git
+git clone https://github.com/ForgeLabHub/ForgeMadrigalProtocolLab.git
 cd madrigal-protocol-lab
 python3 -m venv .venv
 source .venv/bin/activate

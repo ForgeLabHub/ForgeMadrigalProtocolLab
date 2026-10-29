@@ -17,8 +17,8 @@ PRES = Path(__file__).resolve().parent
 OUT = PRES / "public"
 
 CODES = {
-    "qr_repo.png": "https://github.com/Pavel1778/madrigal-protocol-lab",
-    "qr_release.png": "https://github.com/Pavel1778/madrigal-protocol-lab/releases/tag/v1.2.0",
+    "qr_repo.png": "https://github.com/ForgeLabHub/ForgeMadrigalProtocolLab",
+    "qr_release.png": "https://github.com/ForgeLabHub/ForgeMadrigalProtocolLab/releases/tag/v1.2.0",
 }
 
 

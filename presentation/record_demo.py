@@ -151,7 +151,7 @@ def main() -> int:
     window.show_report()
     window.right_tabs.setCurrentWidget(window.report_view)
     scene("Отчёт и переносимая интерпретация.", 4000)
-    scene("github.com/Pavel1778/madrigal-protocol-lab", 4000)
+    scene("github.com/ForgeLabHub/ForgeMadrigalProtocolLab", 4000)
 
     overlay.set_caption("")
     _settle(app, 500)
