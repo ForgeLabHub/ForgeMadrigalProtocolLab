@@ -147,7 +147,7 @@ TCP-сессии, собирает направленные потоки, пок
 sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get install -y python3 python3-venv git
-git clone https://github.com/Pavel1778/madrigal-protocol-lab
+git clone https://github.com/ForgeLabHub/ForgeMadrigalProtocolLab
 cd madrigal-protocol-lab
 ```
 
@@ -352,7 +352,7 @@ v2 на том же корпусе: 140 matched, 0 mismatched, точность 
 Основная поставка — исходное дерево с инструкцией выше, упакованное скриптом
 `python scripts/build_submission.py` в `dist/submission_*.zip`. Архив
 распаковывается и запускается тем же порядком. Готовые сборки лежат в релизе
-[v1.2.0](https://github.com/Pavel1778/madrigal-protocol-lab/releases/tag/v1.2.0);
+[v1.2.0](https://github.com/ForgeLabHub/ForgeMadrigalProtocolLab/releases/tag/v1.2.0);
 пошаговая установка из них — в [docs/INSTALL.md](docs/INSTALL.md).
 
 | Формат | Установка | Размер | Команда запуска |
@@ -383,3 +383,21 @@ v2 на том же корпусе: 140 matched, 0 mismatched, точность 
 ## Лицензия
 
 MIT, см. [LICENSE](LICENSE).
+
+## Команды
+
+| Команда | Что делает |
+| --- | --- |
+| `make doctor` | python, dpkt/PyYAML, PySide6, libEGL, `QT_QPA_PLATFORM`, ruff, LICENSE |
+| `make install-dev` | `pip install -e ".[dev,web]"` |
+| `make test-core` | 446 тестов ядра без Qt (protocol, capture, hypothesis), ~15 с |
+| `make test-web` | веб-интерфейс |
+| `make test-ui` | интерфейс offscreen (нужен PySide6) |
+| `make test` | весь набор, как в CI |
+| `make wheel` / `make package` | сборка wheel и проверка установки в чистом venv |
+| `make docs-check` | полнота документации, живые ссылки, спецификации модулей |
+| `make verify` | lint + ядро + web + документация |
+
+Карта всех 42 документов — [docs/index.md](docs/index.md). Сборка и уровни проверок —
+[BUILD.md](BUILD.md). Чем именно доказано каждое утверждение —
+[docs/verification/matrix.md](docs/verification/matrix.md).

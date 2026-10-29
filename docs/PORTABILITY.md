@@ -124,7 +124,7 @@ Where Docker is unavailable, a clean virtual environment on any Linux x86-64
 host reproduces the check:
 
 ```
-git clone https://github.com/Pavel1778/madrigal-protocol-lab.git
+git clone https://github.com/ForgeLabHub/ForgeMadrigalProtocolLab.git
 cd madrigal-protocol-lab
 python3 -m venv .venv
 source .venv/bin/activate

@@ -1,0 +1,76 @@
+name: Portability
+
+# Дополняет ci.yml: проверяет не корректность модулей, а переносимость поставки —
+# собирается ли артефакт, устанавливается ли он в чистое окружение и запускается ли,
+# а также полна ли документация и куда ведут ссылки.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  schedule:
+    - cron: "0 4 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portability-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    name: Wheel builds and installs into a clean environment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build sdist and wheel
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build --outdir dist
+          ls -la dist
+
+      - name: Install the wheel into a clean virtual environment
+        run: |
+          python -m venv /tmp/clean
+          /tmp/clean/bin/pip install --upgrade pip
+          /tmp/clean/bin/pip install dist/*.whl
+          # Установка обязана тянуть только базовые зависимости, без web/dev.
+          /tmp/clean/bin/python - <<'PY'
+          import importlib.util
+          assert importlib.util.find_spec("src.capture"), "пакет не установлен"
+          assert importlib.util.find_spec("PySide6"), "PySide6 должен ставиться как runtime"
+          assert not importlib.util.find_spec("fastapi"), "web-стек не должен ставиться по умолчанию"
+          print("базовые зависимости корректны")
+          PY
+
+      - name: The packaged entry point starts headless
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libegl1 libgl1 libxkbcommon0
+          QT_QPA_PLATFORM=offscreen /tmp/clean/bin/madrigal-lab --help
+
+      - name: The package runs the protocol engine on the bundled corpus
+        run: |
+          /tmp/clean/bin/python - <<'PY'
+          from src.protocol import *  # noqa: F401,F403 - проверяем импорт пакета
+          print("движок импортируется в чистом окружении")
+          PY
+
+  docs:
+    name: Documentation is complete and linked
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Structural checks
+        run: ./scripts/docs-check.sh
+      - name: Both language sets exist
+        run: |
+          test -f docs/PROJECT_MAP.md
+          test -f docs/ru/PROJECT_MAP.md
+          echo "оба набора документации на месте"

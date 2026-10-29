@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Pavel1778/madrigal-protocol-lab/docs/schemas/rule.schema.json",
+  "$id": "https://github.com/ForgeLabHub/ForgeMadrigalProtocolLab/docs/schemas/rule.schema.json",
   "title": "Interpretation rule",
   "description": "Declarative description of how to frame a directional stream and read fields from each message. Owned by the Protocol engine. A rule is versioned: any change that affects framing or field reading bumps rule_version.",
   "type": "object",
