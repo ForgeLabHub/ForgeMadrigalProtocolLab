@@ -17,16 +17,27 @@ for f in "${required[@]}"; do [ -s "$f" ] && ok "$f" || bad "$f отсутств
 
 printf '\nСпецификации модулей\n'
 shopt -s nullglob
-headings=("Назначение" "Сценарии" "Контракт" "Данные" "Права" "Зависимости" "Конфигурация" "Сборка" "Тесты" "Наблюдаемость" "Ограничения")
+headings_en=("Purpose and boundaries" "Use cases" "Contract" "Data" "Permissions" "Dependencies" "Configuration" "Build and debugging" "Tests" "Observability" "Limitations and readiness")
+headings_ru=("Назначение" "Сценарии" "Контракт" "Данные" "Права" "Зависимости" "Конфигурация" "Сборка" "Тесты" "Наблюдаемость" "Ограничения")
 count=0; module_ok=1
 for m in docs/modules/*.md; do
-  case "$m" in *module-template.md) continue ;; esac
+  # карта модулей и шаблон — не спецификации: 11 разделов от них не требуется
+  case "$m" in *module-template.md|*-map.md) continue ;; esac
   count=$((count+1))
-  for h in "${headings[@]}"; do
+  for h in "${headings_en[@]}"; do
     if ! grep -qi "$h" "$m"; then bad "$m: нет раздела «$h»"; module_ok=0; fi
   done
 done
-[ "$count" -gt 0 ] && [ "$module_ok" -eq 1 ] && ok "спецификаций: $count, все с 11 разделами"
+[ "$count" -gt 0 ] && [ "$module_ok" -eq 1 ] && ok "спецификаций (en): $count, все с 11 разделами"
+count=0; module_ok=1
+for m in docs/ru/modules/*.md; do
+  case "$m" in *module-template.md|*-map.md) continue ;; esac
+  count=$((count+1))
+  for h in "${headings_ru[@]}"; do
+    if ! grep -qi "$h" "$m"; then bad "$m: нет раздела «$h»"; module_ok=0; fi
+  done
+done
+[ "$count" -gt 0 ] && [ "$module_ok" -eq 1 ] && ok "спецификаций (ru): $count, все с 11 разделами"
 
 printf '\nСсылки\n'
 broken=0

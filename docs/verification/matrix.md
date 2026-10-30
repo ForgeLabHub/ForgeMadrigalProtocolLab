@@ -1,41 +1,42 @@
-# Матрица проверок
+# Verification matrix
 
-Проект большой, поэтому «CI зелёный» мало что говорит без расшифровки: ниже —
-какие утверждения чем доказаны.
+The project is large, so "CI is green" says little without a breakdown: below is which claim is
+proven by what.
 
-| Утверждение | Проверка | Команда | CI |
+| Claim | Check | Command | CI |
 | --- | --- | --- | --- |
-| Разбор PCAP/PCAPNG не теряет и не выдумывает байты | `tests/capture/*` | `make test-core` | `ci.yml` → `test` |
-| Сборка потока устойчива к пропускам, перекрытиям, повторам | `tests/capture/test_reassembly*`, `test_fragmentation`, `test_boundaries` | `make test-core` | `ci.yml` → `test` |
-| Каждый байт связан с породившим пакетом (провенанс) | `tests/capture/test_provenance.py` | `make test-core` | `ci.yml` → `test` |
-| Правила интерпретации детерминированы и не зависят от данных | `tests/protocol/test_engine.py`, `test_rule.py`, `test_framing.py` | `make test-core` | `ci.yml` → `test` |
-| Гипотезы и контрпримеры различимы (наблюдение ≠ вывод) | `tests/hypothesis/*` | `make test-core` | `ci.yml` → `test` |
-| Работа на реальном корпусе | `tests/integration/*`, `tests/hypothesis/test_real_corpus.py` | `make test-integration` | `ci.yml` → `test` |
-| Отчёт и экспорт воспроизводимы | `tests/report/*`, `tests/integration/test_reference_report.py` | `make test-integration` | `ci.yml` → `test` |
-| Проект-контейнер переносим | `tests/project/*` | `make test-integration` | `ci.yml` → `test` |
-| Интерфейс не теряет состояние и корректен геометрически | `tests/ui/*` (offscreen) | `make test-ui` | `ci.yml` → `ui-tests` |
-| Веб-интерфейс работает | `tests/web/*` | `make test-web` | `ci.yml` → `test` |
-| Стиль и статика | `ruff check .` | `make lint` | `ci.yml` → `code-quality` |
-| Нет известных уязвимостей в зависимостях | `pip-audit` | — | `ci.yml` → `audit` |
-| Собранный wheel устанавливается и запускается | `make package` | `make package` | `portability.yml` → `package` |
-| Документация полна и ссылки живые | `make docs-check` | `make docs-check` | `portability.yml` → `docs` |
-| Окружение пригодно до запуска | `make doctor` | `make doctor` | локально |
+| PCAP/PCAPNG parsing neither loses nor invents bytes | `tests/capture/*` | `make test-core` | `ci.yml` → `test` |
+| Stream reassembly survives gaps, overlaps and retransmissions | `tests/capture/test_reassembly*`, `test_fragmentation`, `test_boundaries` | `make test-core` | `ci.yml` → `test` |
+| Every byte is linked to the packet that produced it (provenance) | `tests/capture/test_provenance.py` | `make test-core` | `ci.yml` → `test` |
+| Interpretation rules are deterministic and data-independent | `tests/protocol/test_engine.py`, `test_rule.py`, `test_framing.py` | `make test-core` | `ci.yml` → `test` |
+| Hypotheses and counterexamples are distinguishable (observation ≠ conclusion) | `tests/hypothesis/*` | `make test-core` | `ci.yml` → `test` |
+| Work on the real corpus | `tests/integration/*`, `tests/hypothesis/test_real_corpus.py` | `make test-integration` | `ci.yml` → `test` |
+| The report and the export are reproducible | `tests/report/*`, `tests/integration/test_reference_report.py` | `make test-integration` | `ci.yml` → `test` |
+| The project container is portable | `tests/project/*` | `make test-integration` | `ci.yml` → `test` |
+| The interface does not lose state and is geometrically correct | `tests/ui/*` (offscreen) | `make test-ui` | `ci.yml` → `ui-tests` |
+| The web interface works | `tests/web/*` | `make test-web` | `ci.yml` → `test` |
+| Style and static analysis | `ruff check .` | `make lint` | `ci.yml` → `code-quality` |
+| No known vulnerabilities in the dependencies | `pip-audit` | — | `ci.yml` → `audit` |
+| The built wheel installs and starts | `make package` | `make package` | `portability.yml` → `package` |
+| The documentation is complete, the links are alive and the languages match | `make docs-check` | `make docs-check` | `portability.yml` → `docs` |
+| The environment is suitable before start-up | `make doctor` | `make doctor` | locally |
 
-## Что доказывается локально, а что только в CI
+## What is proven locally and what only in CI
 
-| Уровень | Где проверяется |
+| Level | Where it is checked |
 | --- | --- |
-| Ядро без Qt (`make test-core`, 446 тестов) | локально за ~15 с и в CI |
-| Веб-интерфейс (`make test-web`) | локально и в CI |
-| Интерфейс (`make test-ui`) | только там, где есть PySide6 и системные библиотеки Qt |
-| Пакет (`make package`) | локально в venv и в CI |
+| The Qt-free core (`make test-core`, 446 tests) | locally in ~15 s and in CI |
+| The web interface (`make test-web`) | locally and in CI |
+| The interface (`make test-ui`) | only where PySide6 and the system Qt libraries exist |
+| The package (`make package`) | locally in a venv and in CI |
 
-Локальные тесты ядра выполняются без PySide6, dpkt и PyYAML обязательны.
+The local core tests run without PySide6; `dpkt` and `PyYAML` are mandatory.
 
-## Что сознательно не проверяется
+## What is deliberately not checked
 
-- Совпадение английского и русского наборов документации.
-- Совместимость с Windows/macOS: проект заявлен для Linux x86-64.
-- Производительность на захватах, значительно превышающих корпус.
-- Качество гипотез: проверяется непротиворечивость и наличие контрпримеров, а не
-  «истинность» протокола.
+- Parity of the English and Russian documentation sets — checked by `tools/docs_pdf.py --check`
+  since 2026-10-30 (a document without a translation fails `make docs-check`).
+- Compatibility with Windows/macOS: the project targets Linux x86-64.
+- Performance on captures far larger than the corpus.
+- The quality of hypotheses: what is checked is consistency and the presence of counterexamples,
+  not the "truth" of the protocol.

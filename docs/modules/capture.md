@@ -1,61 +1,59 @@
-# Модуль: разбор захвата (src/capture)
+# Module: capture parsing (src/capture)
 
-## 1. Назначение и границы
-Читает PCAP/PCAPNG, выделяет TCP-сессии, восстанавливает направленные потоки байтов
-с диагностикой пропусков, перекрытий и повторных передач. Сохраняет привязку каждого
-байта к пакету.
-Не делает: не интерпретирует содержимое сообщений (это `src/protocol`), не рисует UI.
+## 1. Purpose and boundaries
+Reads PCAP/PCAPNG, identifies TCP sessions and reassembles directed byte streams with diagnostics
+for gaps, overlaps and retransmissions. Keeps every byte tied to its packet.
+It does not: interpret message content (that is `src/protocol`), or draw the UI.
 
-## 2. Сценарии использования
-- Открытие захвата с несколькими блоками интерфейса и разными канальными уровнями.
-- Сессия с пропуском: участок помечается как пропуск, а не заполняется нулями.
-- Неоднозначное перекрытие: показывается как неоднозначность, а не выбирается молча.
-- Повторная передача: отмечается, байты не дублируются.
-- Отказ: повреждённый файл → понятная ошибка, без частично «успешного» результата.
+## 2. Use cases
+- Opening a capture with several interface blocks and different link types.
+- A session with a gap: the stretch is marked as a gap instead of being filled with zeros.
+- An ambiguous overlap: shown as an ambiguity instead of being resolved silently.
+- A retransmission: marked, the bytes are not duplicated.
+- Failure: a corrupted file → a clear error, with no partially "successful" result.
 
-## 3. Контракт
-Публичные функции пакета `src.capture`; форматы результата описаны в
-[docs/CAPTURE_API.md](../CAPTURE_API.md) и схеме
-[docs/schemas/](../schemas/). Нормализованный захват сериализуется в JSON.
+## 3. Contract
+The public functions of the `src.capture` package; the result formats are described in
+[docs/CAPTURE_API.md](../CAPTURE_API.md) and the schema in [docs/schemas/](../schemas/). A
+normalised capture is serialised to JSON.
 
-## 4. Данные
-Вход: файлы `.pcap`/`.pcapng` (в репозитории — `tests/fixtures/`, `tests/corpus/`).
-Выход: нормализованный захват (JSON) с провенансом по байтам. Собственного хранилища
-нет: всё в памяти и в явных файлах.
+## 4. Data
+Input: `.pcap`/`.pcapng` files (in the repository — `tests/fixtures/`, `tests/corpus/`).
+Output: a normalised capture (JSON) with per-byte provenance. There is no storage of its own:
+everything lives in memory and in explicit files.
 
-## 5. Права
-Локальное приложение: доступ определяется правами файловой системы. Сеть не
-используется — обрабатываются только локальные файлы.
+## 5. Permissions
+A local application: access is defined by the file system. The network is not used — only local
+files are processed.
 
-## 6. Зависимости
-Внешние: `dpkt` (разбор), `PyYAML` (не для захвата, но в базовых зависимостях).
-Входящие: `src.protocol`, `src.ui`, `src.report`, `src.project`.
+## 6. Dependencies
+External: `dpkt` (parsing), `PyYAML` (not for captures, but part of the base dependencies).
+Inbound: `src.protocol`, `src.ui`, `src.report`, `src.project`.
 
-## 7. Конфигурация
-Пути и режимы задаются аргументами CLI/UI. Кодировки и таймзоны не «угадываются»:
-временные метки берутся из файла и сохраняются как есть.
+## 7. Configuration
+Paths and modes come from CLI/UI arguments. Encodings and time zones are never "guessed":
+timestamps are taken from the file and preserved as they are.
 
-## 8. Сборка и отладка
+## 8. Build and debugging
 ```bash
 make test-core
 PYTHONPATH=src python -m pytest tests/capture -q
 ```
 
-## 9. Тесты
-`tests/capture/`: `test_parser.py` (форматы), `test_reassembly*.py` (сборка и её
-свойства), `test_fragmentation.py`, `test_boundaries.py`, `test_provenance.py`,
-`test_streaming.py`, `test_session.py`, `test_export*.py`, `test_deformed_captures.py`
-(повреждённые входы), `test_cli*.py`.
+## 9. Tests
+`tests/capture/`: `test_parser.py` (formats), `test_reassembly*.py` (reassembly and its
+properties), `test_fragmentation.py`, `test_boundaries.py`, `test_provenance.py`,
+`test_streaming.py`, `test_session.py`, `test_export*.py`, `test_deformed_captures.py` (corrupted
+inputs), `test_cli*.py`.
 
-## 10. Наблюдаемость
-Диагностика возвращается как часть результата (пропуски, перекрытия, повторы) и
-отражается в отчёте. Логи — CLI/UI. Скрытых состояний нет: результат либо полный,
-либо с явно перечисленными дефектами.
+## 10. Observability
+The diagnostics are returned as part of the result (gaps, overlaps, retransmissions) and appear in
+the report. Logs — CLI/UI. There is no hidden state: the result is either complete or carries
+explicitly listed defects.
 
-## 11. Ограничения и готовность
-- Поддерживаются TCP/IP (IPv4 и IPv6) и Ethernet-подобные канальные уровни;
-  экзотические линки не заявлены.
-- Память растёт с размером захвата: потоковая обработка есть, но гигабайтные дампы не
-  целевой сценарий.
-- Готовность: провенанс по каждому байту подтверждён тестом; дефекты входа видны в
-  результате.
+## 11. Limitations and readiness
+- TCP/IP (IPv4 and IPv6) and Ethernet-like link layers are supported; exotic links are not
+  claimed.
+- Memory grows with the capture size: streaming exists, but gigabyte dumps are not the target
+  scenario.
+- Readiness: per-byte provenance is confirmed by a test; input defects are visible in the result.

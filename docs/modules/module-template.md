@@ -1,16 +1,16 @@
-# Спецификация модуля: шаблон
+# Module specification: template
 
-Скопируйте в `docs/modules/<имя>.md`, заполните все 11 разделов — `make docs-check`
-проверяет их наличие.
+Copy this into `docs/modules/<name>.md` and fill in all 11 sections — `make docs-check` verifies
+that they are present.
 
-## 1. Назначение и границы
-## 2. Сценарии использования
-## 3. Контракт
-## 4. Данные
-## 5. Права
-## 6. Зависимости
-## 7. Конфигурация
-## 8. Сборка и отладка
-## 9. Тесты
-## 10. Наблюдаемость
-## 11. Ограничения и готовность
+## 1. Purpose and boundaries
+## 2. Use cases
+## 3. Contract
+## 4. Data
+## 5. Permissions
+## 6. Dependencies
+## 7. Configuration
+## 8. Build and debugging
+## 9. Tests
+## 10. Observability
+## 11. Limitations and readiness

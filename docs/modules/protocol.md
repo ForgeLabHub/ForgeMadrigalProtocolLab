@@ -1,53 +1,51 @@
-# Модуль: движок правил (src/protocol)
+# Module: the rule engine (src/protocol)
 
-## 1. Назначение и границы
-Применяет декларативные правила к восстановленному потоку: разбиение на сообщения,
-типы полей, контрольные значения. Даёт результат, в котором факт и гипотеза различимы.
-Не делает: не читает захваты напрямую и не принимает решений за инженера — правило
-принадлежит человеку.
+## 1. Purpose and boundaries
+Applies declarative rules to a reassembled stream: message framing, field types, control values.
+Produces a result in which a fact and a hypothesis are distinguishable.
+It does not: read captures directly or decide for the engineer — the rule belongs to a human.
 
-## 2. Сценарии использования
-- Применение правила к корпусу сессий; получение совпадений и контрпримеров.
-- Обновление правила версией v2 без изменения исходных байтов.
-- Отказ: правило не сходится на корпусе → контрпример с привязкой к байтам.
+## 2. Use cases
+- Applying a rule to a corpus of sessions; obtaining matches and counterexamples.
+- Updating a rule with version v2 without touching the source bytes.
+- Failure: a rule that does not converge on the corpus → a counterexample tied to bytes.
 
-## 3. Контракт
-`docs/CONTRACT.md`, `docs/PROTOCOL_API.md`, `docs/RULE_V1_V2.md`, JSON-схемы в
-`docs/schemas/` (проверяются `jsonschema` в тестах). CLI — `docs/demo_cli.md`.
+## 3. Contract
+`docs/CONTRACT.md`, `docs/PROTOCOL_API.md`, `docs/RULE_V1_V2.md`, the JSON schemas in
+`docs/schemas/` (validated with `jsonschema` in the tests). The CLI — `docs/demo_cli.md`.
 
-## 4. Данные
-Вход: нормализованный поток из `src.capture`, правило (YAML/JSON).
-Выход: результат применения (JSON) и отчёт с контрпримерами. Байты входа не
-модифицируются — это инвариант воспроизводимости.
+## 4. Data
+Input: a normalised stream from `src.capture` and a rule (YAML/JSON).
+Output: the application result (JSON) and a report with counterexamples. The input bytes are never
+modified — that is the reproducibility invariant.
 
-## 5. Права
-Локальный инструмент: границ доступа нет, кроме файловых. Никакой сети.
+## 5. Permissions
+A local tool: there are no access boundaries beyond the file system. No network at all.
 
-## 6. Зависимости
-Внешние: `PyYAML`. Входящие: `src.ui`, `src.web`, `src.report`, `src.project`.
+## 6. Dependencies
+External: `PyYAML`. Inbound: `src.ui`, `src.web`, `src.report`, `src.project`.
 
-## 7. Конфигурация
-Правило и его параметры — в файлах; глобальных «магических» настроек нет. Настройки
-приложения — [docs/SETTINGS.md](../SETTINGS.md).
+## 7. Configuration
+The rule and its parameters live in files; there are no global "magic" settings. Application
+settings — [docs/SETTINGS.md](../SETTINGS.md).
 
-## 8. Сборка и отладка
+## 8. Build and debugging
 ```bash
 make test-core
 PYTHONPATH=src python -m pytest tests/protocol -q
 ```
 
-## 9. Тесты
-`tests/protocol/`: `test_rule.py`, `test_engine.py`, `test_framing.py`,
-`test_field_types.py`, `test_stream.py`, `test_result.py`, `test_export.py`,
-`test_cli.py`. Дополнительно `tests/hypothesis/*` — свойства гипотез, версий,
-альтернатив и различий.
+## 9. Tests
+`tests/protocol/`: `test_rule.py`, `test_engine.py`, `test_framing.py`, `test_field_types.py`,
+`test_stream.py`, `test_result.py`, `test_export.py`, `test_cli.py`. Additionally
+`tests/hypothesis/*` — the properties of hypotheses, versions, alternatives and differences.
 
-## 10. Наблюдаемость
-Результат самодокументирован: статус (`matched`, контрпример), привязка к байтам,
-версия правила. Отчёт в Markdown/HTML — `src/report`.
+## 10. Observability
+The result documents itself: the status (`matched`, a counterexample), the byte linkage, the rule
+version. The report in Markdown/HTML — `src/report`.
 
-## 11. Ограничения и готовность
-- `matched` означает «согласуется с наблюдением», а не «доказано».
-- Правило описывает линейные структуры; вложенные контейнеры ограничены.
-- Готовность: контрпример обязателен и привязан к байтам; изменение правила не меняет
-  исходные данные (проверяется тестом).
+## 11. Limitations and readiness
+- `matched` means "consistent with the observation", not "proven".
+- A rule describes linear structures; nested containers are limited.
+- Readiness: a counterexample is mandatory and tied to bytes; changing a rule does not change the
+  source data (verified by a test).
